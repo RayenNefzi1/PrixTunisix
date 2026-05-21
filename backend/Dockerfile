@@ -21,7 +21,9 @@ RUN composer install --no-dev --no-scripts --prefer-dist
 
 COPY . .
 
-RUN php artisan config:cache || true
+RUN cp .env.example .env \
+    && php artisan key:generate \
+    && php artisan config:cache || true
 
 EXPOSE 8000
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
