@@ -19,6 +19,7 @@ interface FavoriteProduct {
 interface AlertProduct {
   id: number
   target_price: number
+  reached: boolean
   product: {
     id: number
     name: string
