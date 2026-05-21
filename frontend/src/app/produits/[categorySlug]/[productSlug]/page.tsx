@@ -56,7 +56,7 @@ export default function ProductDetailPage() {
   // Track product view
   useEffect(() => {
     if (product && isLoggedIn()) {
-      api.post('/client/track-view', { product_id: product.id })
+      product && api.post('/client/track-view', { product_id: product.id })
         .catch(err => console.error('Failed to track view:', err))
     }
   }, [product])
@@ -92,6 +92,7 @@ export default function ProductDetailPage() {
     if (!isLoggedIn() || !product) return
     setTogglingFavorite(true)
     try {
+      if (!product) return
       const res = await api.post('/favorites/toggle', { product_id: product.id })
       setIsFavorited(res.data.status === 'added')
     } catch (err) {
