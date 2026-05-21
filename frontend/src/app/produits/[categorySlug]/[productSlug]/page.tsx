@@ -89,7 +89,7 @@ export default function ProductDetailPage() {
 
   // Toggle favorite
   const toggleFavorite = async () => {
-    if (!isLoggedIn()) return
+    if (!isLoggedIn() || !product) return
     setTogglingFavorite(true)
     try {
       const res = await api.post('/favorites/toggle', { product_id: product.id })
