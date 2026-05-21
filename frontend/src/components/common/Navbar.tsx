@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import Cookies from 'js-cookie'
 import { Heart, Bell, LogOut, Menu, X, ChevronDown, Store, Tag, Ticket, Briefcase, User, Settings, LayoutDashboard } from 'lucide-react'
@@ -30,6 +30,7 @@ interface AlertProduct {
 
 export default function Navbar() {
   const router = useRouter()
+  const pathname = usePathname()
   const [user, setUser] = useState<{ name: string; prename: string; role: string } | null>(null)
   const [fournisseur, setFournisseur] = useState<{ company_name: string } | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -79,7 +80,7 @@ export default function Navbar() {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [router.asPath])
+  }, [pathname])
 
   // Force refresh on mount to check auth state
   useEffect(() => {
