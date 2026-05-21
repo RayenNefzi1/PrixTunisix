@@ -56,7 +56,7 @@ export default function ProductDetailPage() {
   // Track product view
   useEffect(() => {
     if (product && isLoggedIn()) {
-      product && api.post('/client/track-view', { product_id: product!.id })
+      product && api.post('/client/track-view', { product_id: (product as NonNullable<typeof product>).id })
         .catch(err => console.error('Failed to track view:', err))
     }
   }, [product])
@@ -91,9 +91,11 @@ export default function ProductDetailPage() {
 
   // Toggle favorite
   const toggleFavorite = async () => {
-    if (!isLoggedIn() || !product) return
+    if (!isLoggedIn()) return
+    if (!product) return
     setTogglingFavorite(true)
-    const productId = product!.id
+    const prod = product as NonNullable<typeof product>
+    const productId = prod.id
     try {
       const res = await api.post('/favorites/toggle', { product_id: productId })
       setIsFavorited(res.data.status === 'added')
@@ -136,7 +138,8 @@ export default function ProductDetailPage() {
   const createAlert = async () => {
     if (!targetPrice || !bestPrice || !product) return
     setCreatingAlert(true)
-    const productId = product!.id
+    const prod = product as NonNullable<typeof product>
+    const productId = prod.id
     try {
       const res = await api.post('/client/alerts', {
         product_id: productId,
