@@ -91,9 +91,9 @@ export default function ProductDetailPage() {
   const toggleFavorite = async () => {
     if (!isLoggedIn() || !product) return
     setTogglingFavorite(true)
+    const productId = product.id
     try {
-      if (!product) return
-      const res = await api.post('/favorites/toggle', { product_id: product.id })
+      const res = await api.post('/favorites/toggle', { product_id: productId })
       setIsFavorited(res.data.status === 'added')
     } catch (err) {
       console.error('Failed to toggle favorite:', err)
@@ -132,11 +132,12 @@ export default function ProductDetailPage() {
   const bestPrice       = bestOffer?.price
 
   const createAlert = async () => {
-    if (!targetPrice || !bestPrice) return
+    if (!targetPrice || !bestPrice || !product) return
     setCreatingAlert(true)
+    const productId = product.id
     try {
       const res = await api.post('/client/alerts', {
-        product_id: product.id,
+        product_id: productId,
         target_price: parseFloat(targetPrice),
       })
       setAlertCreated(true)
