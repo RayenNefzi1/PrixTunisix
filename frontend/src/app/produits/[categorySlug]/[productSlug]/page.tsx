@@ -56,7 +56,7 @@ export default function ProductDetailPage() {
   // Track product view
   useEffect(() => {
     if (product && isLoggedIn()) {
-      product && api.post('/client/track-view', { product_id: product.id })
+      product && api.post('/client/track-view', { product_id: product!.id })
         .catch(err => console.error('Failed to track view:', err))
     }
   }, [product])
@@ -64,10 +64,11 @@ export default function ProductDetailPage() {
   // Check if product is favorited
   useEffect(() => {
     if (product && isLoggedIn()) {
+      const currentProduct = product
       api.get('/favorites')
         .then(res => {
           const favIds = res.data.map((f: { id: number }) => f.id)
-          setIsFavorited(favIds.includes(product.id))
+          setIsFavorited(favIds.includes(currentProduct.id))
         })
         .catch(() => {})
     }
@@ -76,9 +77,10 @@ export default function ProductDetailPage() {
   // Check if product has alert
   useEffect(() => {
     if (product && isLoggedIn()) {
+      const currentProduct = product
       api.get('/client/alerts')
         .then(res => {
-          const alert = res.data.find((a: { product: { id: number } }) => a.product?.id === product.id)
+          const alert = res.data.find((a: { product: { id: number } }) => a.product?.id === currentProduct.id)
           if (alert) {
             setProductAlert({ id: alert.id, target_price: alert.target_price, reached: alert.reached })
           }
@@ -91,7 +93,7 @@ export default function ProductDetailPage() {
   const toggleFavorite = async () => {
     if (!isLoggedIn() || !product) return
     setTogglingFavorite(true)
-    const productId = product.id
+    const productId = product!.id
     try {
       const res = await api.post('/favorites/toggle', { product_id: productId })
       setIsFavorited(res.data.status === 'added')
@@ -134,7 +136,7 @@ export default function ProductDetailPage() {
   const createAlert = async () => {
     if (!targetPrice || !bestPrice || !product) return
     setCreatingAlert(true)
-    const productId = product.id
+    const productId = product!.id
     try {
       const res = await api.post('/client/alerts', {
         product_id: productId,
