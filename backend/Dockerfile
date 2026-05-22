@@ -21,9 +21,7 @@ RUN composer install --no-scripts --prefer-dist
 
 COPY . .
 
-RUN cp .env.example .env \
-    && php artisan key:generate \
-    && php artisan config:clear
+RUN php artisan key:generate
 
 EXPOSE 8000
 CMD ["sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"]
