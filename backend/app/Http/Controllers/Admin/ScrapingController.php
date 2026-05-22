@@ -209,18 +209,24 @@ class ScrapingController extends Controller
 
     public function logs(ScrapingScript $scrapingScript): JsonResponse
     {
-        $logs = ScrapingLog::where('scraping_script_id', $scrapingScript->id)
-            ->orderByDesc('started_at')
-            ->limit(50)
-            ->get();
+        try {
+            $logs = ScrapingLog::where('scraping_script_id', $scrapingScript->id)
+                ->orderByDesc('started_at')
+                ->limit(50)
+                ->get();
 
-        return response()->json($logs);
+            return response()->json($logs);
+        } catch (\Exception $e) {
+            Log::error('ScrapingController@logs error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function allLogs(Request $request): JsonResponse
     {
-        $query = ScrapingLog::with('script.merchantWebsite')
-            ->orderByDesc('started_at');
+        try {
+            $query = ScrapingLog::with('scrapingScript.merchantWebsite')
+                ->orderByDesc('started_at');
 
         if ($request->script_id) {
             $query->where('scraping_script_id', $request->script_id);
@@ -233,25 +239,30 @@ class ScrapingController extends Controller
 
     public function stats(): JsonResponse
     {
-        $totalScripts = ScrapingScript::count();
-        $activeScripts = ScrapingScript::where('status', 'active')->count();
-        
-        $last24h = ScrapingLog::where('started_at', '>=', now()->subDay())->get();
-        $totalRecords = $last24h->sum('records_collected');
-        $totalErrors = $last24h->sum('errors_count');
-        $successfulRuns = $last24h->where('result', 'success')->count();
-        $failedRuns = $last24h->where('result', 'failed')->count();
+        try {
+            $totalScripts = ScrapingScript::count();
+            $activeScripts = ScrapingScript::where('active', true)->count();
+            
+            $last24h = ScrapingLog::where('started_at', '>=', now()->subDay())->get();
+            $totalRecords = $last24h->sum('records_collected');
+            $totalErrors = $last24h->sum('errors_count');
+            $successfulRuns = $last24h->where('result', 'success')->count();
+            $failedRuns = $last24h->where('result', 'failed')->count();
 
-        return response()->json([
-            'total_scripts' => $totalScripts,
-            'active_scripts' => $activeScripts,
-            'last_24h' => [
-                'total_records' => $totalRecords,
-                'total_errors' => $totalErrors,
-                'successful_runs' => $successfulRuns,
-                'failed_runs' => $failedRuns,
-            ],
-        ]);
+            return response()->json([
+                'total_scripts' => $totalScripts,
+                'active_scripts' => $activeScripts,
+                'last_24h' => [
+                    'total_records' => $totalRecords,
+                    'total_errors' => $totalErrors,
+                    'successful_runs' => $successfulRuns,
+                    'failed_runs' => $failedRuns,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('ScrapingController@stats error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     private function getSpiderName(string $merchantName): ?string
