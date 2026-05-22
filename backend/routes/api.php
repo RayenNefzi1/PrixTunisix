@@ -84,10 +84,10 @@ Route::prefix('admin')->group(function () {
     });
     Route::post('seed-scraping', function () {
         $scripts = [
-            ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Zoom', 'merchant_website_id' => 5, 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'target_url' => 'https://www.tunisianet.com.tn', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'target_url' => 'https://www.tunisiteck.com', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Zoom', 'merchant_website_id' => 5, 'target_url' => 'https://zoom.com.tn', 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'target_url' => 'https://khadraouitek.tn', 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
         ];
         foreach ($scripts as $script) {
             \App\Models\ScrapingScript::firstOrCreate(['name' => $script['name']], $script);
@@ -96,10 +96,10 @@ Route::prefix('admin')->group(function () {
     });
     Route::get('seed-scraping', function () {
         $scripts = [
-            ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Zoom', 'merchant_website_id' => 5, 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'target_url' => 'https://www.tunisianet.com.tn', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'target_url' => 'https://www.tunisiteck.com', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Zoom', 'merchant_website_id' => 5, 'target_url' => 'https://zoom.com.tn', 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'target_url' => 'https://khadraouitek.tn', 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
         ];
         foreach ($scripts as $script) {
             \App\Models\ScrapingScript::firstOrCreate(['name' => $script['name']], $script);
