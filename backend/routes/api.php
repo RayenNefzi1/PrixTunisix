@@ -106,6 +106,53 @@ Route::prefix('admin')->group(function () {
         }
         return response()->json(['message' => 'Scraping scripts seeded']);
     });
+    Route::get('seed-products', function () {
+        $products = [
+            ['name' => 'MacBook Air M3 13"', 'brand' => 'Apple', 'price' => 2999.000],
+            ['name' => 'iPhone 15 Pro', 'brand' => 'Apple', 'price' => 2499.000],
+            ['name' => 'Samsung Galaxy S24 Ultra', 'brand' => 'Samsung', 'price' => 2899.000],
+            ['name' => 'PC Portable HP 15s', 'brand' => 'HP', 'price' => 899.000],
+            ['name' => 'Dell Inspiron 15', 'brand' => 'Dell', 'price' => 1099.000],
+            ['name' => 'Lenovo ThinkPad X1', 'brand' => 'Lenovo', 'price' => 1899.000],
+            ['name' => 'ASUS VivoBook 15', 'brand' => 'Asus', 'price' => 749.000],
+            ['name' => 'Samsung TV 55" 4K', 'brand' => 'Samsung', 'price' => 1199.000],
+            ['name' => 'iPad Pro 11"', 'brand' => 'Apple', 'price' => 1899.000],
+            ['name' => 'Apple Watch Series 9', 'brand' => 'Apple', 'price' => 699.000],
+        ];
+        
+        $category = \App\Models\Category::where('slug', 'informatique')->first();
+        $brandModel = \App\Models\Brand::where('name', 'Apple')->first();
+        $merchant = \App\Models\MerchantWebsite::find(2);
+        
+        foreach ($products as $idx => $prod) {
+            $brand = \App\Models\Brand::firstOrCreate(['name' => $prod['brand']], ['name' => $prod['brand'], 'slug' => strtolower($prod['brand'])]);
+            
+            $product = \App\Models\Product::firstOrCreate(
+                ['name' => $prod['name']],
+                [
+                    'slug' => strtolower(str_replace(' ', '-', $prod['name'])) . '-' . ($idx + 1),
+                    'category_id' => $category?->id,
+                    'brand_id' => $brand->id,
+                    'image_url' => 'https://placehold.co/400x400/f3f4f6/6b7280?text=' . urlencode($prod['name']),
+                    'is_validated' => true,
+                ]
+            );
+            
+            \App\Models\Offer::firstOrCreate(
+                ['product_id' => $product->id, 'merchant_website_id' => $merchant->id],
+                [
+                    'raw_title' => $prod['name'],
+                    'price' => $prod['price'],
+                    'merchant_url' => 'https://www.tunisianet.com.tn/produit/' . $product->slug,
+                    'is_available' => true,
+                    'image_url' => $product->image_url,
+                    'scraped_at' => now(),
+                ]
+            );
+        }
+        
+        return response()->json(['message' => 'Sample products seeded: ' . count($products)]);
+    });
 });
 
 // ── Fournisseur public routes (outside auth:sanctum) ───────────────────
