@@ -7,7 +7,7 @@ import axios from 'axios'
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 
 const adminApi = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
