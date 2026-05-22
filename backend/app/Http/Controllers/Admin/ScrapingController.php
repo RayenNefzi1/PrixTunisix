@@ -101,31 +101,16 @@ class ScrapingController extends Controller
         ]);
 
         try {
-            $spider = $this->getSpiderName($merchantWebsite->name);
-            
-            if (!$spider) {
-                throw new \Exception("No spider found for merchant: {$merchantWebsite->name}");
-            }
-
-            // Clear previous log
-            $logFile = base_path('../scraper/scrapy_log.txt');
-            if (file_exists($logFile)) {
-                unlink($logFile);
-            }
-
-            // Run spider in background - return immediately
-            $scraperPath = base_path('../scraper');
-            $command = "cd \"$scraperPath\" && scrapy crawl $spider --loglevel=INFO > \"$logFile\" 2>&1 &";
-            
-            Log::info("Starting scraper: $command");
-            exec($command);
-
-            $scrapingScript->update(['last_run' => now()]);
+            // Set active flag - the external scraper service will pick this up
+            $scrapingScript->update([
+                'active' => true,
+                'last_run' => now(),
+            ]);
 
             return response()->json([
-                'message' => 'Scraping started in background',
+                'message' => 'Scraping job queued. The scraper service will pick it up.',
                 'log_id' => $log->id,
-                'spider' => $spider,
+                'script' => $scrapingScript->name,
             ]);
 
         } catch (\Exception $e) {
