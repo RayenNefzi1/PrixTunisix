@@ -97,36 +97,31 @@ class ScrapingController extends Controller
             'started_at' => now(),
             'records_collected' => 0,
             'errors_count' => 0,
-            'result' => 'running',
+            'result' => 'queued',
         ]);
 
-        try {
-            // Set active flag - the external scraper service will pick this up
-            $scrapingScript->update([
-                'active' => true,
-                'last_run' => now(),
-            ]);
+        // Set active flag - the external scraper service will pick this up
+        $scrapingScript->update([
+            'active' => true,
+            'last_run' => now(),
+        ]);
 
-            return response()->json([
-                'message' => 'Scraping job queued. The scraper service will pick it up.',
-                'log_id' => $log->id,
-                'script' => $scrapingScript->name,
-            ]);
+        return response()->json([
+            'message' => 'Scraping job queued successfully! The scraper will pick it up shortly.',
+            'log_id' => $log->id,
+            'script' => $scrapingScript->name,
+        ]);
+    }
 
-        } catch (\Exception $e) {
-            $log->update([
-                'ended_at' => now(),
-                'errors_count' => 1,
-                'error_details' => json_encode([$e->getMessage()]),
-                'result' => 'failed',
-            ]);
-
-            Log::error('Scraping failed: ' . $e->getMessage());
-
-            return response()->json([
-                'error' => 'Scraping failed',
-                'message' => $e->getMessage(),
-            ], 500);
+    public function stopScript(ScrapingScript $scrapingScript): JsonResponse
+    {
+        $scrapingScript->update(['active' => false]);
+        
+        return response()->json([
+            'message' => 'Scraping stopped',
+            'script' => $scrapingScript->name,
+        ]);
+    }
         }
     }
 
