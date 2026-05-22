@@ -13,7 +13,12 @@ interface Category {
 }
 
 const TAB_CONFIG: Record<string, { icon: string; color: string }> = {
-  'informatique':   { icon: '💻', color: 'hover:text-blue-600' },
+  'informatique':     { icon: '💻', color: 'hover:text-blue-600' },
+  'electromenager':  { icon: '🏠', color: 'hover:text-orange-500' },
+  'maison':          { icon: '🛋️', color: 'hover:text-yellow-600' },
+  'animalerie':      { icon: '🐾', color: 'hover:text-green-600' },
+  'beaute-sante':    { icon: '💄', color: 'hover:text-rose-500' },
+  'loisirs-sports':  { icon: '⚽', color: 'hover:text-emerald-600' },
   'pc-portables':    { icon: '🖥️', color: 'hover:text-indigo-600' },
   'smartphones':     { icon: '📱', color: 'hover:text-green-500' },
   'tablettes':       { icon: '📲', color: 'hover:text-purple-500' },
@@ -22,7 +27,6 @@ const TAB_CONFIG: Record<string, { icon: string; color: string }> = {
   'gaming':         { icon: '🎮', color: 'hover:text-red-500' },
   'composants-pc':   { icon: '⚙️', color: 'hover:text-gray-600' },
   'peripheriques':   { icon: '🖱️', color: 'hover:text-teal-500' },
-  'electromenager': { icon: '🏠', color: 'hover:text-orange-500' },
 }
 
 const SUB_ICONS: Record<string, string> = {
