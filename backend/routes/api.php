@@ -72,6 +72,17 @@ Route::get('marques/{slug}', [MarqueController::class, 'show']);
 // ── Chatbot ───────────────────────────────────────────────────────────────
 Route::post('chatbot', [ChatbotController::class, 'chat']);
 
+// ── Admin: Seed database (protected) ─────────────────────────────────────
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::post('seed', function () {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return response()->json(['message' => 'Database seeded successfully']);
+    });
+});
+
 // ── Fournisseur public routes (outside auth:sanctum) ───────────────────
 Route::prefix('fournisseur')->group(function () {
     Route::post('register',          [FournisseurAuthController::class, 'register']);
