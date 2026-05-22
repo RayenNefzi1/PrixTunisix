@@ -78,6 +78,10 @@ Route::prefix('admin')->group(function () {
         \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
         return response()->json(['message' => 'Database seeded successfully']);
     });
+    Route::get('seed', function () {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return response()->json(['message' => 'Database seeded successfully']);
+    });
 });
 
 // ── Fournisseur public routes (outside auth:sanctum) ───────────────────
