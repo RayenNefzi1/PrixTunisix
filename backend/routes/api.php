@@ -153,6 +153,36 @@ Route::prefix('admin')->group(function () {
         
         return response()->json(['message' => 'Sample products seeded: ' . count($products)]);
     });
+
+    // Scrape trigger endpoint
+    Route::post('scrape-trigger', function (\Illuminate\Http\Request $request) {
+        $script = \App\Models\ScrapingScript::find($request->script_id);
+        if (!$script) {
+            return response()->json(['error' => 'Script not found'], 404);
+        }
+        
+        $script->update([
+            'last_run' => now(),
+            'active' => true,
+        ]);
+        
+        return response()->json(['message' => 'Scraping started', 'script' => $script]);
+    });
+
+    // Scrape status update endpoint
+    Route::post('scrape-status', function (\Illuminate\Http\Request $request) {
+        $script = \App\Models\ScrapingScript::find($request->script_id);
+        if (!$script) {
+            return response()->json(['error' => 'Script not found'], 404);
+        }
+        
+        $script->update([
+            'active' => $request->status !== 'running',
+            'last_run' => $request->status === 'running' ? now() : $script->last_run,
+        ]);
+        
+        return response()->json(['message' => 'Status updated']);
+    });
 });
 
 // ── Fournisseur public routes (outside auth:sanctum) ───────────────────

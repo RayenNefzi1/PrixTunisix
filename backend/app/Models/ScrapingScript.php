@@ -13,6 +13,7 @@ class ScrapingScript extends Model
         'frequency',
         'frequency_minutes',
         'status',
+        'active',
         'last_run',
     ];
 
