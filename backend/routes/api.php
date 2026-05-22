@@ -371,6 +371,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::delete('scraping/{scrapingScript}', [ScrapingController::class, 'destroy']);
                 Route::post('scraping/{scrapingScript}/toggle', [ScrapingController::class, 'toggleStatus']);
                 Route::post('scraping/{scrapingScript}/run', [ScrapingController::class, 'runScript']);
+                Route::post('scraping/{scrapingScript}/stop', [ScrapingController::class, 'stopScript']);
                 Route::post('scraping/run-all',    [ScrapingController::class, 'runAll']);
                 Route::get('scraping/{scrapingScript}/logs', [ScrapingController::class, 'logs']);
                 Route::get('scraping/logs',        [ScrapingController::class, 'allLogs']);
