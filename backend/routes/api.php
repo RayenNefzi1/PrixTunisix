@@ -94,6 +94,18 @@ Route::prefix('admin')->group(function () {
         }
         return response()->json(['message' => 'Scraping scripts seeded']);
     });
+    Route::get('seed-scraping', function () {
+        $scripts = [
+            ['name' => 'Tunisianet', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'TunisiaTech', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Zoom', 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
+            ['name' => 'Khadraoui', 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
+        ];
+        foreach ($scripts as $script) {
+            \App\Models\ScrapingScript::firstOrCreate(['name' => $script['name']], $script);
+        }
+        return response()->json(['message' => 'Scraping scripts seeded']);
+    });
 });
 
 // ── Fournisseur public routes (outside auth:sanctum) ───────────────────
