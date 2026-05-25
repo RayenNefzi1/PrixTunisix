@@ -21,6 +21,7 @@ interface ScrapingScript {
   frequency: string
   frequency_minutes: number | null
   status: string
+  active: boolean
   last_run: string | null
   merchant_website?: MerchantWebsite
 }
@@ -126,12 +127,11 @@ export default function ScrapingPage() {
     setRunningScriptId(script.id)
     try {
       const response = await adminApi.post(`/admin/scraping/${script.id}/run`)
-      const { message, spider } = response.data
-      alert(`${message}\n\nSpider: ${spider}\n\nThe scraper is running in the background.\nCheck the logs table for results.`)
+      alert(`${response.data.message}\n\nThe scraper service will pick up this job.`)
       fetchData()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to run script:', err)
-      alert('Scraping failed. Check logs for details.')
+      alert(err.response?.data?.message || 'Scraping failed. Check logs for details.')
     } finally {
       setRunningScriptId(null)
     }
@@ -342,7 +342,15 @@ export default function ScrapingPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      {getStatusBadge(script.status)}
+                      {script.active ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          Inactive
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {script.last_run ? (
