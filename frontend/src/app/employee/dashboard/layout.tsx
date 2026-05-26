@@ -428,8 +428,11 @@ function ProductsView() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchProducts = async () => {
+    setLoading(true)
+    setError(null)
     try {
       console.log('Fetching products from API...')
       const res = await employeeApi.get(`/employee/products?q=${search}&page=${page}`)
@@ -438,6 +441,7 @@ function ProductsView() {
       setTotalPages(res.data.last_page || 1)
     } catch (err: any) {
       console.error('Products error:', err)
+      setError(err.message || 'Failed to load products')
     } finally {
       setLoading(false)
     }
@@ -448,14 +452,14 @@ function ProductsView() {
   }, [page])
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
+    const timer = setTimeout(() => {
       setPage(1)
       fetchProducts()
     }, 300)
-    return () => clearTimeout(debounce)
+    return () => clearTimeout(timer)
   }, [search])
 
-  console.log('Products loaded:', products.length)
+  console.log('Products loaded:', products.length, 'error:', error)
 
   return (
     <div className="space-y-6">

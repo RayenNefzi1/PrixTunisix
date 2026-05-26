@@ -19,13 +19,8 @@ employeeApi.interceptors.request.use((config) => {
 employeeApi.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('employee_token')
-      localStorage.removeItem('employee_user')
-      if (typeof window !== 'undefined') {
-        window.location.href = '/employee/login'
-      }
-    }
+    console.error('API Error:', err.response?.status, err.response?.data)
+    // Don't redirect automatically - let the component handle errors
     return Promise.reject(err)
   }
 )
