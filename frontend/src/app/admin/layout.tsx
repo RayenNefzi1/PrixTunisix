@@ -5,9 +5,18 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
   LayoutDashboard, Users, ShoppingBag, Store, BarChart3, 
-  Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw, BellRing
+  Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw, BellRing, Trash2, CheckCircle
 } from 'lucide-react'
 import ToastProvider from '@/components/Toast'
+
+interface Notification {
+  id: string
+  title: string
+  message: string
+  type: 'info' | 'success' | 'warning' | 'error'
+  read: boolean
+  created_at: string
+}
 
 const menuItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -27,6 +36,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [admin, setAdmin] = useState<{ name: string; prename: string } | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [showNotifications, setShowNotifications] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('admin_notifications')
+    if (stored) {
+      setNotifications(JSON.parse(stored))
+    } else {
+      setNotifications([
+        { id: '1', title: 'Bienvenue', message: 'Bienvenue dans le panneau admin PrixTunisix', type: 'info', read: false, created_at: new Date().toISOString() }
+      ])
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('admin_notifications', JSON.stringify(notifications))
+  }, [notifications])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const markAsRead = (id: string) => {
+    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n))
+  }
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })))
+  }
+
+  const clearNotifications = () => {
+    setNotifications([])
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token')
@@ -78,10 +118,52 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-slate-700 rounded text-slate-300 hover:text-white relative">
-              <BellRing className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 hover:bg-slate-700 rounded text-slate-300 hover:text-white relative"
+              >
+                <BellRing className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              {showNotifications && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
+                  <div className="p-3 border-b border-gray-100 flex items-center justify-between">
+                    <span className="font-bold text-gray-900">Notifications</span>
+                    <div className="flex gap-2">
+                      <button onClick={markAllAsRead} className="text-xs text-brand-600 hover:underline">Tout lire</button>
+                      <button onClick={clearNotifications} className="text-xs text-gray-500 hover:underline">Effacer</button>
+                    </div>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">Aucune notification</div>
+                    ) : (
+                      notifications.map(n => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => markAsRead(n.id)}
+                          className={`p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 ${!n.read ? 'bg-blue-50' : ''}`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <div className={`w-2 h-2 rounded-full mt-1.5 ${n.type === 'success' ? 'bg-green-500' : n.type === 'error' ? 'bg-red-500' : n.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'}`} />
+                            <div className="flex-1">
+                              <p className="font-medium text-sm text-gray-900">{n.title}</p>
+                              <p className="text-xs text-gray-500">{n.message}</p>
+                              <p className="text-xs text-gray-400 mt-1">{new Date(n.created_at).toLocaleString()}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
             <span className="text-sm text-slate-300">
               {(admin?.prename || '')[0]}{(admin?.name || '')[0]}
             </span>
