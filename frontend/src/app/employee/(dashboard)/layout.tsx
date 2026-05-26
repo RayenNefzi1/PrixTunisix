@@ -240,11 +240,22 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
 function DashboardView() {
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const token = localStorage.getItem('employee_token')
+    console.log('Employee token:', token ? 'exists' : 'missing')
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api')
+    
     employeeApi.get('/employee/dashboard')
-      .then(res => setStats(res.data))
-      .catch(console.error)
+      .then(res => {
+        console.log('Dashboard response:', res.data)
+        setStats(res.data)
+      })
+      .catch(err => {
+        console.error('Dashboard error:', err)
+        setError(err.message || 'Failed to load')
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -254,6 +265,18 @@ function DashboardView() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 space-y-4">
         {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />)}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600">
+          <p className="font-medium">Erreur de chargement</p>
+          <p className="text-sm">{error}</p>
+          <p className="text-xs mt-2">Vérifiez que le serveur backend est en cours d'exécution</p>
+        </div>
       </div>
     )
   }
