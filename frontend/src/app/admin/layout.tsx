@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import ToastProvider from '@/components/Toast'
 import { 
   LayoutDashboard, Users, ShoppingBag, Store, BarChart3, 
   Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw
@@ -47,12 +46,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const isLoginPage = pathname === '/admin/login'
 
-  // If on login page, just render children without the admin layout
   if (isLoginPage) {
     return <>{children}</>
   }
 
-  // Show loading while checking auth
   if (!admin) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -62,9 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <ToastProvider>
     <div className="min-h-screen bg-gray-100">
-      {/* Top bar */}
       <header className="bg-slate-800 text-white sticky top-0 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -96,7 +91,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
         <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} lg:w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-56px)] transition-all overflow-hidden`}>
           <nav className="p-4 space-y-1">
             {menuItems.map(item => (
@@ -112,7 +106,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
         </aside>
 
-        {/* Mobile menu overlay */}
         {sidebarOpen && (
           <div 
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -120,11 +113,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           />
         )}
 
-        {/* Main content */}
         <main className="flex-1 p-6">
           {children}
         </main>
       </div>
-    </ToastProvider>
+    </div>
   )
 }
