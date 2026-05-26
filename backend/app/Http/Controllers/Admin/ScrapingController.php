@@ -104,20 +104,49 @@ class ScrapingController extends Controller
             'started_at' => now(),
             'records_collected' => 0,
             'errors_count' => 0,
-            'result' => 'queued',
+            'result' => 'running',
         ]);
 
-        // Set active flag - the external scraper service will pick this up
-        $scrapingScript->update([
-            'active' => true,
-            'last_run' => now(),
-        ]);
+        try {
+            $spider = $this->getSpiderName($merchantWebsite->name);
+            
+            if (!$spider) {
+                throw new \Exception("No spider found for merchant: {$merchantWebsite->name}");
+            }
 
-        return response()->json([
-            'message' => 'Scraping job queued successfully! The scraper will pick it up shortly.',
-            'log_id' => $log->id,
-            'script' => $scrapingScript->name,
-        ]);
+            $result = $this->runSpiderSync($spider);
+
+            $log->update([
+                'ended_at' => now(),
+                'records_collected' => $result['records'],
+                'errors_count' => $result['errors'],
+                'error_details' => $result['error_details'],
+                'result' => $result['success'] ? 'success' : 'failed',
+            ]);
+
+            $scrapingScript->update(['last_run' => now()]);
+
+            return response()->json([
+                'message' => "Scraping completed! Collected {$result['records']} records.",
+                'log_id' => $log->id,
+                'records' => $result['records'],
+                'errors' => $result['errors'],
+                'script' => $scrapingScript->name,
+            ]);
+
+        } catch (\Exception $e) {
+            $log->update([
+                'ended_at' => now(),
+                'errors_count' => 1,
+                'error_details' => json_encode([$e->getMessage()]),
+                'result' => 'failed',
+            ]);
+
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Scraping failed. Check logs for details.',
+            ], 500);
+        }
     }
 
     public function stopScript(ScrapingScript $scrapingScript): JsonResponse
@@ -301,8 +330,102 @@ class ScrapingController extends Controller
 
     private function runSpiderSync(string $spider): array
     {
-        $scraperPath = base_path('../scraper');
-        $logFile = base_path('../scraper/scrapy_log.txt');
+        $scraperPath = dirname(base_path()) . '/scraper';
+        $logFile = $scraperPath . '/scrapy_log.txt';
+        
+        Log::info("Starting scraper: $spider at path: $scraperPath");
+        
+        // Clear previous log
+        if (file_exists($logFile)) {
+            unlink($logFile);
+        }
+        
+        // Run spider - try Windows cmd first, then Unix
+        $command = "cd /d \"$scraperPath\" && python -m scrapy crawl $spider --loglevel=INFO";
+        
+        $descriptorspec = [
+            0 => ["pipe", "r"],
+            1 => ["file", $logFile, "w"],
+            2 => ["file", $logFile, "a"],
+        ];
+        
+        $process = proc_open($command, $descriptorspec, $pipes);
+        
+        if (!is_resource($process)) {
+            Log::error("Failed to start scraper process: $spider");
+            return [
+                'success' => false,
+                'records' => 0,
+                'errors' => 1,
+                'error_details' => json_encode(["Failed to start scraper"]),
+            ];
+        }
+        
+        // Close input pipe
+        fclose($pipes[0]);
+        
+        // Wait for process to complete (up to 3 minutes)
+        $maxWait = 180;
+        $waited = 0;
+        
+        while ($waited < $maxWait) {
+            $status = proc_get_status($process);
+            
+            if (!$status['running']) {
+                break;
+            }
+            
+            sleep(5);
+            $waited += 5;
+        }
+        
+        // If still running after maxWait, terminate
+        if ($status['running']) {
+            proc_terminate($process);
+        }
+        
+        proc_close($process);
+        
+        $records = 0;
+        $errors = 0;
+        $newProducts = 0;
+
+        if (file_exists($logFile)) {
+            $logContent = file_get_contents($logFile);
+            
+            // Count scraped items
+            $scrapedMatches = [];
+            if (preg_match_all('/DEBUG: OK product#(\d+)/', $logContent, $scrapedMatches)) {
+                $records = count($scrapedMatches[0]);
+            }
+
+            // Count new products
+            $newMatches = [];
+            if (preg_match_all('/NEW \[([^\]]+)\]/', $logContent, $newMatches)) {
+                $newProducts = count($newMatches[0]);
+            }
+
+            // Count errors
+            $errorMatches = [];
+            if (preg_match_all('/\[([^\]]+)\] ERROR/', $logContent, $errorMatches)) {
+                $errors = count($errorMatches[0]);
+            }
+
+            Log::info("Scraper finished: $spider, records: $records, new: $newProducts, errors: $errors");
+        }
+
+        return [
+            'success' => $records > 0 || $newProducts > 0,
+            'records' => $newProducts > 0 ? $newProducts : $records,
+            'errors' => $errors,
+            'error_details' => $errors > 0 ? json_encode(["Spider completed with $errors errors"]) : null,
+        ];
+    }
+    
+    private function runSpiderSyncOld(string $spider): array
+    {
+        $scraperPath = dirname(base_path()) . '/scraper';
+        $logFile = $scraperPath . '/scrapy_log.txt';
         
         // Clear previous log
         if (file_exists($logFile)) {

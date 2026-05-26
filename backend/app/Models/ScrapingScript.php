@@ -22,6 +22,7 @@ class ScrapingScript extends Model
         return [
             'last_run' => 'datetime',
             'frequency_minutes' => 'integer',
+            'active' => 'boolean',
         ];
     }
 

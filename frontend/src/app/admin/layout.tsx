@@ -5,8 +5,9 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
   LayoutDashboard, Users, ShoppingBag, Store, BarChart3, 
-  Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw
+  Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw, BellRing
 } from 'lucide-react'
+import ToastProvider from '@/components/Toast'
 
 const menuItems = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -76,7 +77,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span>PrixTunisix Admin</span>
             </Link>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <button className="p-2 hover:bg-slate-700 rounded text-slate-300 hover:text-white relative">
+              <BellRing className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
             <span className="text-sm text-slate-300">
               {(admin?.prename || '')[0]}{(admin?.name || '')[0]}
             </span>
@@ -114,7 +119,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         )}
 
         <main className="flex-1 p-6">
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </main>
       </div>
     </div>
