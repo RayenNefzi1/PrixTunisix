@@ -40,7 +40,7 @@ export default function EmployeeLoginPage() {
 
       localStorage.setItem('employee_token', data.token)
       localStorage.setItem('employee_user', JSON.stringify(data.user))
-      router.push('/employee')
+      router.push('/employee/dashboard')
     } catch (err: any) {
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors)
