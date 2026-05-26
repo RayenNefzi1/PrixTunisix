@@ -14,7 +14,15 @@ class CategoryController extends Controller
         $categories = Category::with('children')  // children already ordered by name via model
             ->whereNull('parent_id')
             ->orderBy('code')                      // root categories keep their manual order
-            ->get();
+            ->get()
+            ->map(function ($category) {
+                // Count products in this category and all subcategories
+                $categoryIds = $category->children->pluck('id')->prepend($category->id);
+                $category->products_count = \App\Models\Product::whereIn('category_id', $categoryIds)
+                    ->where('is_validated', true)
+                    ->count();
+                return $category;
+            });
 
         return response()->json($categories);
     }

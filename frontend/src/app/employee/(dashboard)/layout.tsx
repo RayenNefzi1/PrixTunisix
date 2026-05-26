@@ -113,7 +113,7 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 hover:bg-gray-100 rounded"
@@ -125,8 +125,24 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
                 <span className="text-white font-black text-sm">PT</span>
               </div>
               <span className="hidden sm:inline">PrixTunisix</span>
-              <span className="text-xs bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">Employé</span>
             </Link>
+            
+            {/* Top navigation */}
+            <nav className="hidden lg:flex items-center gap-1 ml-6">
+              {menuItems.map(item => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                    pathname === item.href 
+                      ? 'bg-brand-50 text-brand-700' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-brand-600'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
           
           <div className="flex items-center gap-2">

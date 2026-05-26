@@ -3,19 +3,25 @@
 import { useEffect, useState } from 'react'
 import employeeApi from '@/lib/employee-api'
 import { useToast } from '@/components/Toast'
-import { Search, Plus, Edit, Trash2, Eye, X, Check, Image } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Eye, X, Check, Image, ExternalLink, MoreVertical } from 'lucide-react'
+import Link from 'next/link'
+
+interface Offer {
+  id: number
+  merchant_website: { id: number; name: string } | null
+  price: number
+  merchant_url: string
+  is_available: boolean
+}
 
 interface Product {
   id: number
   name: string
   slug: string
-  image: string | null
+  image_url: string | null
   category: { id: number; name: string } | null
   brand: { id: number; name: string } | null
-  offers_count: number
-  lowest_price: number | null
-  highest_price: number | null
-  is_available: boolean
+  offers: Offer[]
 }
 
 export default function EmployeeProductsPage() {
@@ -29,7 +35,7 @@ export default function EmployeeProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await employeeApi.get(`/employee/products?search=${search}&page=${page}`)
+      const res = await employeeApi.get(`/employee/products?q=${search}&page=${page}`)
       setProducts(res.data.data || [])
       setTotalPages(res.data.last_page || 1)
     } catch (err) {
@@ -48,6 +54,14 @@ export default function EmployeeProductsPage() {
     setPage(1)
     fetchProducts()
   }
+  
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      setPage(1)
+      fetchProducts()
+    }, 300)
+    return () => clearTimeout(debounce)
+  }, [search])
 
   const handleDelete = async (product: Product) => {
     if (!confirm(`Supprimer "${product.name}" ?`)) return
@@ -114,15 +128,15 @@ export default function EmployeeProductsPage() {
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                          {product.image ? (
-                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {product.image_url ? (
+                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
-                            <Image className="w-5 h-5 text-gray-400" />
+                            <Image className="w-6 h-6 text-gray-400" />
                           )}
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{product.name}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{product.name}</p>
                           <p className="text-xs text-gray-400">{product.slug}</p>
                         </div>
                       </div>
@@ -134,16 +148,30 @@ export default function EmployeeProductsPage() {
                       {product.brand?.name || '-'}
                     </td>
                     <td className="px-4 py-3 text-sm">
-                      {product.lowest_price ? (
-                        <span className="font-medium text-green-600">
-                          {product.lowest_price.toFixed(2)} - {product.highest_price?.toFixed(2)} TND
-                        </span>
+                      {product.offers && product.offers.length > 0 ? (
+                        <div className="space-y-1">
+                          {product.offers.slice(0, 2).map(offer => (
+                            <a
+                              key={offer.id}
+                              href={offer.merchant_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between gap-2 text-xs hover:bg-gray-50 p-1 rounded"
+                            >
+                              <span className="text-gray-600">{offer.merchant_website?.name || 'Unknown'}</span>
+                              <span className="font-medium text-green-600">{offer.price.toFixed(2)} TND</span>
+                            </a>
+                          ))}
+                          {product.offers.length > 2 && (
+                            <span className="text-xs text-gray-400">+{product.offers.length - 2} autres</span>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      {product.offers_count}
+                      {product.offers?.length || 0}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
