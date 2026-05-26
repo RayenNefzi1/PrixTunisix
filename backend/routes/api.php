@@ -40,6 +40,13 @@ Route::prefix('auth')->group(function () {
     Route::post('otp/verify-register', [OtpController::class, 'verifyRegister']);
 });
 
+// ── Employee API (public test) ───────────────────────────────────────────
+Route::prefix('employee')->group(function () {
+    Route::get('test', function() {
+        return response()->json(['status' => 'ok']);
+    });
+});
+
 // ── Public catalog ────────────────────────────────────────────────────────
 Route::get('categories',           [CategoryController::class, 'index']);
 Route::get('categories/{category}',[CategoryController::class, 'show']);
