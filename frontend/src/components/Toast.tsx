@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, createContext, useContext, ReactNode } from 'react'
+import React, { useEffect, useState, createContext, useContext, ReactNode } from 'react'
 import { X, CheckCircle, AlertCircle, Info, XCircle } from 'lucide-react'
 
 type ToastType = 'success' | 'error' | 'info' | 'warning'
@@ -26,7 +26,7 @@ export function useToast() {
   return context
 }
 
-export function ToastProvider({ children }: { children: ReactNode }) {
+export default function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   const showToast = (message: string, type: ToastType = 'info') => {

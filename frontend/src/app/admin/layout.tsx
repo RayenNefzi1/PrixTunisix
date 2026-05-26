@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { ToastProvider } from '@/components/Toast'
+import ToastProvider from '@/components/Toast'
 import { 
   LayoutDashboard, Users, ShoppingBag, Store, BarChart3, 
   Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw

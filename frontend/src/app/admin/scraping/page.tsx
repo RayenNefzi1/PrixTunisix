@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import adminApi from '@/lib/admin-api'
-import { useToast } from '@/components/Toast'
+import ToastProvider, { useToast } from '@/components/Toast'
 import { 
   Play, Pause, Trash2, Plus, RefreshCw, CheckCircle, XCircle, 
   AlertCircle, Clock, Database, Activity, Settings, ChevronDown, Loader2
