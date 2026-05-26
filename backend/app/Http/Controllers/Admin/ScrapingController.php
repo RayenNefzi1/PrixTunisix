@@ -18,7 +18,10 @@ class ScrapingController extends Controller
 
     public function __construct()
     {
-        $this->logPath = base_path('../scraper/scrapy_log.txt');
+        $scraperPath = base_path('../scraper');
+        $this->logPath = file_exists($scraperPath) 
+            ? $scraperPath . '/scrapy_log.txt' 
+            : storage_path('logs/scrapy_log.txt');
     }
 
     public function index(): JsonResponse
