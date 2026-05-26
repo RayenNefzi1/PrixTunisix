@@ -248,6 +248,8 @@ function DashboardView() {
       .finally(() => setLoading(false))
   }, [])
 
+  const chartColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899']
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 space-y-4">
@@ -256,9 +258,12 @@ function DashboardView() {
     )
   }
 
+  const categoryData = stats?.products_by_category || []
+  const totalProducts = stats?.total_products || 1
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-4 mb-8 p-6 bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl text-white">
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+      <div className="flex items-center gap-4 p-6 bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl text-white">
         <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
           <LayoutDashboard className="w-7 h-7" />
         </div>
@@ -268,18 +273,125 @@ function DashboardView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Produits', value: stats?.total_products ?? 0, icon: <Package className="w-5 h-5 text-green-500" /> },
-          { label: 'Catégories', value: stats?.total_categories ?? 0, icon: <Tag className="w-5 h-5 text-purple-500" /> },
-          { label: 'Marques', value: stats?.total_brands ?? 0, icon: <Tag className="w-5 h-5 text-orange-500" /> },
-          { label: 'Alertes', value: stats?.active_alerts ?? 0, icon: <Bell className="w-5 h-5 text-red-500" /> },
+          { label: 'Produits', value: stats?.total_products ?? 0, icon: <Package className="w-5 h-5 text-green-500" />, bg: 'bg-green-50' },
+          { label: 'Catégories', value: stats?.total_categories ?? 0, icon: <Tag className="w-5 h-5 text-purple-500" />, bg: 'bg-purple-50' },
+          { label: 'Marques', value: stats?.total_brands ?? 0, icon: <Tag className="w-5 h-5 text-orange-500" />, bg: 'bg-orange-50' },
+          { label: 'Alertes', value: stats?.active_alerts ?? 0, icon: <Bell className="w-5 h-5 text-red-500" />, bg: 'bg-red-50' },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <div className="flex items-center gap-2 mb-1">{s.icon}<span className="text-xs text-gray-500">{s.label}</span></div>
+            <div className={`w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center mb-3`}>
+              {s.icon}
+            </div>
             <p className="text-2xl font-extrabold text-gray-900">{s.value.toLocaleString()}</p>
+            <p className="text-xs text-gray-500">{s.label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Pie Chart - Products by Category */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Produits par catégorie</h2>
+          {categoryData.length > 0 ? (
+            <div className="flex items-center gap-6">
+              {/* Pie Chart Visual */}
+              <div className="relative w-32 h-32">
+                <svg viewBox="0 0 36 36" className="w-32 h-32 -rotate-90">
+                  {categoryData.reduce((acc, cat, i) => {
+                    const pct = cat.count / totalProducts
+                    const offset = acc.offset
+                    acc.elements.push(
+                      <circle
+                        key={i}
+                        cx="18"
+                        cy="18"
+                        r="15.9"
+                        fill="transparent"
+                        stroke={chartColors[i % chartColors.length]}
+                        strokeWidth="3"
+                        strokeDasharray={`${pct * 100} ${100 - pct * 100}`}
+                        strokeDashoffset={-offset}
+                      />
+                    )
+                    acc.offset += pct * 100
+                    return acc
+                  }, { offset: 0, elements: [] }).elements}
+                </svg>
+              </div>
+              {/* Legend */}
+              <div className="flex-1 space-y-2">
+                {categoryData.map((cat: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: chartColors[i % chartColors.length] }} />
+                      <span className="text-gray-600">{cat.name}</span>
+                    </div>
+                    <span className="font-medium">{cat.count} ({cat.percentage}%)</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">Aucune donnée disponible</p>
+          )}
+        </div>
+
+        {/* Top Brands */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Top Marques</h2>
+          {stats?.top_brands?.length > 0 ? (
+            <div className="space-y-3">
+              {stats.top_brands.map((brand: any, i: number) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span className="w-6 h-6 bg-brand-100 text-brand-700 rounded-full flex items-center justify-center text-xs font-bold">
+                    {i + 1}
+                  </span>
+                  <span className="flex-1 text-gray-700">{brand.name}</span>
+                  <span className="text-sm font-medium text-brand-600">{brand.count} produits</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">Aucune donnée disponible</p>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Products */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <h2 className="font-bold text-gray-900 mb-4">Produits récents</h2>
+        {stats?.recent_products?.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Produit</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Catégorie</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Marque</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Ajouté</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {stats.recent_products.map((product: any) => (
+                  <tr key={product.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{product.name}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{product.category || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{product.brand || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-400">
+                      {new Date(product.created_at).toLocaleDateString('fr-FR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-gray-500 text-center py-8">Aucun produit récent</p>
+        )}
       </div>
     </div>
   )

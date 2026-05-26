@@ -20,15 +20,64 @@ class AdminController extends Controller
 {
     public function dashboard(): JsonResponse
     {
+        $productsCount = Product::where('is_validated', true)->count();
+        $categoriesCount = \App\Models\Category::whereNull('parent_id')->count();
+        $brandsCount = \App\Models\Brand::count();
+        
+        // Products by category for pie chart
+        $rootCategories = \App\Models\Category::whereNull('parent_id')
+            ->with(['products' => function($q) {
+                $q->where('is_validated', true);
+            }])
+            ->get()
+            ->map(function($cat) use ($productsCount) {
+                return [
+                    'name' => $cat->name,
+                    'count' => $cat->products->count(),
+                    'percentage' => $productsCount > 0 ? round(($cat->products->count() / $productsCount) * 100, 1) : 0
+                ];
+            })
+            ->filter(fn($c) => $c['count'] > 0)
+            ->take(6);
+
+        // Recent products
+        $recentProducts = Product::where('is_validated', true)
+            ->with(['category', 'brand'])
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get()
+            ->map(function($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'category' => $p->category?->name,
+                    'brand' => $p->brand?->name,
+                    'created_at' => $p->created_at,
+                ];
+            });
+
+        // Top brands
+        $topBrands = \App\Models\Brand::withCount('products')
+            ->orderByDesc('products_count')
+            ->limit(5)
+            ->get()
+            ->map(function($b) {
+                return [
+                    'name' => $b->name,
+                    'count' => $b->products_count,
+                ];
+            });
+
         $stats = [
-            'total_users' => User::count(),
-            'total_fournisseurs' => Fournisseur::count(),
-            'total_products' => Product::count(),
-            'total_offers' => Offer::count(),
+            'total_products' => $productsCount,
+            'total_categories' => $categoriesCount,
+            'total_brands' => $brandsCount,
             'active_alerts' => PriceAlert::whereNull('triggered_at')->count(),
-            'total_categories' => \App\Models\Category::count(),
-            'total_brands' => \App\Models\Brand::count(),
-            'total_merchants' => \App\Models\Merchant::count(),
+            'total_offers' => Offer::count(),
+            'products_by_category' => $rootCategories,
+            'recent_products' => $recentProducts,
+            'top_brands' => $topBrands,
+            'total_users' => User::count(),
         ];
 
         return response()->json($stats);
