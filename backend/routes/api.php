@@ -380,9 +380,14 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
     // ── Employee routes ─────────────────────────────────────────────────
-    Route::prefix('employee')
-        ->middleware(['auth:sanctum'])
-        ->group(function () {
+    Route::prefix('employee')->group(function () {
+        // Public test endpoint
+        Route::get('test', function() {
+            return response()->json(['status' => 'ok', 'message' => 'Employee routes working']);
+        });
+        
+        // Protected routes
+        Route::middleware(['auth:sanctum'])->group(function () {
             Route::middleware([\App\Http\Middleware\RoleMiddleware::class.':employee'])->group(function () {
                 Route::get('dashboard', [AdminController::class, 'dashboard']);
                 Route::get('products', [\App\Http\Controllers\Catalog\ProductController::class, 'index']);
@@ -394,6 +399,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::get('analytics/clicks', [AdminController::class, 'clickAnalytics']);
             });
         });
+    });
 
     // ── Client routes ─────────────────────────────────────────────────────
     Route::middleware('role:client')->prefix('client')->group(function () {
