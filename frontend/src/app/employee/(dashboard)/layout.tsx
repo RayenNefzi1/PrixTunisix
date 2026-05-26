@@ -451,6 +451,8 @@ function ProductsView() {
     return () => clearTimeout(debounce)
   }, [search])
 
+  console.log('Products loaded:', products.length)
+
   return (
     <div className="space-y-6">
       <div>
@@ -574,8 +576,11 @@ function CategoriesView() {
 
   useEffect(() => {
     employeeApi.get('/employee/categories')
-      .then(res => setCategories(res.data.data || res.data || []))
-      .catch(console.error)
+      .then(res => {
+        console.log('Categories response:', res.data)
+        setCategories(res.data.data || res.data || [])
+      })
+      .catch(err => console.error('Categories error:', err))
       .finally(() => setLoading(false))
   }, [])
 
