@@ -340,16 +340,16 @@ class ScrapingController extends Controller
             unlink($logFile);
         }
         
-        // Run spider - try Windows cmd first, then Unix
-        $command = "cd /d \"$scraperPath\" && python -m scrapy crawl $spider --loglevel=INFO";
+        // Run spider - Linux compatible command
+        $command = "cd \"$scraperPath\" && python -m scrapy crawl $spider --loglevel=INFO 2>&1";
         
         $descriptorspec = [
             0 => ["pipe", "r"],
-            1 => ["file", $logFile, "w"],
-            2 => ["file", $logFile, "a"],
+            1 => ["pipe", "w"],
+            2 => ["pipe", "w"],
         ];
         
-        $process = proc_open($command, $descriptorspec, $pipes);
+        $process = proc_open($command, $descriptorspec, $pipes, $scraperPath);
         
         if (!is_resource($process)) {
             Log::error("Failed to start scraper process: $spider");
@@ -357,34 +357,57 @@ class ScrapingController extends Controller
                 'success' => false,
                 'records' => 0,
                 'errors' => 1,
-                'error_details' => json_encode(["Failed to start scraper"]),
+                'error_details' => json_encode(["Failed to start scraper - command failed"]),
             ];
         }
         
         // Close input pipe
         fclose($pipes[0]);
         
-        // Wait for process to complete (up to 3 minutes)
+        $output = '';
+        $errorOutput = '';
+        
+        // Read output while process runs
         $maxWait = 180;
         $waited = 0;
         
         while ($waited < $maxWait) {
             $status = proc_get_status($process);
             
+            // Read stdout
+            if (!feof($pipes[1])) {
+                $output .= fread($pipes[1], 4096);
+            }
+            // Read stderr
+            if (!feof($pipes[2])) {
+                $errorOutput .= fread($pipes[2], 4096);
+            }
+            
             if (!$status['running']) {
                 break;
             }
             
-            sleep(5);
-            $waited += 5;
+            sleep(2);
+            $waited += 2;
         }
         
-        // If still running after maxWait, terminate
+        // Read any remaining output
+        $output .= stream_get_contents($pipes[1]);
+        $errorOutput .= stream_get_contents($pipes[2]);
+        
+        // Close pipes
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        
+        // Terminate if still running
         if ($status['running']) {
             proc_terminate($process);
         }
         
         proc_close($process);
+        
+        // Write to log file
+        file_put_contents($logFile, $output . "\n\nSTDERR:\n" . $errorOutput);
         
         $records = 0;
         $errors = 0;
@@ -418,7 +441,7 @@ class ScrapingController extends Controller
             'success' => $records > 0 || $newProducts > 0,
             'records' => $newProducts > 0 ? $newProducts : $records,
             'errors' => $errors,
-            'error_details' => $errors > 0 ? json_encode(["Spider completed with $errors errors"]) : null,
+            'error_details' => $errors > 0 ? json_encode(["Spider completed with $errors errors"]) : ($records === 0 ? json_encode([$errorOutput]) : null),
         ];
     }
     
