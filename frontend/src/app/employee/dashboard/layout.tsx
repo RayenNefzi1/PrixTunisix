@@ -86,7 +86,8 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
       setEmployee(JSON.parse(stored))
     } else if (pathname !== '/employee/login') {
       router.push('/employee/login')
-  }
+    }
+  }, [router, pathname])
 
   const handleNavClick = (id: string) => {
     console.log('Nav click:', id)
