@@ -41,10 +41,8 @@ Route::prefix('auth')->group(function () {
 });
 
 // ── Employee API (public test) ───────────────────────────────────────────
-Route::prefix('employee')->group(function () {
-    Route::get('test', function() {
-        return response()->json(['status' => 'ok']);
-    });
+Route::get('employee-test', function() {
+    return response()->json(['status' => 'ok', 'time' => now()]);
 });
 
 // ── Public catalog ────────────────────────────────────────────────────────
