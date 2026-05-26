@@ -1,0 +1,11 @@
+Failed to compile.
+./src/app/employee/dashboard/layout.tsx:186:24
+Type error: Cannot find name 'handleLogout'.
+  184 |             </span>
+  185 |             <button 
+> 186 |               onClick={handleLogout}
+      |                        ^
+  187 |               className="p-2 hover:bg-gray-100 rounded text-gray-600 hover:text-red-600"
+  188 |             >
+  189 |               <LogOut className="w-5 h-5" />
+Error: Command "npm run build" exited with 1

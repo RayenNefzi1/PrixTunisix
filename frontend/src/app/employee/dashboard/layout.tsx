@@ -89,6 +89,12 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
     }
   }, [router, pathname])
 
+  const handleLogout = () => {
+    localStorage.removeItem('employee_token')
+    localStorage.removeItem('employee_user')
+    router.push('/employee/login')
+  }
+
   const handleNavClick = (id: string) => {
     console.log('Nav click:', id)
     setCurrentView(id as View)
