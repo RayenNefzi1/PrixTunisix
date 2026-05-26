@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { ToastProvider } from '@/components/Toast'
 import { 
   LayoutDashboard, Users, ShoppingBag, Store, BarChart3, 
   Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw
@@ -61,6 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
+    <ToastProvider>
     <div className="min-h-screen bg-gray-100">
       {/* Top bar */}
       <header className="bg-slate-800 text-white sticky top-0 z-50">
@@ -123,6 +125,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {children}
         </main>
       </div>
-    </div>
+    </ToastProvider>
   )
 }

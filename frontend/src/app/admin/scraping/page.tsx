@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import adminApi from '@/lib/admin-api'
+import { useToast } from '@/components/Toast'
 import { 
   Play, Pause, Trash2, Plus, RefreshCw, CheckCircle, XCircle, 
   AlertCircle, Clock, Database, Activity, Settings, ChevronDown, Loader2
@@ -65,6 +66,8 @@ export default function ScrapingPage() {
     frequency_minutes: '',
   })
 
+  const { showToast } = useToast()
+
   const fetchData = async () => {
     try {
       const [scriptsRes, logsRes, statsRes] = await Promise.all([
@@ -127,11 +130,11 @@ export default function ScrapingPage() {
     setRunningScriptId(script.id)
     try {
       const response = await adminApi.post(`/admin/scraping/${script.id}/run`)
-      alert(`${response.data.message}\n\nThe scraper service will pick up this job.`)
+      showToast(response.data.message, 'success')
       fetchData()
     } catch (err: any) {
       console.error('Failed to run script:', err)
-      alert(err.response?.data?.message || 'Scraping failed. Check logs for details.')
+      showToast(err.response?.data?.message || 'Scraping failed. Check logs for details.', 'error')
     } finally {
       setRunningScriptId(null)
     }
@@ -141,7 +144,7 @@ export default function ScrapingPage() {
     setRunningAll(true)
     try {
       const response = await adminApi.post('/admin/scraping/run-all')
-      alert(`Scraping complete!\nRecords: ${response.data.total_records}\nErrors: ${response.data.total_errors}\n${response.data.message}`)
+      showToast(`Scraping complete! Records: ${response.data.total_records}, Errors: ${response.data.total_errors}`, response.data.total_errors > 0 ? 'warning' : 'success')
       fetchData()
     } catch (err) {
       console.error('Failed to run all scripts:', err)
@@ -156,7 +159,7 @@ export default function ScrapingPage() {
       setRunningScriptId(script.id)
       try {
         const response = await adminApi.post(`/admin/scraping/${script.id}/run`)
-        alert(`${siteName}: ${response.data.records_collected} records collected`)
+        showToast(`${siteName}: ${response.data.records_collected} records collected`, 'success')
         fetchData()
       } catch (err) {
         console.error(`Failed to run ${siteName}:`, err)

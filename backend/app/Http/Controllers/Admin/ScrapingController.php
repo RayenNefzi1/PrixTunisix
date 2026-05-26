@@ -222,8 +222,8 @@ class ScrapingController extends Controller
 
             return response()->json($logs);
         } catch (\Exception $e) {
-            Log::error('ScrapingController@logs error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error('ScrapingController@logs error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage(), 'file' => basename($e->getFile()), 'line' => $e->getLine()], 500);
         }
     }
 
