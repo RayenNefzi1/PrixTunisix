@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import axios from 'axios'
@@ -20,6 +20,13 @@ export default function EmployeeLoginPage() {
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [loading, setLoading] = useState(false)
   const [generalError, setGeneralError] = useState('')
+
+  useEffect(() => {
+    const token = localStorage.getItem('employee_token')
+    if (token) {
+      router.push('/employee/dashboard')
+    }
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
