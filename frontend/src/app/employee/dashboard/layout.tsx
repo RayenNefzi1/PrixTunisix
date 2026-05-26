@@ -98,7 +98,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
   const handleNavClick = (id: string) => {
     console.log('Nav click:', id)
     setCurrentView(id as View)
-    setSidebarOpen(false)
+    // Don't close sidebar on mobile when navigating
     console.log('Current view set to:', id)
   }
 
@@ -431,11 +431,13 @@ function ProductsView() {
 
   const fetchProducts = async () => {
     try {
+      console.log('Fetching products from API...')
       const res = await employeeApi.get(`/employee/products?q=${search}&page=${page}`)
+      console.log('Products response:', res.data)
       setProducts(res.data.data || [])
       setTotalPages(res.data.last_page || 1)
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      console.error('Products error:', err)
     } finally {
       setLoading(false)
     }
