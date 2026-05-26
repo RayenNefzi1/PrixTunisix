@@ -45,6 +45,13 @@ Route::get('employee-test', function() {
     return response()->json(['status' => 'ok', 'time' => now()]);
 });
 
+// ── Employee API ────────────────────────────────────────────────────────────
+Route::get('employee/dashboard', [AdminController::class, 'dashboard']);
+Route::get('employee/products', [\App\Http\Controllers\Catalog\ProductController::class, 'index']);
+Route::get('employee/categories', [\App\Http\Controllers\Catalog\CategoryController::class, 'index']);
+Route::get('employee/alerts', [AdminController::class, 'alerts']);
+Route::get('employee/analytics/clicks', [AdminController::class, 'clickAnalytics']);
+
 // ── Public catalog ────────────────────────────────────────────────────────
 Route::get('categories',           [CategoryController::class, 'index']);
 Route::get('categories/{category}',[CategoryController::class, 'show']);
