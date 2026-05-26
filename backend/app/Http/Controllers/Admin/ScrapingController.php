@@ -38,8 +38,12 @@ class ScrapingController extends Controller
                 'websites' => $websites,
             ]);
         } catch (\Exception $e) {
-            Log::error('ScrapingController@index error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error('ScrapingController@index error: ' . $e->getMessage() . ' trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => basename($e->getFile()),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 
@@ -265,8 +269,12 @@ class ScrapingController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            Log::error('ScrapingController@stats error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error('ScrapingController@stats error: ' . $e->getMessage() . ' trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => basename($e->getFile()),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 
