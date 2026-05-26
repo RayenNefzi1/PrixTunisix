@@ -56,6 +56,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const unreadCount = notifications.filter(n => !n.read).length
 
+  const addNotification = (title: string, message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
+    const newNotification: Notification = {
+      id: Date.now().toString(),
+      title,
+      message,
+      type,
+      read: false,
+      created_at: new Date().toISOString()
+    }
+    setNotifications(prev => [newNotification, ...prev])
+  }
+
   const markAsRead = (id: string) => {
     setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n))
   }
@@ -66,6 +78,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const clearNotifications = () => {
     setNotifications([])
+  }
+
+  if (typeof window !== 'undefined') {
+    (window as any).addAdminNotification = addNotification
   }
 
   useEffect(() => {

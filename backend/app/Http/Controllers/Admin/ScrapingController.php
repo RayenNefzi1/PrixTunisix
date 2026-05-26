@@ -330,19 +330,34 @@ class ScrapingController extends Controller
 
     private function runSpiderSync(string $spider): array
     {
-        $scraperPath = dirname(base_path()) . '/scraper';
-        $logFile = $scraperPath . '/scrapy_log.txt';
+        // Try multiple possible scraper paths
+        $possiblePaths = [
+            dirname(base_path()) . '/scraper',
+            base_path() . '/../scraper',
+            base_path() . '/scraper',
+            '/app/scraper',
+        ];
         
-        // Check if scraper path exists
-        if (!is_dir($scraperPath)) {
-            Log::error("Scraper directory not found: $scraperPath");
+        $scraperPath = null;
+        foreach ($possiblePaths as $path) {
+            if (is_dir($path)) {
+                $scraperPath = $path;
+                break;
+            }
+        }
+        
+        if (!$scraperPath) {
+            $pathsChecked = implode(', ', $possiblePaths);
+            Log::error("Scraper directory not found. Checked: $pathsChecked");
             return [
                 'success' => false,
                 'records' => 0,
                 'errors' => 1,
-                'error_details' => json_encode(["Scraper directory not found at: $scraperPath"]),
+                'error_details' => json_encode(["Scraper not deployed. Checked paths: $pathsChecked"]),
             ];
         }
+        
+        $logFile = $scraperPath . '/scrapy_log.txt';
         
         Log::info("Starting scraper: $spider at path: $scraperPath");
         
@@ -351,8 +366,22 @@ class ScrapingController extends Controller
             unlink($logFile);
         }
         
-        // Run spider - use python -m scrapy 
-        $command = "cd \"$scraperPath\" && python -m scrapy crawl $spider --loglevel=INFO 2>&1";
+        // Check if python and scrapy are available
+        $pythonCheck = shell_exec("which python3 || which python");
+        Log::info("Python path: " . ($pythonCheck ?? 'not found'));
+        
+        if (!$pythonCheck) {
+            Log::error("Python not found on server");
+            return [
+                'success' => false,
+                'records' => 0,
+                'errors' => 1,
+                'error_details' => json_encode(["Python not installed on server"]),
+            ];
+        }
+        
+        // Run spider 
+        $command = "cd \"$scraperPath\" && python3 -m scrapy crawl $spider --loglevel=INFO 2>&1";
         
         Log::info("Running command: $command");
         
@@ -361,7 +390,7 @@ class ScrapingController extends Controller
         // Write output to log file for debugging
         file_put_contents($logFile, $output ?? 'No output');
         
-        Log::info("Command output: " . ($output ?? 'empty'));
+        Log::info("Command output length: " . strlen($output ?? ''));
         
         $records = 0;
         $errors = 0;

@@ -33,6 +33,16 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
     const id = Date.now().toString()
     setToasts(prev => [...prev, { id, message, type }])
     
+    // Also add to notifications
+    if (typeof window !== 'undefined' && (window as any).addAdminNotification) {
+      const notifType = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info'
+      ;(window as any).addAdminNotification(
+        type === 'success' ? 'Succès' : type === 'error' ? 'Erreur' : type === 'warning' ? 'Attention' : 'Info',
+        message,
+        notifType
+      )
+    }
+    
     // Auto remove after 4 seconds
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
