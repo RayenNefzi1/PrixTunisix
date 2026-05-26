@@ -122,8 +122,6 @@ class ScrapingController extends Controller
             'script' => $scrapingScript->name,
         ]);
     }
-        }
-    }
 
     public function runAll(Request $request): JsonResponse
     {
