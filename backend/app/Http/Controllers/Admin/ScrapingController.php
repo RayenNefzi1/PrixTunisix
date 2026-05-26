@@ -333,6 +333,17 @@ class ScrapingController extends Controller
         $scraperPath = dirname(base_path()) . '/scraper';
         $logFile = $scraperPath . '/scrapy_log.txt';
         
+        // Check if scraper path exists
+        if (!is_dir($scraperPath)) {
+            Log::error("Scraper directory not found: $scraperPath");
+            return [
+                'success' => false,
+                'records' => 0,
+                'errors' => 1,
+                'error_details' => json_encode(["Scraper directory not found at: $scraperPath"]),
+            ];
+        }
+        
         Log::info("Starting scraper: $spider at path: $scraperPath");
         
         // Clear previous log
@@ -340,98 +351,45 @@ class ScrapingController extends Controller
             unlink($logFile);
         }
         
-        // Run spider - Linux compatible command
+        // Run spider - use python -m scrapy 
         $command = "cd \"$scraperPath\" && python -m scrapy crawl $spider --loglevel=INFO 2>&1";
         
-        $descriptorspec = [
-            0 => ["pipe", "r"],
-            1 => ["pipe", "w"],
-            2 => ["pipe", "w"],
-        ];
+        Log::info("Running command: $command");
         
-        $process = proc_open($command, $descriptorspec, $pipes, $scraperPath);
+        $output = shell_exec($command);
         
-        if (!is_resource($process)) {
-            Log::error("Failed to start scraper process: $spider");
-            return [
-                'success' => false,
-                'records' => 0,
-                'errors' => 1,
-                'error_details' => json_encode(["Failed to start scraper - command failed"]),
-            ];
-        }
+        // Write output to log file for debugging
+        file_put_contents($logFile, $output ?? 'No output');
         
-        // Close input pipe
-        fclose($pipes[0]);
-        
-        $output = '';
-        $errorOutput = '';
-        
-        // Read output while process runs
-        $maxWait = 180;
-        $waited = 0;
-        
-        while ($waited < $maxWait) {
-            $status = proc_get_status($process);
-            
-            // Read stdout
-            if (!feof($pipes[1])) {
-                $output .= fread($pipes[1], 4096);
-            }
-            // Read stderr
-            if (!feof($pipes[2])) {
-                $errorOutput .= fread($pipes[2], 4096);
-            }
-            
-            if (!$status['running']) {
-                break;
-            }
-            
-            sleep(2);
-            $waited += 2;
-        }
-        
-        // Read any remaining output
-        $output .= stream_get_contents($pipes[1]);
-        $errorOutput .= stream_get_contents($pipes[2]);
-        
-        // Close pipes
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        
-        // Terminate if still running
-        if ($status['running']) {
-            proc_terminate($process);
-        }
-        
-        proc_close($process);
-        
-        // Write to log file
-        file_put_contents($logFile, $output . "\n\nSTDERR:\n" . $errorOutput);
+        Log::info("Command output: " . ($output ?? 'empty'));
         
         $records = 0;
         $errors = 0;
         $newProducts = 0;
-
-        if (file_exists($logFile)) {
-            $logContent = file_get_contents($logFile);
-            
+        
+        if ($output) {
             // Count scraped items
             $scrapedMatches = [];
-            if (preg_match_all('/DEBUG: OK product#(\d+)/', $logContent, $scrapedMatches)) {
+            if (preg_match_all('/DEBUG: OK product#(\d+)/', $output, $scrapedMatches)) {
                 $records = count($scrapedMatches[0]);
             }
 
             // Count new products
             $newMatches = [];
-            if (preg_match_all('/NEW \[([^\]]+)\]/', $logContent, $newMatches)) {
+            if (preg_match_all('/NEW \[([^\]]+)\]/', $output, $newMatches)) {
                 $newProducts = count($newMatches[0]);
             }
 
             // Count errors
             $errorMatches = [];
-            if (preg_match_all('/\[([^\]]+)\] ERROR/', $logContent, $errorMatches)) {
+            if (preg_match_all('/ERROR/', $output, $errorMatches)) {
                 $errors = count($errorMatches[0]);
+            }
+            
+            // Also check for scrapy errors
+            if (preg_match('/Traceback/', $output)) {
+                $errors = 1;
+                Log::error("Scraper error: " . substr($output, 0, 500));
             }
 
             Log::info("Scraper finished: $spider, records: $records, new: $newProducts, errors: $errors");
@@ -441,79 +399,7 @@ class ScrapingController extends Controller
             'success' => $records > 0 || $newProducts > 0,
             'records' => $newProducts > 0 ? $newProducts : $records,
             'errors' => $errors,
-            'error_details' => $errors > 0 ? json_encode(["Spider completed with $errors errors"]) : ($records === 0 ? json_encode([$errorOutput]) : null),
-        ];
-    }
-    
-    private function runSpiderSyncOld(string $spider): array
-    {
-        $scraperPath = dirname(base_path()) . '/scraper';
-        $logFile = $scraperPath . '/scrapy_log.txt';
-        
-        // Clear previous log
-        if (file_exists($logFile)) {
-            unlink($logFile);
-        }
-        
-        // Run spider in background
-        $command = "cd \"$scraperPath\" && scrapy crawl $spider --loglevel=INFO > \"$logFile\" 2>&1 &";
-        exec($command);
-        
-        // Wait for spider to start
-        sleep(5);
-        
-        // Wait for results (up to 2 minutes)
-        $maxWait = 120;
-        $waited = 0;
-        $records = 0;
-        $errors = 0;
-        $newProducts = 0;
-
-        while ($waited < $maxWait) {
-            sleep(5);
-            $waited += 5;
-
-            if (!file_exists($logFile)) {
-                continue;
-            }
-
-            $logContent = file_get_contents($logFile);
-            
-            // Count scraped items
-            $scrapedMatches = [];
-            if (preg_match_all('/DEBUG: OK product#(\d+)/', $logContent, $scrapedMatches)) {
-                $records = count($scrapedMatches[0]);
-            }
-
-            // Count new products
-            $newMatches = [];
-            if (preg_match_all('/NEW \[([^\]]+)\]/', $logContent, $newMatches)) {
-                $newProducts = count($newMatches[0]);
-            }
-
-            // Count errors
-            $errorMatches = [];
-            if (preg_match_all('/\[([^\]]+)\] ERROR/', $logContent, $errorMatches)) {
-                $errors = count($errorMatches[0]);
-            }
-
-            // Check if spider finished
-            if (preg_match('/Spider closed \(finished\)/', $logContent) || 
-                preg_match('/Shutting down spider/', $logContent)) {
-                break;
-            }
-
-            // If we've waited 60 seconds and have records, consider it done
-            if ($waited >= 60 && $records > 0) {
-                break;
-            }
-        }
-
-        return [
-            'success' => $records > 0 || $newProducts > 0,
-            'records' => $newProducts > 0 ? $newProducts : $records,
-            'errors' => $errors,
-            'error_details' => $errors > 0 ? json_encode(["Spider completed with $errors errors"]) : null,
+            'error_details' => $errors > 0 ? json_encode(["Spider completed with errors"]) : ($records === 0 ? json_encode([$output]) : null),
         ];
     }
 }
