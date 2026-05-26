@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
-  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Menu, Search
+  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Menu, Search, X, Image, ExternalLink
 } from 'lucide-react'
 import ToastProvider from '@/components/Toast'
+import employeeApi from '@/lib/employee-api'
 
 interface Notification {
   id: string
@@ -17,21 +18,24 @@ interface Notification {
   created_at: string
 }
 
+type View = 'dashboard' | 'products' | 'categories' | 'analytics' | 'alerts'
+
 const menuItems = [
-  { href: '/employee', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/employee/products', icon: Package, label: 'Produits' },
-  { href: '/employee/categories', icon: Tag, label: 'Catégories' },
-  { href: '/employee/analytics', icon: BarChart3, label: 'Analytics' },
-  { href: '/employee/alerts', icon: Bell, label: 'Alertes Prix' },
+  { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { id: 'products', icon: Package, label: 'Produits' },
+  { id: 'categories', icon: Tag, label: 'Catégories' },
+  { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+  { id: 'alerts', icon: Bell, label: 'Alertes Prix' },
 ]
 
-export default function EmployeeLayout({ children }: { children: React.ReactNode }) {
+export default function EmployeeLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const [employee, setEmployee] = useState<{ name: string; prename: string } | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotifications, setShowNotifications] = useState(false)
+  const [currentView, setCurrentView] = useState<View>('dashboard')
 
   useEffect(() => {
     const stored = localStorage.getItem('employee_notifications')
@@ -91,6 +95,11 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
     router.push('/employee/login')
   }
 
+  const handleNavClick = (id: string) => {
+    setCurrentView(id as View)
+    setSidebarOpen(false)
+  }
+
   const isLoginPage = pathname === '/employee/login'
 
   if (isLoginPage) {
@@ -113,7 +122,7 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 hover:bg-gray-100 rounded"
@@ -126,23 +135,6 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
               </div>
               <span className="hidden sm:inline">PrixTunisix</span>
             </Link>
-            
-            {/* Top navigation */}
-            <nav className="hidden lg:flex items-center gap-1 ml-6">
-              {menuItems.map(item => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-                    pathname === item.href 
-                      ? 'bg-brand-50 text-brand-700' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-brand-600'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
           </div>
           
           <div className="flex items-center gap-2">
@@ -208,18 +200,18 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
         <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} lg:w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-56px)] transition-all overflow-hidden`}>
           <nav className="p-4 space-y-1">
             {menuItems.map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition ${
-                  pathname === item.href 
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition ${
+                  currentView === item.id 
                     ? 'bg-brand-50 text-brand-700 font-medium' 
                     : 'text-gray-700 hover:bg-gray-50 hover:text-brand-600'
                 }`}
               >
                 <item.icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
-              </Link>
+              </button>
             ))}
           </nav>
         </aside>
@@ -233,10 +225,423 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
 
         <main className="flex-1 p-6">
           <ToastProvider>
-            {children}
+            {currentView === 'dashboard' && <DashboardView />}
+            {currentView === 'products' && <ProductsView />}
+            {currentView === 'categories' && <CategoriesView />}
+            {currentView === 'analytics' && <AnalyticsView />}
+            {currentView === 'alerts' && <AlertsView />}
           </ToastProvider>
         </main>
       </div>
+    </div>
+  )
+}
+
+function DashboardView() {
+  const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    employeeApi.get('/employee/dashboard')
+      .then(res => setStats(res.data))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-16 space-y-4">
+        {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />)}
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="flex items-center gap-4 mb-8 p-6 bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl text-white">
+        <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+          <LayoutDashboard className="w-7 h-7" />
+        </div>
+        <div className="flex-1">
+          <h1 className="text-2xl font-extrabold">Dashboard Employé</h1>
+          <p className="text-brand-200 text-sm mt-0.5">Gérez les produits et analysez les données</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        {[
+          { label: 'Produits', value: stats?.total_products ?? 0, icon: <Package className="w-5 h-5 text-green-500" /> },
+          { label: 'Catégories', value: stats?.total_categories ?? 0, icon: <Tag className="w-5 h-5 text-purple-500" /> },
+          { label: 'Marques', value: stats?.total_brands ?? 0, icon: <Tag className="w-5 h-5 text-orange-500" /> },
+          { label: 'Alertes', value: stats?.active_alerts ?? 0, icon: <Bell className="w-5 h-5 text-red-500" /> },
+        ].map(s => (
+          <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="flex items-center gap-2 mb-1">{s.icon}<span className="text-xs text-gray-500">{s.label}</span></div>
+            <p className="text-2xl font-extrabold text-gray-900">{s.value.toLocaleString()}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ProductsView() {
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+
+  const fetchProducts = async () => {
+    try {
+      const res = await employeeApi.get(`/employee/products?q=${search}&page=${page}`)
+      setProducts(res.data.data || [])
+      setTotalPages(res.data.last_page || 1)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [page])
+
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      setPage(1)
+      fetchProducts()
+    }, 300)
+    return () => clearTimeout(debounce)
+  }, [search])
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Produits</h1>
+        <p className="text-gray-500">Gérez les produits de la plateforme</p>
+      </div>
+
+      <form onSubmit={(e) => { e.preventDefault(); fetchProducts() }} className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Rechercher un produit..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl"
+          />
+        </div>
+        <button type="submit" className="px-4 py-2 bg-brand-600 text-white rounded-xl hover:bg-brand-700">
+          Rechercher
+        </button>
+      </form>
+
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full mx-auto" />
+          </div>
+        ) : products.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <p>Aucun produit trouvé</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Offres</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {products.map(product => (
+                  <tr key={product.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {product.image_url ? (
+                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Image className="w-6 h-6 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{product.name}</p>
+                          <p className="text-xs text-gray-400">{product.slug}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {product.category?.name || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      {product.offers && product.offers.length > 0 ? (
+                        <div className="space-y-1">
+                          {product.offers.slice(0, 2).map(offer => (
+                            <a
+                              key={offer.id}
+                              href={offer.merchant_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between gap-2 text-xs hover:bg-gray-50 p-1 rounded"
+                            >
+                              <span className="text-gray-600">{offer.merchant_website?.name || 'Unknown'}</span>
+                              <span className="font-medium text-green-600">{offer.price.toFixed(2)} TND</span>
+                            </a>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {product.offers?.length || 0}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`px-3 py-1 rounded-lg ${
+                page === p 
+                  ? 'bg-brand-600 text-white' 
+                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CategoriesView() {
+  const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    employeeApi.get('/employee/categories')
+      .then(res => setCategories(res.data.data || res.data || []))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  const filteredCategories = categories.filter(c => 
+    c.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Catégories</h1>
+        <p className="text-gray-500">Visualisez les catégories de produits</p>
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Rechercher une catégorie..."
+          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl"
+        />
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredCategories.map(category => (
+            <div
+              key={category.id}
+              className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-md transition"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center overflow-hidden">
+                  {category.image ? (
+                    <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Tag className="w-6 h-6 text-brand-600" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900">{category.name}</h3>
+                  <p className="text-sm text-gray-500">{category.products_count} produits</p>
+                </div>
+              </div>
+              {category.children && category.children.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {category.children.slice(0, 3).map((child: any) => (
+                    <span key={child.id} className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-600">
+                      {child.name}
+                    </span>
+                  ))}
+                  {category.children.length > 3 && (
+                    <span className="text-xs text-gray-400">+{category.children.length - 3}</span>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AnalyticsView() {
+  const [analytics, setAnalytics] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    employeeApi.get('/employee/analytics/clicks')
+      .then(res => setAnalytics(res.data))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-24 bg-gray-200 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+        <p className="text-gray-500">Analysez les performances de la plateforme</p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Clics aujourd'hui", value: analytics?.clicks_today ?? 0, icon: <Package className="w-5 h-5 text-blue-500" /> },
+          { label: 'Clics ce mois', value: analytics?.clicks_this_month ?? 0, icon: <Tag className="w-5 h-5 text-green-500" /> },
+          { label: 'Clics total', value: analytics?.total_clicks ?? 0, icon: <BarChart3 className="w-5 h-5 text-orange-500" /> },
+        ].map(s => (
+          <div key={s.label} className="bg-white rounded-2xl border border-gray-200 p-5">
+            <div className="flex items-center gap-2 mb-1">{s.icon}<span className="text-xs text-gray-500">{s.label}</span></div>
+            <p className="text-2xl font-bold text-gray-900">{s.value.toLocaleString()}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Top Produits</h2>
+          <div className="space-y-3">
+            {analytics?.top_products?.slice(0, 5).map((product: any, i: number) => (
+              <div key={i} className="flex items-center justify-between">
+                <span className="text-gray-700 truncate">{product.name}</span>
+                <span className="font-medium text-brand-600">{product.clicks} clics</span>
+              </div>
+            )) || <p className="text-gray-500">Aucune donnée</p>}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Top Marchands</h2>
+          <div className="space-y-3">
+            {analytics?.top_merchants?.slice(0, 5).map((merchant: any, i: number) => (
+              <div key={i} className="flex items-center justify-between">
+                <span className="text-gray-700">{merchant.name}</span>
+                <span className="font-medium text-brand-600">{merchant.clicks} clics</span>
+              </div>
+            )) || <p className="text-gray-500">Aucune donnée</p>}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AlertsView() {
+  const [alerts, setAlerts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    employeeApi.get('/employee/alerts')
+      .then(res => setAlerts(res.data.data || res.data || []))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Alertes Prix</h1>
+        <p className="text-gray-500">Visualisez les alertes de prix des clients</p>
+      </div>
+
+      {loading ? (
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+      ) : alerts.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
+          <Bell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">Aucune alerte de prix</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {alerts.map(alert => (
+            <div key={alert.id} className="bg-white rounded-2xl border border-gray-200 p-4">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Bell className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        {alert.product?.name || 'Produit supprimé'}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Prix ciblé: <span className="font-medium text-green-600">{alert.target_price} TND</span>
+                      </p>
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {new Date(alert.created_at).toLocaleDateString('fr-FR')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
