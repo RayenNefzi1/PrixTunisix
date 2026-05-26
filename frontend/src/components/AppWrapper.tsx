@@ -21,9 +21,8 @@ export default function AppWrapper({ children }: { children: ReactNode }) {
 
   const isAdmin = pathname?.startsWith('/admin')
   const isEmployee = pathname?.startsWith('/employee')
-  const isFournisseur = pathname?.startsWith('/fournisseur')
 
-  if (isAdmin || isEmployee || isFournisseur) {
+  if (isAdmin || isEmployee) {
     return <>{children}</>
   }
 
