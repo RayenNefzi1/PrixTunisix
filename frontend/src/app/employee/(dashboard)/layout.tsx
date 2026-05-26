@@ -96,8 +96,10 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
   }
 
   const handleNavClick = (id: string) => {
+    console.log('Nav click:', id)
     setCurrentView(id as View)
     setSidebarOpen(false)
+    console.log('Current view set to:', id)
   }
 
   const isLoginPage = pathname === '/employee/login'

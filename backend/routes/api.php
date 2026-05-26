@@ -386,18 +386,16 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json(['status' => 'ok', 'message' => 'Employee routes working']);
         });
         
-        // Protected routes
+        // Protected routes - simplified without role middleware first
         Route::middleware(['auth:sanctum'])->group(function () {
-            Route::middleware([\App\Http\Middleware\RoleMiddleware::class.':employee'])->group(function () {
-                Route::get('dashboard', [AdminController::class, 'dashboard']);
-                Route::get('products', [\App\Http\Controllers\Catalog\ProductController::class, 'index']);
-                Route::get('products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'show']);
-                Route::put('products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'update']);
-                Route::get('categories', [\App\Http\Controllers\Catalog\CategoryController::class, 'index']);
-                Route::get('brands', [\App\Http\Controllers\Catalog\BrandController::class, 'index']);
-                Route::get('alerts', [AdminController::class, 'alerts']);
-                Route::get('analytics/clicks', [AdminController::class, 'clickAnalytics']);
-            });
+            Route::get('dashboard', [AdminController::class, 'dashboard']);
+            Route::get('products', [\App\Http\Controllers\Catalog\ProductController::class, 'index']);
+            Route::get('products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'show']);
+            Route::put('products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'update']);
+            Route::get('categories', [\App\Http\Controllers\Catalog\CategoryController::class, 'index']);
+            Route::get('brands', [\App\Http\Controllers\Catalog\BrandController::class, 'index']);
+            Route::get('alerts', [AdminController::class, 'alerts']);
+            Route::get('analytics/clicks', [AdminController::class, 'clickAnalytics']);
         });
     });
 
