@@ -377,6 +377,18 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::get('scraping/logs',        [ScrapingController::class, 'allLogs']);
                 Route::get('scraping/stats',       [ScrapingController::class, 'stats']);
             });
+
+            // Employee routes (limited access)
+            Route::middleware([\App\Http\Middleware\RoleMiddleware::class.':employee'])->group(function () {
+                Route::get('employee/dashboard', [AdminController::class, 'dashboard']);
+                Route::get('employee/products', [\App\Http\Controllers\Catalog\ProductController::class, 'index']);
+                Route::get('employee/products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'show']);
+                Route::put('employee/products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'update']);
+                Route::get('employee/categories', [\App\Http\Controllers\Catalog\CategoryController::class, 'index']);
+                Route::get('employee/brands', [\App\Http\Controllers\Catalog\BrandController::class, 'index']);
+                Route::get('employee/alerts', [AdminController::class, 'alerts']);
+                Route::get('employee/analytics/clicks', [AdminController::class, 'clickAnalytics']);
+            });
         });
 
     // ── Client routes ─────────────────────────────────────────────────────
