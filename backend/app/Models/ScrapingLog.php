@@ -28,6 +28,11 @@ class ScrapingLog extends Model
         ];
     }
 
+    public function scrapingScript()
+    {
+        return $this->belongsTo(ScrapingScript::class, 'scraping_script_id');
+    }
+
     public function script()
     {
         return $this->belongsTo(ScrapingScript::class, 'scraping_script_id');

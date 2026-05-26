@@ -230,8 +230,9 @@ class ScrapingController extends Controller
     public function allLogs(Request $request): JsonResponse
     {
         try {
-            $query = ScrapingLog::with('scrapingScript.merchantWebsite')
+            $query = ScrapingLog::query()
                 ->orderByDesc('started_at');
+
 
             if ($request->script_id) {
                 $query->where('scraping_script_id', $request->script_id);
@@ -241,7 +242,7 @@ class ScrapingController extends Controller
 
             return response()->json($logs);
         } catch (\Exception $e) {
-            Log::error('ScrapingController@allLogs error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('ScrapingController@allLogs error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
