@@ -192,34 +192,18 @@ class AdminController extends Controller
             ->orderBy('date')
             ->get();
         
-        // Top products
-        $topProducts = \App\Models\RedirectClick::select(
-            'product_id',
-            DB::raw('COUNT(*) as clicks')
-        )
-            ->with('product:id,name')
-            ->whereNotNull('product_id')
-            ->groupBy('product_id')
-            ->orderByDesc('clicks')
-            ->limit(5)
-            ->get()
-            ->map(fn($c) => [
-                'name' => $c->product?->name ?? 'Unknown',
-                'clicks' => $c->clicks
-            ]);
-        
-        // Top merchants
-        $topMerchants = \App\Models\RedirectClick::select(
+        // Top offers (by merchant)
+        $topOffers = \App\Models\RedirectClick::select(
             'offer_id',
             DB::raw('COUNT(*) as clicks')
         )
-            ->with('offer.merchantWebsite:id,name')
+            ->with('offer:id,raw_title,merchant_website_id,price')
             ->groupBy('offer_id')
             ->orderByDesc('clicks')
             ->limit(5)
             ->get()
             ->map(fn($c) => [
-                'name' => $c->offer?->merchantWebsite?->name ?? 'Unknown',
+                'name' => $c->offer?->raw_title ?? 'Unknown Offer',
                 'clicks' => $c->clicks
             ]);
 
@@ -228,8 +212,8 @@ class AdminController extends Controller
             'clicks_this_month' => $clicksThisMonth,
             'clicks_today' => $clicksToday,
             'clicks_by_day' => $clicksByDay,
-            'top_products' => $topProducts,
-            'top_merchants' => $topMerchants,
+            'top_products' => $topOffers,
+            'top_merchants' => $topOffers,
         ]);
     }
 
