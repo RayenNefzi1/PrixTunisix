@@ -22,7 +22,7 @@ class OfferController extends Controller
     }
 
     /**
-     * POST /offers/{offer}/redirect — Phase 4 of sequence diagram
+     * GET /offers/{offer}/redirect — Phase 4 of sequence diagram
      * Logs click, returns merchant URL for frontend redirect.
      */
     public function redirect(Request $request, Offer $offer): JsonResponse
@@ -36,5 +36,20 @@ class OfferController extends Controller
         return response()->json([
             'url' => $offer->merchant_url,
         ]);
+    }
+    
+    /**
+     * GET /offers/{offer}/go — Direct redirect with click tracking
+     * This endpoint redirects to the merchant URL while tracking the click
+     */
+    public function go(Request $request, Offer $offer)
+    {
+        RedirectClick::create([
+            'offer_id' => $offer->id,
+            'user_id' => optional($request->user())->id,
+            'ip_address' => $request->ip(),
+        ]);
+        
+        return redirect($offer->merchant_url);
     }
 }

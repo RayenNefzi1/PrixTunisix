@@ -515,16 +515,21 @@ function ProductsView() {
                       {product.offers && product.offers.length > 0 ? (
                         <div className="space-y-1">
                           {product.offers.slice(0, 2).map(offer => (
-                            <a
+                            <button
                               key={offer.id}
-                              href={offer.merchant_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-between gap-2 text-xs hover:bg-gray-50 p-1 rounded"
+                              onClick={async () => {
+                                try {
+                                  const res = await employeeApi.get(`/offers/${offer.id}/redirect`)
+                                  window.open(res.data.url, '_blank')
+                                } catch (err) {
+                                  window.open(offer.merchant_url, '_blank')
+                                }
+                              }}
+                              className="w-full flex items-center justify-between gap-2 text-xs hover:bg-gray-50 p-1 rounded cursor-pointer"
                             >
                               <span className="text-gray-600">{offer.merchant_website?.name || 'Unknown'}</span>
                               <span className="font-medium text-green-600">{offer.price.toFixed(2)} TND</span>
-                            </a>
+                            </button>
                           ))}
                         </div>
                       ) : (
