@@ -126,12 +126,28 @@ class ScrapingController extends Controller
 
             $scrapingScript->update(['last_run' => now()]);
 
+            // Check for products with no offers or out of stock
+            $noOffers = \App\Models\Product::whereDoesntHave('offers', function($q) {
+                $q->where('is_available', true);
+            })->count();
+            
+            $outOfStock = \App\Models\Offer::where('is_available', false)->count();
+
+            $notification = null;
+            if ($noOffers > 0 || $outOfStock > 0) {
+                $notification = [
+                    'no_offers' => $noOffers,
+                    'out_of_stock' => $outOfStock,
+                ];
+            }
+
             return response()->json([
                 'message' => "Scraping completed! Collected {$result['records']} records.",
                 'log_id' => $log->id,
                 'records' => $result['records'],
                 'errors' => $result['errors'],
                 'script' => $scrapingScript->name,
+                'notification' => $notification,
             ]);
 
         } catch (\Exception $e) {

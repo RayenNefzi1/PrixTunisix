@@ -4,7 +4,7 @@ import { useEffect, useState, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
-  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Search, X, Image
+  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Search, X, Image, Edit, Trash2
 } from 'lucide-react'
 import ToastProvider from '@/components/Toast'
 import employeeApi from '@/lib/employee-api'
@@ -415,18 +415,16 @@ function ProductsView() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [error, setError] = useState<string | null>(null)
+  const [editingProduct, setEditingProduct] = useState<any>(null)
 
   const fetchProducts = async () => {
     setLoading(true)
     setError(null)
     try {
-      console.log('Fetching products from API...')
       const res = await employeeApi.get(`/employee/products?q=${search}&page=${page}`)
-      console.log('Products response:', res.data)
       setProducts(res.data.data || [])
       setTotalPages(res.data.last_page || 1)
     } catch (err: any) {
-      console.error('Products error:', err)
       setError(err.message || 'Failed to load products')
     } finally {
       setLoading(false)
@@ -445,7 +443,39 @@ function ProductsView() {
     return () => clearTimeout(timer)
   }, [search])
 
-  console.log('Products loaded:', products.length, 'error:', error)
+  const handleDelete = async (productId: number) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit?')) return
+    try {
+      await employeeApi.delete(`/employee/products/${productId}`)
+      if (typeof window !== 'undefined' && (window as any).addEmployeeNotification) {
+        (window as any).addEmployeeNotification('Produit supprimé', 'Le produit a été supprimé avec succès', 'success')
+      }
+      fetchProducts()
+    } catch (err: any) {
+      if (typeof window !== 'undefined' && (window as any).addEmployeeNotification) {
+        (window as any).addEmployeeNotification('Erreur', err.message || 'Failed to delete product', 'error')
+      }
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingProduct) return
+    try {
+      await employeeApi.put(`/employee/products/${editingProduct.id}`, {
+        name: editingProduct.name,
+        description: editingProduct.description,
+      })
+      setEditingProduct(null)
+      if (typeof window !== 'undefined' && (window as any).addEmployeeNotification) {
+        (window as any).addEmployeeNotification('Produit mis à jour', 'Les informations ont été enregistrées', 'success')
+      }
+      fetchProducts()
+    } catch (err: any) {
+      if (typeof window !== 'undefined' && (window as any).addEmployeeNotification) {
+        (window as any).addEmployeeNotification('Erreur', err.message || 'Failed to update product', 'error')
+      }
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -481,37 +511,37 @@ function ProductsView() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Offres</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-32">Catégorie</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-48">Prix</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-20">Offres</th>
+                  <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-24">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {products.map(product => (
                   <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                           {product.image_url ? (
                             <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
-                            <Image className="w-6 h-6 text-gray-400" />
+                            <Image className="w-5 h-5 text-gray-400" />
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                          <p className="text-xs text-gray-400">{product.slug}</p>
+                          <p className="font-medium text-gray-900 text-sm truncate max-w-[200px]">{product.name}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-3 py-2 text-sm text-gray-600">
                       {product.category?.name || '-'}
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-3 py-2 text-sm">
                       {product.offers && product.offers.length > 0 ? (
                         <div className="space-y-1">
                           {product.offers.slice(0, 2).map(offer => (
@@ -525,10 +555,10 @@ function ProductsView() {
                                   window.open(offer.merchant_url, '_blank')
                                 }
                               }}
-                              className="w-full flex items-center justify-between gap-2 text-xs hover:bg-gray-50 p-1 rounded cursor-pointer"
+                              className="w-full flex items-center justify-between gap-1 text-xs hover:bg-gray-50 p-1 rounded cursor-pointer"
                             >
-                              <span className="text-gray-600">{offer.merchant_website?.name || 'Unknown'}</span>
-                              <span className="font-medium text-green-600">{offer.price.toFixed(2)} TND</span>
+                              <span className="text-gray-600 truncate">{offer.merchant_website?.name || 'Unknown'}</span>
+                              <span className="font-medium text-green-600 whitespace-nowrap">{offer.price.toFixed(2)} TND</span>
                             </button>
                           ))}
                         </div>
@@ -536,8 +566,26 @@ function ProductsView() {
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-3 py-2 text-sm text-gray-600 text-center">
                       {product.offers?.length || 0}
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => setEditingProduct(product)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                          title="Modifier"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -546,6 +594,49 @@ function ProductsView() {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {editingProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md p-4">
+            <h3 className="font-bold text-lg mb-4">Modifier le produit</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={editingProduct.name}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={editingProduct.description || ''}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="flex-1 px-3 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex justify-center gap-2">
