@@ -453,10 +453,12 @@ function ProductsView() {
       fetchProducts()
     } catch (err: any) {
       if (typeof window !== 'undefined' && (window as any).addEmployeeNotification) {
-        (window as any).addEmployeeNotification('Erreur', err.message || 'Failed to delete product', 'error')
+        (window as any).addEmployeeNotification('Erreur', err.response?.data?.message || 'Échec de la suppression', 'error')
       }
     }
   }
+
+  const [deletingProduct, setDeletingProduct] = useState<any>(null)
 
   const handleSaveEdit = async () => {
     if (!editingProduct) return
@@ -511,37 +513,55 @@ function ProductsView() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
+            <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-32">Catégorie</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-48">Prix</th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-20">Offres</th>
-                  <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase w-24">Actions</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase w-1/3">Produit</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase w-24">Catégorie</th>
+                  <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase w-40">Prix</th>
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase w-16">Offres</th>
+                  <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {products.map(product => (
                   <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-3 py-2">
+                    <td className="px-2 py-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
                           {product.image_url ? (
                             <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
-                            <Image className="w-5 h-5 text-gray-400" />
+                            <Image className="w-4 h-4 text-gray-400" />
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-gray-900 text-sm truncate max-w-[200px]">{product.name}</p>
-                        </div>
+                        <p className="font-medium text-gray-900 text-sm truncate">{product.name}</p>
                       </div>
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-600">
+                    <td className="px-2 py-2 text-sm text-gray-600">
                       {product.category?.name || '-'}
                     </td>
-                    <td className="px-3 py-2 text-sm">
+                    <td className="px-2 py-2 text-sm">
+                      {product.offers && product.offers.length > 0 ? (
+                        <div className="space-y-1">
+                          {product.offers.slice(0, 2).map(offer => (
+                            <button
+                              key={offer.id}
+                              onClick={async () => {
+                                try {
+                                  const res = await employeeApi.get(`/offers/${offer.id}/redirect`)
+                                  window.open(res.data.url, '_blank')
+                                } catch (err) {
+                                  window.open(offer.merchant_url, '_blank')
+                                }
+                              }}
+                              className="w-full flex items-center justify-between gap-1 text-xs hover:bg-gray-50 p-1 rounded cursor-pointer"
+                            >
+                              <span className="text-gray-600 truncate">{offer.merchant_website?.name || 'Unknown'}</span>
+                              <span className="font-medium text-green-600 whitespace-nowrap">{offer.price.toFixed(0)} TND</span>
+                            </button>
+                          ))}
+                        </div>
                       {product.offers && product.offers.length > 0 ? (
                         <div className="space-y-1">
                           {product.offers.slice(0, 2).map(offer => (
@@ -579,7 +599,7 @@ function ProductsView() {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(product.id)}
+                          onClick={() => setDeletingProduct(product)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                           title="Supprimer"
                         >
@@ -653,6 +673,39 @@ function ProductsView() {
               {p}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center">
+            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-7 h-7 text-red-600" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Confirmer la suppression</h3>
+            <p className="text-gray-500 mb-6">
+              Êtes-vous sûr de vouloir supprimer <br/>
+              <span className="font-medium text-gray-900">"{deletingProduct.name}"</span> ?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeletingProduct(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 font-medium"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={async () => {
+                  await handleDelete(deletingProduct.id)
+                  setDeletingProduct(null)
+                }}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
