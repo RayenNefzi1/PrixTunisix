@@ -409,10 +409,10 @@ function DashboardView() {
 }
 
 function ProductsView() {
-  return <ProductsViewComponent />
+  return <ProductsList />
 }
 
-function ProductsViewComponent() {
+function ProductsList() {
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
