@@ -420,6 +420,7 @@ function ProductsViewComponent() {
   const [totalPages, setTotalPages] = useState(1)
   const [error, setError] = useState<string | null>(null)
   const [editingProduct, setEditingProduct] = useState<any>(null)
+  const [deletingProduct, setDeletingProduct] = useState<any>(null)
 
   const fetchProducts = async () => {
     setLoading(true)
@@ -446,8 +447,6 @@ function ProductsViewComponent() {
     }, 300)
     return () => clearTimeout(timer)
   }, [search])
-
-  const [deletingProduct, setDeletingProduct] = useState<any>(null)
 
   const handleDelete = async (productId: number) => {
     try {
