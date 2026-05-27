@@ -560,26 +560,6 @@ function ProductsList() {
                               className="w-full flex items-center justify-between gap-1 text-xs hover:bg-gray-50 p-1 rounded cursor-pointer"
                             >
                               <span className="text-gray-600 truncate">{offer.merchant_website?.name || 'Unknown'}</span>
-                              <span className="font-medium text-green-600 whitespace-nowrap">{offer.price.toFixed(0)} TND</span>
-                            </button>
-                          ))}
-                        </div>
-                      {product.offers && product.offers.length > 0 ? (
-                        <div className="space-y-1">
-                          {product.offers.slice(0, 2).map(offer => (
-                            <button
-                              key={offer.id}
-                              onClick={async () => {
-                                try {
-                                  const res = await employeeApi.get(`/offers/${offer.id}/redirect`)
-                                  window.open(res.data.url, '_blank')
-                                } catch (err) {
-                                  window.open(offer.merchant_url, '_blank')
-                                }
-                              }}
-                              className="w-full flex items-center justify-between gap-1 text-xs hover:bg-gray-50 p-1 rounded cursor-pointer"
-                            >
-                              <span className="text-gray-600 truncate">{offer.merchant_website?.name || 'Unknown'}</span>
                               <span className="font-medium text-green-600 whitespace-nowrap">{offer.price.toFixed(2)} TND</span>
                             </button>
                           ))}
