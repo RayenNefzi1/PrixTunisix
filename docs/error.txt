@@ -1,19 +1,1 @@
-./src/app/employee/dashboard/layout.tsx
-Error: 
-  x Unexpected token `div`. Expected jsx identifier
-     ,-[/vercel/path0/frontend/src/app/employee/dashboard/layout.tsx:480:1]
- 480 |   }
- 481 | 
- 482 |   return (
- 483 |     <div className="space-y-6">
-     :      ^^^
- 484 |       <div>
- 485 |         <h1 className="text-2xl font-bold text-gray-900">Produits</h1>
- 486 |         <p className="text-gray-500">Gérez les produits de la plateforme</p>
-     `----
-Caused by:
-    Syntax Error
-Import trace for requested module:
-./src/app/employee/dashboard/layout.tsx
-> Build failed because of webpack errors
-Error: Command "npm run build" exited with 1
+./src/app/employee/dashboard/layout.tsxError:   x Unexpected token `div`. Expected jsx identifier     ,-[/vercel/path0/frontend/src/app/employee/dashboard/layout.tsx:479:1] 479 |   } 480 |  481 |   return ( 482 |     <div className="space-y-6">     :      ^^^ 483 |       <div> 484 |         <h1 className="text-2xl font-bold text-gray-900">Produits</h1> 485 |         <p className="text-gray-500">Gérez les produits de la plateforme</p>     `----Caused by:    Syntax ErrorImport trace for requested module:./src/app/employee/dashboard/layout.tsx> Build failed because of webpack errorsError: Command "npm run build" exited with 1
