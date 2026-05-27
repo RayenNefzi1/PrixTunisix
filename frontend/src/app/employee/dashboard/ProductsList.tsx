@@ -96,7 +96,7 @@ export default function ProductsList() {
         </button>
       </form>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto">
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full mx-auto" />
@@ -106,12 +106,12 @@ export default function ProductsList() {
             <p>Aucun produit trouvé</p>
           </div>
         ) : (
-          <table className="w-full table-fixed">
+          <table className="w-full min-w-[560px]">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[200px]">Produit</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[100px]">Catégorie</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[180px]">Prix</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[180px]">Produit</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[80px]">Catégorie</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[160px]">Prix</th>
                 <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 w-[60px]">Offres</th>
                 <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 w-[80px]">Actions</th>
               </tr>
