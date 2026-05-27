@@ -177,21 +177,60 @@ class AdminController extends Controller
     /** GET /admin/analytics/clicks — redirect click analytics (Phase 4) */
     public function clickAnalytics(Request $request): JsonResponse
     {
-        $from = $request->date('from', 'Y-m-d') ?? now()->subDays(30);
-        $to = $request->date('to', 'Y-m-d') ?? now();
-
-        $clicks = RedirectClick::select(
-            'offer_id',
-            DB::raw('COUNT(*) as total_clicks'),
-            DB::raw('DATE(clicked_at) as date')
+        // Total clicks
+        $totalClicks = \App\Models\RedirectClick::count();
+        $clicksThisMonth = \App\Models\RedirectClick::whereMonth('clicked_at', now()->month)->count();
+        $clicksToday = \App\Models\RedirectClick::whereDate('clicked_at', today())->count();
+        
+        // Clicks by day (last 30 days)
+        $clicksByDay = \App\Models\RedirectClick::select(
+            DB::raw('DATE(clicked_at) as date'),
+            DB::raw('COUNT(*) as clicks')
         )
-            ->whereBetween('clicked_at', [$from, $to])
-            ->groupBy('offer_id', DB::raw('DATE(clicked_at)'))
-            ->orderByDesc('total_clicks')
-            ->limit(50)
+            ->where('clicked_at', '>=', now()->subDays(30))
+            ->groupBy(DB::raw('DATE(clicked_at)'))
+            ->orderBy('date')
             ->get();
+        
+        // Top products
+        $topProducts = \App\Models\RedirectClick::select(
+            'product_id',
+            DB::raw('COUNT(*) as clicks')
+        )
+            ->with('product:id,name')
+            ->whereNotNull('product_id')
+            ->groupBy('product_id')
+            ->orderByDesc('clicks')
+            ->limit(5)
+            ->get()
+            ->map(fn($c) => [
+                'name' => $c->product?->name ?? 'Unknown',
+                'clicks' => $c->clicks
+            ]);
+        
+        // Top merchants
+        $topMerchants = \App\Models\RedirectClick::select(
+            'offer_id',
+            DB::raw('COUNT(*) as clicks')
+        )
+            ->with('offer.merchantWebsite:id,name')
+            ->groupBy('offer_id')
+            ->orderByDesc('clicks')
+            ->limit(5)
+            ->get()
+            ->map(fn($c) => [
+                'name' => $c->offer?->merchantWebsite?->name ?? 'Unknown',
+                'clicks' => $c->clicks
+            ]);
 
-        return response()->json($clicks);
+        return response()->json([
+            'total_clicks' => $totalClicks,
+            'clicks_this_month' => $clicksThisMonth,
+            'clicks_today' => $clicksToday,
+            'clicks_by_day' => $clicksByDay,
+            'top_products' => $topProducts,
+            'top_merchants' => $topMerchants,
+        ]);
     }
 
     public function subscriptions(Request $request): JsonResponse
