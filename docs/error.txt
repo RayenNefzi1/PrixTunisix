@@ -1,11 +1,19 @@
-Failed to compile.
-./src/app/employee/dashboard/layout.tsx:186:24
-Type error: Cannot find name 'handleLogout'.
-  184 |             </span>
-  185 |             <button 
-> 186 |               onClick={handleLogout}
-      |                        ^
-  187 |               className="p-2 hover:bg-gray-100 rounded text-gray-600 hover:text-red-600"
-  188 |             >
-  189 |               <LogOut className="w-5 h-5" />
+./src/app/employee/dashboard/layout.tsx
+Error: 
+  x Unexpected token `div`. Expected jsx identifier
+     ,-[/vercel/path0/frontend/src/app/employee/dashboard/layout.tsx:480:1]
+ 480 |   }
+ 481 | 
+ 482 |   return (
+ 483 |     <div className="space-y-6">
+     :      ^^^
+ 484 |       <div>
+ 485 |         <h1 className="text-2xl font-bold text-gray-900">Produits</h1>
+ 486 |         <p className="text-gray-500">Gérez les produits de la plateforme</p>
+     `----
+Caused by:
+    Syntax Error
+Import trace for requested module:
+./src/app/employee/dashboard/layout.tsx
+> Build failed because of webpack errors
 Error: Command "npm run build" exited with 1

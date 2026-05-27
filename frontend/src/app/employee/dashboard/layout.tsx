@@ -443,8 +443,9 @@ function ProductsView() {
     return () => clearTimeout(timer)
   }, [search])
 
+  const [deletingProduct, setDeletingProduct] = useState<any>(null)
+
   const handleDelete = async (productId: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit?')) return
     try {
       await employeeApi.delete(`/employee/products/${productId}`)
       if (typeof window !== 'undefined' && (window as any).addEmployeeNotification) {
@@ -457,8 +458,6 @@ function ProductsView() {
       }
     }
   }
-
-  const [deletingProduct, setDeletingProduct] = useState<any>(null)
 
   const handleSaveEdit = async () => {
     if (!editingProduct) return
