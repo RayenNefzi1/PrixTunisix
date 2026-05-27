@@ -49,6 +49,8 @@ Route::get('employee-test', function() {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('employee/dashboard', [AdminController::class, 'dashboard']);
     Route::get('employee/products', [\App\Http\Controllers\Catalog\ProductController::class, 'index']);
+    Route::put('employee/products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'update']);
+    Route::delete('employee/products/{product}', [\App\Http\Controllers\Catalog\ProductController::class, 'destroy']);
     Route::get('employee/categories', [\App\Http\Controllers\Catalog\CategoryController::class, 'index']);
     Route::get('employee/alerts', [AdminController::class, 'alerts']);
     Route::get('employee/analytics/clicks', [AdminController::class, 'clickAnalytics']);
