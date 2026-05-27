@@ -4,7 +4,7 @@ import { useEffect, useState, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
-  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Menu, Search, X, Image, ExternalLink
+  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Search, X, Image
 } from 'lucide-react'
 import ToastProvider from '@/components/Toast'
 import employeeApi from '@/lib/employee-api'
@@ -32,7 +32,6 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const [employee, setEmployee] = useState<{ name: string; prename: string } | null>(null)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotifications, setShowNotifications] = useState(false)
   const [currentView, setCurrentView] = useState<View>('dashboard')
@@ -125,12 +124,6 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
             <Link href="/employee" className="text-xl font-bold flex items-center gap-2">
               <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-black text-sm">PT</span>
@@ -199,7 +192,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
       </header>
 
       <div className="flex">
-        <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} lg:w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-56px)] transition-all overflow-hidden`}>
+        <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-56px)] flex-shrink-0">
           <nav className="p-4 space-y-1">
             {menuItems.map(item => (
               <button
@@ -217,13 +210,6 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
             ))}
           </nav>
         </aside>
-
-        {sidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
 
         <main className="flex-1 p-6">
           <ToastProvider>
