@@ -421,4 +421,57 @@ class FournisseurController extends Controller
             'subscription' => $subscription->fresh(),
         ]);
     }
+
+    public function uploadManualProducts(Request $request): JsonResponse
+    {
+        $fournisseur = $request->user()->fournisseur;
+
+        if (!$fournisseur) {
+            return response()->json(['message' => 'Fournisseur non trouvé.'], 404);
+        }
+
+        $subscription = $fournisseur->subscription;
+        if (!$subscription || !$subscription->canAddProductsManually()) {
+            return response()->json(['message' => 'Abonnement premium manuel requis.'], 403);
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:csv,xlsx,xls|max:10240',
+        ]);
+
+        $file = $request->file('file');
+        $extension = $file->getClientOriginalExtension();
+        $fileName = $file->getClientOriginalName();
+
+        $path = $file->store('manual_products', 'public');
+
+        $requestRecord = \App\Models\ManualProductRequest::create([
+            'fournisseur_id' => $fournisseur->id,
+            'file_path' => $path,
+            'file_name' => $fileName,
+            'file_type' => $extension,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'message' => 'Fichier uploaded. En attente de validation.',
+            'request' => $requestRecord,
+        ], 201);
+    }
+
+    public function getManualProductRequests(Request $request): JsonResponse
+    {
+        $fournisseur = $request->user()->fournisseur;
+
+        if (!$fournisseur) {
+            return response()->json(['message' => 'Fournisseur non trouvé.'], 404);
+        }
+
+        $requests = \App\Models\ManualProductRequest::where('fournisseur_id', $fournisseur->id)
+            ->with('products')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json(['requests' => $requests]);
+    }
 }

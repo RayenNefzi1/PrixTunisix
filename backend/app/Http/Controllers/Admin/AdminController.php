@@ -246,4 +246,58 @@ class AdminController extends Controller
         $priceAlert->delete();
         return response()->json(null, 204);
     }
+
+    public function getManualProductRequests(): JsonResponse
+    {
+        $requests = \App\Models\ManualProductRequest::with('fournisseur', 'products')
+            ->orderByDesc('created_at')
+            ->get();
+        return response()->json(['requests' => $requests]);
+    }
+
+    public function getManualProducts($requestId): JsonResponse
+    {
+        $products = \App\Models\ManualProduct::where('request_id', $requestId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return response()->json(['products' => $products]);
+    }
+
+    public function approveManualProduct(\App\Models\ManualProduct $manualProduct): JsonResponse
+    {
+        $manualProduct->update([
+            'status' => 'approved',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        $subscription = $manualProduct->fournisseur->subscription;
+        if ($subscription && $subscription->plan === 'premium_manual') {
+            Product::create([
+                'name' => $manualProduct->name,
+                'description' => $manualProduct->description,
+                'price' => $manualProduct->price,
+                'image_url' => $manualProduct->image_url,
+                'reference' => $manualProduct->reference,
+                'category_id' => $manualProduct->category_id,
+                'brand_id' => $manualProduct->brand_id,
+                'is_validated' => true,
+                'fournisseur_id' => $manualProduct->fournisseur_id,
+            ]);
+        }
+
+        return response()->json(['message' => 'Produit approuvé']);
+    }
+
+    public function rejectManualProduct(Request $request, \App\Models\ManualProduct $manualProduct): JsonResponse
+    {
+        $manualProduct->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->reason,
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return response()->json(['message' => 'Produit rejeté']);
+    }
 }

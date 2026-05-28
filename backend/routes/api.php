@@ -82,6 +82,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('employee/categories', [\App\Http\Controllers\Catalog\CategoryController::class, 'index']);
     Route::get('employee/alerts', [AdminController::class, 'alerts']);
     Route::get('employee/analytics/clicks', [AdminController::class, 'clickAnalytics']);
+    Route::get('employee/manual-product-requests', [AdminController::class, 'getManualProductRequests']);
+    Route::get('employee/manual-products/{requestId}', [AdminController::class, 'getManualProducts']);
+    Route::post('employee/manual-products/{id}/approve', [AdminController::class, 'approveManualProduct']);
+    Route::post('employee/manual-products/{id}/reject', [AdminController::class, 'rejectManualProduct']);
 });
 
 // ── Public catalog ────────────────────────────────────────────────────────
@@ -558,6 +562,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('subscription',            [FournisseurController::class, 'getSubscription']);
         Route::post('subscription',           [FournisseurController::class, 'subscribe']);
         Route::post('subscription/cancel',    [FournisseurController::class, 'cancelSubscription']);
+        Route::post('manual-products/upload', [FournisseurController::class, 'uploadManualProducts']);
+        Route::get('manual-products/requests', [FournisseurController::class, 'getManualProductRequests']);
     });
 });
 
