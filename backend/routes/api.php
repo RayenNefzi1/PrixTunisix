@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ScrapingController;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Catalog\BrandController;
@@ -50,8 +50,24 @@ Route::get('employee-test', function() {
 
 Route::get('run-migrations', function() {
     try {
-        Artisan::call('migrate', ['--force' => true]);
-        return response()->json(['status' => 'ok', 'message' => Artisan::output()]);
+        Schema::table('employees', function ($table) {
+            if (!Schema::hasColumn('employees', 'name')) {
+                $table->string('name')->nullable()->after('user_id');
+            }
+            if (!Schema::hasColumn('employees', 'prename')) {
+                $table->string('prename')->nullable()->after('name');
+            }
+            if (!Schema::hasColumn('employees', 'cin')) {
+                $table->string('cin')->nullable()->unique()->after('prename');
+            }
+            if (!Schema::hasColumn('employees', 'phone')) {
+                $table->string('phone')->nullable()->after('cin');
+            }
+            if (!Schema::hasColumn('employees', 'auto_id')) {
+                $table->string('auto_id')->nullable()->unique()->after('phone');
+            }
+        });
+        return response()->json(['status' => 'ok', 'message' => 'Columns added']);
     } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
     }
