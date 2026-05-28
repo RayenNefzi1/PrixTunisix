@@ -63,29 +63,44 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'email' => ['required', 'email'],
+            'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::where('email', $data['email'])->first();
+        $login = $data['login'];
+
+        // Check if login is employee ID (starts with EMP)
+        if (str_starts_with($login, 'EMP')) {
+            $employee = \App\Models\Employee::where('auto_id', $login)->first();
+            if ($employee && $employee->user) {
+                $user = $employee->user;
+            } else {
+                throw ValidationException::withMessages([
+                    'login' => ['ID employé incorrect.'],
+                ]);
+            }
+        } else {
+            // Otherwise treat as email
+            $user = User::where('email', $login)->first();
+        }
 
         // Clients must use phone OTP
         if ($user && $user->role === 'client') {
             throw ValidationException::withMessages([
-                'email' => ['Pour les clients, veuillez utiliser la connexion par numéro de téléphone.'],
+                'login' => ['Pour les clients, veuillez utiliser la connexion par numéro de téléphone.'],
             ]);
         }
 
-        // Admin, Employee, Merchant, Fournisseur can use email/password
+        // Admin, Employee, Merchant, Fournisseur can use email/password or employee ID
         if (! $user || ! in_array($user->role, ['admin', 'employee', 'merchant', 'fournisseur'])) {
             throw ValidationException::withMessages([
-                'email' => ['Identifiants incorrects.'],
+                'login' => ['Identifiants incorrects.'],
             ]);
         }
 
         if (! Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'login' => ['The provided credentials are incorrect.'],
             ]);
         }
 

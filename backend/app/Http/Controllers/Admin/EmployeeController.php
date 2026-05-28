@@ -21,11 +21,11 @@ class EmployeeController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'prename' => 'required|string|max:255',
-            'cin' => 'required|string|max:20|unique:employees,cin',
-            'phone' => 'required|string|max:20',
+            'cin' => 'required|regex:/^[2-9]\d{7}$/|unique:employees,cin',
+            'phone' => 'required|regex:/^[2459]\d{7}$/',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'position' => 'nullable|string|max:255',
+            'auto_id' => 'nullable|string|unique:employees,auto_id',
         ]);
 
         $user = \App\Models\User::create([
@@ -43,7 +43,7 @@ class EmployeeController extends Controller
             'prename' => $data['prename'],
             'cin' => $data['cin'],
             'phone' => $data['phone'],
-            'position' => $data['position'] ?? 'Employé',
+            'auto_id' => $data['auto_id'] ?? null,
         ]);
 
         return response()->json($employee->load('user'), 201);
@@ -54,9 +54,9 @@ class EmployeeController extends Controller
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
             'prename' => 'sometimes|string|max:255',
-            'cin' => 'sometimes|string|max:20|unique:employees,cin,' . $employee->id,
-            'phone' => 'sometimes|string|max:20',
-            'position' => 'nullable|string|max:255',
+            'cin' => 'sometimes|regex:/^[2-9]\d{7}$/|unique:employees,cin,' . $employee->id,
+            'phone' => 'sometimes|regex:/^[2459]\d{7}$/',
+            'auto_id' => 'nullable|string|unique:employees,auto_id,' . $employee->id,
             'email' => 'sometimes|email|unique:users,email,' . $employee->user_id,
             'password' => 'nullable|string|min:6',
         ]);

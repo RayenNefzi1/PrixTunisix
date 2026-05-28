@@ -31,7 +31,7 @@ export default function AdminEmployeesPage() {
     phone: '',
     email: '',
     password: '',
-    position: 'Employé',
+    auto_id: '',
   })
 
   useEffect(() => {
@@ -56,8 +56,8 @@ export default function AdminEmployeesPage() {
           prename: formData.prename,
           cin: formData.cin,
           phone: formData.phone,
-          position: formData.position,
         }
+        if (formData.auto_id) updateData.auto_id = formData.auto_id
         if (formData.email) updateData.email = formData.email
         if (formData.password) updateData.password = formData.password
         await adminApi.put(`/admin/employees/${editingEmployee.id}`, updateData)
@@ -98,7 +98,7 @@ export default function AdminEmployeesPage() {
       phone: '',
       email: '',
       password: '',
-      position: 'Employé',
+      auto_id: '',
     })
     setEditingEmployee(null)
     setShowModal(false)
@@ -112,7 +112,7 @@ export default function AdminEmployeesPage() {
       phone: emp.phone,
       email: emp.user?.email || '',
       password: '',
-      position: emp.position,
+      auto_id: emp.auto_id || '',
     })
     setEditingEmployee(emp)
     setShowModal(true)
@@ -137,16 +137,15 @@ export default function AdminEmployeesPage() {
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">ID Auto</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Nom</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Prénom</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">CIN</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Téléphone</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Email</th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Poste</th>
-              <th className="text-right px-6 py-3 text-sm font-medium text-gray-500">Actions</th>
-            </tr>
+              <tr>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">ID</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Nom</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Prénom</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">CIN</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Téléphone</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Email</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-gray-500">Actions</th>
+              </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
@@ -178,7 +177,6 @@ export default function AdminEmployeesPage() {
                 <td className="px-6 py-4 text-gray-600 font-mono">{emp.cin}</td>
                 <td className="px-6 py-4 text-gray-600">{emp.phone}</td>
                 <td className="px-6 py-4 text-gray-600">{emp.user?.email || '-'}</td>
-                <td className="px-6 py-4 text-gray-600">{emp.position}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
                     <button onClick={() => openEdit(emp)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Modifier">
@@ -228,22 +226,26 @@ export default function AdminEmployeesPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">CIN</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">CIN (8 chiffres)</label>
                 <input
                   type="text"
                   value={formData.cin}
-                  onChange={e => setFormData({ ...formData, cin: e.target.value })}
+                  onChange={e => setFormData({ ...formData, cin: e.target.value.replace(/\D/g, '').slice(0, 8) })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  placeholder="12345678"
+                  maxLength={8}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone (8 chiffres)</label>
                 <input
                   type="text"
                   value={formData.phone}
-                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 8) })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  placeholder="21234567"
+                  maxLength={8}
                   required
                 />
               </div>
@@ -270,12 +272,13 @@ export default function AdminEmployeesPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Poste</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">ID Employé (optionnel)</label>
                 <input
                   type="text"
-                  value={formData.position}
-                  onChange={e => setFormData({ ...formData, position: e.target.value })}
+                  value={formData.auto_id}
+                  onChange={e => setFormData({ ...formData, auto_id: e.target.value.toUpperCase() })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  placeholder="EMPXXXXXXXX"
                 />
               </div>
               <div className="flex gap-2 pt-2">

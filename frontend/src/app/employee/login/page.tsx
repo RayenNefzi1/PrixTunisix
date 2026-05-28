@@ -16,7 +16,7 @@ const employeeApi = axios.create({
 
 export default function EmployeeLoginPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState({ login: '', password: '' })
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [loading, setLoading] = useState(false)
   const [generalError, setGeneralError] = useState('')
@@ -49,10 +49,11 @@ export default function EmployeeLoginPage() {
       localStorage.setItem('employee_user', JSON.stringify(data.user))
       router.push('/employee/dashboard')
     } catch (err: any) {
-      if (err.response?.data?.errors) {
-        setErrors(err.response.data.errors)
-      } else if (err.response?.data?.message) {
-        setGeneralError(err.response.data.message)
+      const errorData = err.response?.data?.errors || err.response?.data
+      if (errorData?.login) {
+        setErrors({ login: errorData.login })
+      } else if (errorData?.message) {
+        setGeneralError(errorData.message)
       } else {
         setGeneralError('Une erreur est survenue. Veuillez réessayer.')
       }
@@ -72,7 +73,7 @@ export default function EmployeeLoginPage() {
             <Briefcase className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-xl font-bold text-white mt-4">Espace Employé</h1>
-          <p className="text-slate-400 mt-2">Connectez-vous pour gérer les produits</p>
+          <p className="text-slate-400 mt-2">Connectez-vous avec votre ID ou email</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -85,15 +86,15 @@ export default function EmployeeLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">ID Employé ou Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type="email"
-                  value={form.email}
-                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  type="text"
+                  value={form.login}
+                  onChange={e => setForm(f => ({ ...f, login: e.target.value.toUpperCase() }))}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500"
-                  placeholder="employe@prixtunisix.tn"
+                  placeholder="EMP12345678 ou email@exemple.com"
                   required
                 />
               </div>
