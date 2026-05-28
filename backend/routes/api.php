@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ScrapingController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\OtpController;
@@ -354,6 +355,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::middleware([\App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
                 Route::get('dashboard', [AdminController::class, 'dashboard']);
                 Route::get('users', [AdminController::class, 'users']);
+                Route::get('employees', [EmployeeController::class, 'index']);
+                Route::post('employees', [EmployeeController::class, 'store']);
+                Route::put('employees/{employee}', [EmployeeController::class, 'update']);
+                Route::delete('employees/{employee}', [EmployeeController::class, 'destroy']);
+                Route::post('employees/{employee}/regenerate-id', [EmployeeController::class, 'regenerateId']);
                 Route::get('fournisseurs',          [AdminController::class, 'fournisseurs']);
                 Route::put('fournisseurs/{fournisseur}/toggle', [AdminController::class, 'toggleFournisseur']);
                 Route::get('subscriptions',        [AdminController::class, 'subscriptions']);

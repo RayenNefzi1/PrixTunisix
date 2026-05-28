@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
   LayoutDashboard, Users, ShoppingBag, Store, BarChart3, 
-  Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw, BellRing, Trash2, CheckCircle
+  Settings, LogOut, Menu, X, Package, Bell, Tag, CreditCard, RefreshCw, BellRing, Trash2, CheckCircle, UserCheck
 } from 'lucide-react'
 import ToastProvider from '@/components/Toast'
 
@@ -25,6 +25,7 @@ const menuItems = [
   { href: '/admin/products', icon: Package, label: 'Produits' },
   { href: '/admin/subscriptions', icon: CreditCard, label: 'Abonnements' },
   { href: '/admin/categories', icon: Tag, label: 'Catégories' },
+  { href: '/admin/employees', icon: UserCheck, label: 'Employés' },
   { href: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
   { href: '/admin/alerts', icon: Bell, label: 'Alertes Prix' },
   { href: '/admin/scraping', icon: RefreshCw, label: 'Scraping' },

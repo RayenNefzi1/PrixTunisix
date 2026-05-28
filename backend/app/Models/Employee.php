@@ -6,7 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
-    protected $fillable = ['user_id', 'position'];
+    protected $fillable = ['user_id', 'position', 'name', 'prename', 'cin', 'phone', 'auto_id'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($employee) {
+            if (empty($employee->auto_id)) {
+                $employee->auto_id = 'EMP' . strtoupper(uniqid());
+            }
+        });
+    }
 
     public function user()
     {
