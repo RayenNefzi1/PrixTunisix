@@ -48,13 +48,15 @@ export default function ManualProductsUploadPage() {
     formData.append('file', file)
 
     try {
-      await api.post('/fournisseur/manual-products/upload', formData)
+      const res = await api.post('/fournisseur/manual-products/upload', formData)
       setFile(null)
       setError(null)
       fetchRequests()
+      alert(res.data.message || 'Upload réussi!')
     } catch (err: any) {
-      console.error(err)
-      setError(err.response?.data?.message || 'Erreur lors de l\'upload')
+      console.error('Upload error:', err.response?.data)
+      const msg = err.response?.data?.message || err.response?.data?.errors?.file?.[0] || 'Erreur lors de l\'upload'
+      setError(msg)
     } finally {
       setUploading(false)
     }

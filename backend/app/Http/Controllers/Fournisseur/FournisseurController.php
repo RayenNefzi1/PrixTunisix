@@ -445,7 +445,7 @@ class FournisseurController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|file|mimes:csv,xlsx,xls|max:10240',
+            'file' => 'required|file|max:10240',
         ]);
 
         $file = $request->file('file');
