@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/api'
-import { Briefcase, BarChart2, Package, Key, ExternalLink, TrendingUp, Eye, MousePointer, CreditCard, AlertCircle } from 'lucide-react'
+import { Briefcase, BarChart2, Package, Key, ExternalLink, TrendingUp, Eye, MousePointer, CreditCard, AlertCircle, Upload } from 'lucide-react'
 
 interface Stats {
   total_clicks: number; clicks_this_month: number; clicks_today: number
@@ -133,6 +133,22 @@ export default function FournisseurPage() {
           </div>
           <Link href="/fournisseur/subscription" className="text-sm text-brand-600 hover:underline">
             Gérer
+          </Link>
+        </div>
+      )}
+
+      {/* Manual Product Upload Button */}
+      {subscription?.plan === 'premium_manual' && subscription.status === 'active' && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-4">
+          <div className="p-2 rounded-lg bg-blue-100">
+            <Upload className="w-5 h-5 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-gray-900">Ajouter des produits manuellement</p>
+            <p className="text-sm text-gray-500">Uploadez un fichier Excel avec vos produits</p>
+          </div>
+          <Link href="/fournisseur/products/upload" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 whitespace-nowrap">
+            Uploader
           </Link>
         </div>
       )}
