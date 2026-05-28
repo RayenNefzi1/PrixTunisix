@@ -40,7 +40,7 @@ export default function AdminEmployeesPage() {
 
   const fetchEmployees = () => {
     setLoading(true)
-    adminApi.get('/employees')
+    adminApi.get('/admin/employees')
       .then(res => res.data)
       .then(data => setEmployees(data.data || data))
       .catch(err => console.error(err))
@@ -60,9 +60,9 @@ export default function AdminEmployeesPage() {
         }
         if (formData.email) updateData.email = formData.email
         if (formData.password) updateData.password = formData.password
-        await adminApi.put(`/employees/${editingEmployee.id}`, updateData)
+        await adminApi.put(`/admin/employees/${editingEmployee.id}`, updateData)
       } else {
-        await adminApi.post('/employees', formData)
+        await adminApi.post('/admin/employees', formData)
       }
       fetchEmployees()
       resetForm()
@@ -73,7 +73,7 @@ export default function AdminEmployeesPage() {
 
   const handleDelete = async (id: number) => {
     try {
-      await adminApi.delete(`/employees/${id}`)
+      await adminApi.delete(`/admin/employees/${id}`)
       setEmployees(employees.filter(e => e.id !== id))
     } catch (err) {
       console.error('Delete failed:', err)
@@ -83,7 +83,7 @@ export default function AdminEmployeesPage() {
 
   const handleRegenerateId = async (id: number) => {
     try {
-      const res = await adminApi.post(`/employees/${id}/regenerate-id`)
+      const res = await adminApi.post(`/admin/employees/${id}/regenerate-id`)
       setEmployees(employees.map(e => e.id === id ? res.data : e))
     } catch (err) {
       console.error('Regenerate failed:', err)
