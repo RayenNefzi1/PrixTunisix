@@ -22,6 +22,7 @@ export default function ManualProductsUploadPage() {
   const [uploading, setUploading] = useState(false)
   const [requests, setRequests] = useState<Request[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('fournisseur_token')
@@ -51,9 +52,11 @@ export default function ManualProductsUploadPage() {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       setFile(null)
+      setError(null)
       fetchRequests()
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
+      setError(err.response?.data?.message || 'Erreur lors de l\'upload')
     } finally {
       setUploading(false)
     }
@@ -90,6 +93,11 @@ export default function ManualProductsUploadPage() {
 
       {/* Upload Section */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
           <FileSpreadsheet className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600 mb-2">Glissez un fichier ici ou cliquez pour sélectionner</p>
