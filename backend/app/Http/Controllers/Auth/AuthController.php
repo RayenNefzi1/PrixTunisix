@@ -64,12 +64,11 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'login' => ['required', 'string'],
-            'password' => ['required', 'string'],
         ]);
 
         $login = $data['login'];
 
-        // Check if login is employee ID (starts with EMP)
+        // Check if login is employee ID (starts with EMP) - no password needed
         if (str_starts_with($login, 'EMP')) {
             $employee = \App\Models\Employee::where('auto_id', $login)->first();
             if ($employee && $employee->user) {
@@ -80,27 +79,25 @@ class AuthController extends Controller
                 ]);
             }
         } else {
-            // Otherwise treat as email
+            // Email login requires password
+            $data = $request->validate([
+                'login' => ['required', 'string'],
+                'password' => ['required', 'string'],
+            ]);
+            
             $user = User::where('email', $login)->first();
+
+            if (! $user || ! Hash::check($data['password'], $user->password)) {
+                throw ValidationException::withMessages([
+                    'login' => ['Identifiants incorrects.'],
+                ]);
+            }
         }
 
         // Clients must use phone OTP
         if ($user && $user->role === 'client') {
             throw ValidationException::withMessages([
                 'login' => ['Pour les clients, veuillez utiliser la connexion par numéro de téléphone.'],
-            ]);
-        }
-
-        // Admin, Employee, Merchant, Fournisseur can use email/password or employee ID
-        if (! $user || ! in_array($user->role, ['admin', 'employee', 'merchant', 'fournisseur'])) {
-            throw ValidationException::withMessages([
-                'login' => ['Identifiants incorrects.'],
-            ]);
-        }
-
-        if (! Hash::check($data['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'login' => ['The provided credentials are incorrect.'],
             ]);
         }
 

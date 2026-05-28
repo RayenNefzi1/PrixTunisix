@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import axios from 'axios'
-import { Lock, Mail, AlertCircle, Loader2, Briefcase } from 'lucide-react'
+import { AlertCircle, Loader2, Briefcase } from 'lucide-react'
 
 const employeeApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
@@ -16,7 +16,7 @@ const employeeApi = axios.create({
 
 export default function EmployeeLoginPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ login: '', password: '' })
+  const [form, setForm] = useState({ login: '' })
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [loading, setLoading] = useState(false)
   const [generalError, setGeneralError] = useState('')
@@ -99,22 +99,6 @@ export default function EmployeeLoginPage() {
                 />
               </div>
               {errors.login && <p className="text-red-500 text-xs mt-1">{errors.login[0]}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="password"
-                  value={form.password}
-                  onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password[0]}</p>}
             </div>
 
             <button
