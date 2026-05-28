@@ -211,7 +211,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
           </nav>
         </aside>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 overflow-x-hidden">
           <ToastProvider>
             {currentView === 'dashboard' && <DashboardView />}
             {currentView === 'products' && <ProductsView />}
