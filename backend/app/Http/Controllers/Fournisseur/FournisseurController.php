@@ -444,11 +444,16 @@ class FournisseurController extends Controller
             return response()->json(['message' => 'Votre abonnement n\'est pas actif. Veuillez le renouveler.'], 403);
         }
 
-        $request->validate([
-            'file' => 'required|file|max:10240',
-        ]);
-
         $file = $request->file('file');
+        
+        if (!$file || !$request->hasFile('file')) {
+            return response()->json(['message' => 'Aucun fichier reçu'], 422);
+        }
+
+        if (!$file->isValid()) {
+            return response()->json(['message' => 'Fichier invalide'], 422);
+        }
+        
         $extension = $file->getClientOriginalExtension();
         $fileName = $file->getClientOriginalName();
 
