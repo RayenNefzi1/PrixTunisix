@@ -230,20 +230,38 @@ export default function ProductsList() {
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`px-3 py-1 rounded-lg ${
-                page === p 
-                  ? 'bg-brand-600 text-white' 
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {p}
-            </button>
-          ))}
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 10))}
+            disabled={page <= 10}
+            className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            -10
+          </button>
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Précédent
+          </button>
+          <span className="px-3 py-1 text-sm text-gray-600">
+            {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Suivant
+          </button>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 10))}
+            disabled={page + 10 > totalPages}
+            className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            +10
+          </button>
         </div>
       )}
 
