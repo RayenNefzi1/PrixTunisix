@@ -7,6 +7,7 @@ use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class EmployeeController extends Controller
 {
@@ -24,16 +25,17 @@ class EmployeeController extends Controller
             'cin' => 'required|regex:/^[2-9]\d{7}$/|unique:employees,cin',
             'phone' => 'required|regex:/^[2459]\d{7}$/',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
             'auto_id' => 'nullable|string|unique:employees,auto_id',
         ]);
+
+        $password = Str::random(12);
 
         $user = \App\Models\User::create([
             'name' => $data['name'],
             'prename' => $data['prename'],
             'email' => $data['email'],
             'phone' => $data['phone'],
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make($password),
             'role' => 'employee',
         ]);
 

@@ -11,11 +11,24 @@ interface Employee {
   cin: string
   phone: string
   auto_id: string
-  position: string
   created_at: string
   user?: {
     email: string
   }
+}
+
+function validateCin(value: string): string | null {
+  if (value.length === 0) return null
+  if (value.length !== 8) return 'CIN doit avoir 8 chiffres'
+  if (!/^[2-9]/.test(value)) return 'CIN doit commencer par 2-9'
+  return null
+}
+
+function validatePhone(value: string): string | null {
+  if (value.length === 0) return null
+  if (value.length !== 8) return 'Téléphone doit avoir 8 chiffres'
+  if (!/^[2459]/.test(value)) return 'Téléphone doit commencer par 2, 4, 5 ou 9'
+  return null
 }
 
 export default function AdminEmployeesPage() {
@@ -33,6 +46,8 @@ export default function AdminEmployeesPage() {
     password: '',
     auto_id: '',
   })
+  const [cinError, setCinError] = useState<string | null>(null)
+  const [phoneError, setPhoneError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchEmployees()
@@ -230,24 +245,34 @@ export default function AdminEmployeesPage() {
                 <input
                   type="text"
                   value={formData.cin}
-                  onChange={e => setFormData({ ...formData, cin: e.target.value.replace(/\D/g, '').slice(0, 8) })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  onChange={e => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 8)
+                    setFormData({ ...formData, cin: val })
+                    setCinError(validateCin(val))
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg ${cinError ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder="12345678"
                   maxLength={8}
                   required
                 />
+                {cinError && <p className="text-red-500 text-xs mt-1">{cinError}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone (8 chiffres)</label>
                 <input
                   type="text"
                   value={formData.phone}
-                  onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 8) })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  onChange={e => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 8)
+                    setFormData({ ...formData, phone: val })
+                    setPhoneError(validatePhone(val))
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg ${phoneError ? 'border-red-500' : 'border-gray-200'}`}
                   placeholder="21234567"
                   maxLength={8}
                   required
                 />
+                {phoneError && <p className="text-red-500 text-xs mt-1">{phoneError}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -255,18 +280,6 @@ export default function AdminEmployeesPage() {
                   type="email"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
-                  required={!editingEmployee}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {editingEmployee ? 'Nouveau mot de passe (laisser vide)' : 'Mot de passe'}
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={e => setFormData({ ...formData, password: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   required={!editingEmployee}
                 />
