@@ -48,9 +48,7 @@ export default function ManualProductsUploadPage() {
     formData.append('file', file)
 
     try {
-      await api.post('/fournisseur/manual-products/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      await api.post('/fournisseur/manual-products/upload', formData)
       setFile(null)
       setError(null)
       fetchRequests()

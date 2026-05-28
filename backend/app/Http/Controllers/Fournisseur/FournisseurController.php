@@ -431,8 +431,17 @@ class FournisseurController extends Controller
         }
 
         $subscription = $fournisseur->subscription;
-        if (!$subscription || !$subscription->canAddProductsManually()) {
-            return response()->json(['message' => 'Abonnement premium manuel requis.'], 403);
+        
+        if (!$subscription) {
+            return response()->json(['message' => 'Aucun abonnement trouvé. Veuillez d\'abord choisir un abonnement.'], 403);
+        }
+        
+        if ($subscription->plan !== 'premium_manual') {
+            return response()->json(['message' => 'L\'abonnement Premium Manuel est requis pour uploader des produits. Veuillez passer à ce plan.'], 403);
+        }
+        
+        if ($subscription->status !== 'active') {
+            return response()->json(['message' => 'Votre abonnement n\'est pas actif. Veuillez le renouveler.'], 403);
         }
 
         $request->validate([
