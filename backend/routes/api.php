@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ScrapingController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Catalog\BrandController;
@@ -44,6 +46,15 @@ Route::prefix('auth')->group(function () {
 // ── Employee API (public test) ───────────────────────────────────────────
 Route::get('employee-test', function() {
     return response()->json(['status' => 'ok', 'time' => now()]);
+});
+
+Route::get('run-migrations', function() {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return response()->json(['status' => 'ok', 'message' => Artisan::output()]);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+    }
 });
 
 // ── Employee API ────────────────────────────────────────────────────────────
