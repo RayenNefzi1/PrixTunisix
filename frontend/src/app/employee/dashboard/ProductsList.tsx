@@ -107,14 +107,14 @@ export default function ProductsList() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full table-layout-fixed">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 min-w-[150px]">Produit</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 min-w-[70px]">Catégorie</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 min-w-[120px]">Prix</th>
-                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 w-12">Offres</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 w-16">Actions</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[160px]">Produit</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[80px]">Catégorie</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 w-[140px]">Prix</th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 w-[50px]">Offres</th>
+                <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 w-[70px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
