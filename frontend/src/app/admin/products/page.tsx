@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Package, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { Package, ChevronLeft, ChevronRight, Search, Edit, Trash2 } from 'lucide-react'
 import adminApi from '@/lib/admin-api'
 
 interface Product {
@@ -13,6 +13,7 @@ interface Product {
   brand: { name: string } | null
   is_validated: boolean
   created_at: string
+  description?: string
 }
 
 export default function AdminProductsPage() {
@@ -21,6 +22,8 @@ export default function AdminProductsPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [search, setSearch] = useState('')
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
 
   useEffect(() => {
     setLoading(true)
@@ -36,6 +39,30 @@ export default function AdminProductsPage() {
       .catch((err) => console.error(err))
       .finally(() => setLoading(false))
   }, [page, search])
+
+  const handleDelete = async (productId: number) => {
+    try {
+      await adminApi.delete(`/products/${productId}`)
+      setProducts(products.filter(p => p.id !== productId))
+    } catch (err) {
+      console.error('Delete failed:', err)
+    }
+    setDeletingProduct(null)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingProduct) return
+    try {
+      await adminApi.put(`/products/${editingProduct.id}`, {
+        name: editingProduct.name,
+        description: editingProduct.description,
+      })
+      setProducts(products.map(p => p.id === editingProduct.id ? editingProduct : p))
+    } catch (err) {
+      console.error('Update failed:', err)
+    }
+    setEditingProduct(null)
+  }
 
   return (
     <div className="space-y-6">
@@ -66,18 +93,19 @@ export default function AdminProductsPage() {
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Marque</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Statut</th>
               <th className="text-left px-6 py-3 text-sm font-medium text-gray-500">Date</th>
+              <th className="text-right px-6 py-3 text-sm font-medium text-gray-500">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               [...Array(5)].map((_, i) => (
                 <tr key={i}>
-                  <td colSpan={5} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-full animate-pulse" /></td>
+                  <td colSpan={6} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-full animate-pulse" /></td>
                 </tr>
               ))
             ) : products.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">Aucun produit trouvé</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Aucun produit trouvé</td>
               </tr>
             ) : products.map(p => (
               <tr key={p.id} className="hover:bg-gray-50">
@@ -103,6 +131,24 @@ export default function AdminProductsPage() {
                 <td className="px-6 py-4 text-gray-500 text-sm">
                   {new Date(p.created_at).toLocaleDateString('fr-FR')}
                 </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => setEditingProduct(p)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      title="Modifier"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setDeletingProduct(p)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -119,6 +165,77 @@ export default function AdminProductsPage() {
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50">
               <ChevronRight className="w-5 h-5" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {editingProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md p-4">
+            <h3 className="font-bold text-lg mb-4">Modifier le produit</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={editingProduct.name}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={editingProduct.description || ''}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="flex-1 px-3 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deletingProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center">
+            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-7 h-7 text-red-600" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Confirmer la suppression</h3>
+            <p className="text-gray-500 mb-6">
+              Êtes-vous sûr de vouloir supprimer <br/>
+              <span className="font-medium text-gray-900">"{deletingProduct.name}"</span> ?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeletingProduct(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 font-medium"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => handleDelete(deletingProduct.id)}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium"
+              >
+                Supprimer
+              </button>
+            </div>
           </div>
         </div>
       )}
