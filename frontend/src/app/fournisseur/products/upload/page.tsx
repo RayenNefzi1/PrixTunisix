@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/api'
 import { Upload, FileSpreadsheet, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react'
+import ToastProvider from '@/components/Toast'
 
 interface Request {
   id: number
@@ -23,6 +24,7 @@ export default function ManualProductsUploadPage() {
   const [requests, setRequests] = useState<Request[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('fournisseur_token')
@@ -57,8 +59,9 @@ export default function ManualProductsUploadPage() {
       const res = await api.post('/fournisseur/manual-products/upload', formData)
       setFile(null)
       setError(null)
+      setSuccess(res.data.message || 'Upload réussi!')
       fetchRequests()
-      alert(res.data.message || 'Upload réussi!')
+      setTimeout(() => setSuccess(null), 3000)
     } catch (err: any) {
       console.error('Upload error:', err.response?.data)
       const errors = err.response?.data?.errors
@@ -67,6 +70,7 @@ export default function ManualProductsUploadPage() {
         msg = Object.values(errors).flat().join(', ')
       }
       setError(msg)
+      setTimeout(() => setError(null), 5000)
     } finally {
       setUploading(false)
     }
@@ -106,6 +110,12 @@ export default function ManualProductsUploadPage() {
         {error && (
           <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
             {error}
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 p-3 bg-green-50 text-green-600 rounded-lg text-sm flex items-center gap-2">
+            <CheckCircle className="w-4 h-4" />
+            {success}
           </div>
         )}
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
