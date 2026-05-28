@@ -41,11 +41,17 @@ export default function ManualProductsUploadPage() {
   }
 
   const handleUpload = async () => {
-    if (!file) return
+    if (!file) {
+      setError('Veuillez sélectionner un fichier')
+      return
+    }
     setUploading(true)
+    setError(null)
     
     const formData = new FormData()
     formData.append('file', file)
+    
+    console.log('Uploading file:', file.name, file.size, file.type)
 
     try {
       const res = await api.post('/fournisseur/manual-products/upload', formData)
@@ -55,7 +61,11 @@ export default function ManualProductsUploadPage() {
       alert(res.data.message || 'Upload réussi!')
     } catch (err: any) {
       console.error('Upload error:', err.response?.data)
-      const msg = err.response?.data?.message || err.response?.data?.errors?.file?.[0] || 'Erreur lors de l\'upload'
+      const errors = err.response?.data?.errors
+      let msg = err.response?.data?.message || 'Erreur lors de l\'upload'
+      if (errors) {
+        msg = Object.values(errors).flat().join(', ')
+      }
       setError(msg)
     } finally {
       setUploading(false)
