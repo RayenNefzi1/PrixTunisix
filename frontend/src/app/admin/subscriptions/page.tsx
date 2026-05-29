@@ -68,7 +68,7 @@ export default function AdminSubscriptionsPage() {
           const count = subscriptions.filter(s => s.plan === plan && s.status === 'active').length
           return (
             <div key={plan} className="bg-white rounded-xl border border-gray-100 p-4">
-              <p className="text-sm text-gray-500 capitalize">{plan === 'premium_manual' ? 'Premium Manuel' : plan === 'pro' ? 'Go Pro' : plan}</p>
+              <p className="text-sm text-gray-500 capitalize">{plan === 'premium_manual' ? 'Premium Manuel' : plan === 'pro' ? 'Pro' : plan}</p>
               <p className="text-2xl font-bold text-gray-900">{count}</p>
             </div>
           )
@@ -107,7 +107,7 @@ export default function AdminSubscriptionsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPlanBadge(sub.plan)}`}>
-                    {sub.plan === 'pro' ? 'Go Pro' : sub.plan === 'max' ? 'Max' : sub.plan === 'premium_manual' ? 'Premium Manuel' : 'Basic'}
+                    {sub.plan === 'pro' ? 'Pro' : sub.plan === 'max' ? 'Max' : sub.plan === 'premium_manual' ? 'Premium Manuel' : 'Basic'}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-gray-900 font-medium">{typeof sub.price === 'number' ? sub.price.toFixed(2) : '—'} DT</td>

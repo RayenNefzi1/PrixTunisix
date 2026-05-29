@@ -184,7 +184,7 @@ export default function SubscriptionPage() {
         <h3 className="font-bold text-gray-900 mb-2">Comment fonctionne l'abonnement?</h3>
         <ul className="space-y-2 text-gray-600">
           <li>• <strong>Basic</strong>: Gratuit, idéal pour tester (5 produits max, n'apparaît pas sur le site)</li>
-          <li>• <strong>Go Pro</strong>: Pour les fournisseurs avec site web, scraping automatique Enabled</li>
+          <li>• <strong>Pro</strong>: Pour les fournisseurs avec site web, scraping automatique Enabled</li>
           <li>• <strong>Max</strong>: Le plus complet avec tous les avantages premium</li>
           <li>• <strong>Premium Manuel</strong>: Pour les fournisseurs sans site web, ajout manuel des produits</li>
         </ul>

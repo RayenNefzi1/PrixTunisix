@@ -98,7 +98,7 @@ export default function AdminFournisseursPage() {
                 <td className="px-6 py-4">
                   {f.subscription ? (
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPlanBadge(f.subscription.plan, f.subscription.status)}`}>
-                      {f.subscription.plan === 'pro' ? 'Go Pro' : f.subscription.plan === 'max' ? 'Max' : f.subscription.plan === 'premium_manual' ? 'Premium Manuel' : 'Basic'}
+                      {f.subscription.plan === 'pro' ? 'Pro' : f.subscription.plan === 'max' ? 'Max' : f.subscription.plan === 'premium_manual' ? 'Premium Manuel' : 'Basic'}
                     </span>
                   ) : (
                     <span className="text-gray-400 text-sm">Aucun</span>
