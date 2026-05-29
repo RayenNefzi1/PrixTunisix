@@ -205,7 +205,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex min-h-0">
         <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-56px)] flex-shrink-0">
           <nav className="p-4 space-y-1">
             {menuItems.map(item => (
@@ -225,7 +225,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
           </nav>
         </aside>
 
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto min-h-0">
           <ToastProvider>
             {currentView === 'dashboard' && <DashboardView />}
             {currentView === 'products' && <ProductsView />}
