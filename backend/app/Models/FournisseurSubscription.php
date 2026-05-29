@@ -33,7 +33,7 @@ class FournisseurSubscription extends Model
     {
         return [
             'pro' => [
-                'name' => 'Go Pro',
+                'name' => 'Pro',
                 'price' => 29.99,
                 'features' => [
                     'Apparaître sur le site',

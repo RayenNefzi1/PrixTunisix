@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FileSpreadsheet, Check, X, Clock } from 'lucide-react'
+import { FileSpreadsheet, Check, X, Clock, Search, Tag, Package, Eye } from 'lucide-react'
 import employeeApi from '@/lib/employee-api'
 
 interface ManualProduct {
@@ -19,6 +19,16 @@ interface ManualProduct {
   created_at: string
 }
 
+interface Category {
+  id: number
+  name: string
+}
+
+interface Brand {
+  id: number
+  name: string
+}
+
 interface Request {
   id: number
   fournisseur_id: number
@@ -29,18 +39,23 @@ interface Request {
   fournisseur?: {
     company_name: string
   }
-  products?: ManualProduct[]
 }
 
 export default function ManualProductsView() {
   const [requests, setRequests] = useState<Request[]>([])
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [products, setProducts] = useState<ManualProduct[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingProducts, setLoadingProducts] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<ManualProduct | null>(null)
+  const [matchBy, setMatchBy] = useState<'name' | 'reference'>('name')
+  const [suggestions, setSuggestions] = useState<{id: number, name: string}[]>([])
 
   useEffect(() => {
     fetchRequests()
+    employeeApi.get('/employee/categories').then(res => setCategories(res.data.data || [])).catch(console.error)
   }, [])
 
   const fetchRequests = () => {
@@ -64,10 +79,30 @@ export default function ManualProductsView() {
     fetchProducts(req.id)
   }
 
+  const selectProduct = async (product: ManualProduct) => {
+    setSelectedProduct(product)
+    setSuggestions([])
+    
+    if (matchBy === 'reference' && product.reference) {
+      try {
+        const res = await employeeApi.get(`/employee/products?q=${product.reference}&page=1`)
+        const prods = res.data.data || []
+        setSuggestions(prods.slice(0, 5).map((p: any) => ({ id: p.id, name: p.name })))
+      } catch {}
+    } else if (matchBy === 'name' && product.name) {
+      try {
+        const res = await employeeApi.get(`/employee/products?q=${encodeURIComponent(product.name)}&page=1`)
+        const prods = res.data.data || []
+        setSuggestions(prods.slice(0, 5).map((p: any) => ({ id: p.id, name: p.name })))
+      } catch {}
+    }
+  }
+
   const handleApprove = async (productId: number) => {
     try {
       await employeeApi.post(`/employee/manual-products/${productId}/approve`)
       setProducts(products.map(p => p.id === productId ? { ...p, status: 'approved' } : p))
+      setSelectedProduct(null)
     } catch (err) {
       console.error(err)
     }
@@ -79,6 +114,7 @@ export default function ManualProductsView() {
     try {
       await employeeApi.post(`/employee/manual-products/${productId}/reject`, { reason })
       setProducts(products.map(p => p.id === productId ? { ...p, status: 'rejected', rejection_reason: reason } : p))
+      setSelectedProduct(null)
     } catch (err) {
       console.error(err)
     }
@@ -121,16 +157,6 @@ export default function ManualProductsView() {
                   <p className="text-xs text-gray-500 mt-1">
                     {req.fournisseur?.company_name || 'Fournisseur'} • {req.total_rows} produits
                   </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${
-                      req.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      req.status === 'processing' ? 'bg-blue-100 text-blue-700' :
-                      req.status === 'completed' ? 'bg-green-100 text-green-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {req.status}
-                    </span>
-                  </div>
                 </button>
               ))}
             </div>
@@ -171,6 +197,13 @@ export default function ManualProductsView() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => selectProduct(product)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                        title="Voir/Modifier"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
                       {product.status === 'pending' ? (
                         <>
                           <button
@@ -198,15 +231,124 @@ export default function ManualProductsView() {
                       )}
                     </div>
                   </div>
-                  {product.rejection_reason && (
-                    <p className="text-xs text-red-500 mt-2">Motif: {product.rejection_reason}</p>
-                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-2xl p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg">Détails du produit</h3>
+              <button onClick={() => setSelectedProduct(null)} className="p-1 hover:bg-gray-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={selectedProduct.name}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={selectedProduct.description || ''}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Prix</label>
+                  <input
+                    type="text"
+                    value={selectedProduct.price ? `${selectedProduct.price} DT` : '-'}
+                    readOnly
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Référence</label>
+                  <input
+                    type="text"
+                    value={selectedProduct.reference || '-'}
+                    readOnly
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Rechercher par</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setMatchBy('name'); selectProduct(selectedProduct) }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                      matchBy === 'name' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    Nom
+                  </button>
+                  <button
+                    onClick={() => { setMatchBy('reference'); selectProduct(selectedProduct) }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                      matchBy === 'reference' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    Référence
+                  </button>
+                </div>
+              </div>
+
+              {suggestions.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Produits suggérés</label>
+                  <div className="space-y-2">
+                    {suggestions.map(s => (
+                      <div key={s.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <span className="text-sm text-gray-700">{s.name}</span>
+                        <button
+                          onClick={() => handleApprove(selectedProduct.id)}
+                          className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200"
+                        >
+                          Approuver comme ceci
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-4 border-t">
+                <button
+                  onClick={() => handleApprove(selectedProduct.id)}
+                  className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                >
+                  Approuver
+                </button>
+                <button
+                  onClick={() => handleReject(selectedProduct.id)}
+                  className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                >
+                  Rejeter
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
