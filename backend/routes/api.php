@@ -83,6 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('employee/alerts', [AdminController::class, 'alerts']);
     Route::get('employee/analytics/clicks', [AdminController::class, 'clickAnalytics']);
     Route::get('employee/manual-product-requests', [AdminController::class, 'getManualProductRequests']);
+    Route::get('employee/manual-products/pending-count', [AdminController::class, 'getPendingManualProductCount']);
     Route::get('employee/manual-products/{requestId}', [AdminController::class, 'getManualProducts']);
     Route::post('employee/manual-products/{id}/approve', [AdminController::class, 'approveManualProduct']);
     Route::post('employee/manual-products/{id}/reject', [AdminController::class, 'rejectManualProduct']);

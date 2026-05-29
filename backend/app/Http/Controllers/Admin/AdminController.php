@@ -255,6 +255,16 @@ class AdminController extends Controller
         return response()->json(['requests' => $requests]);
     }
 
+    public function getPendingManualProductCount(): JsonResponse
+    {
+        $count = \App\Models\ManualProductRequest::where('status', 'pending')
+            ->orWhereHas('products', function ($q) {
+                $q->where('status', 'pending');
+            })
+            ->count();
+        return response()->json(['count' => $count]);
+    }
+
     public function getManualProducts($requestId): JsonResponse
     {
         $products = \App\Models\ManualProduct::where('request_id', $requestId)

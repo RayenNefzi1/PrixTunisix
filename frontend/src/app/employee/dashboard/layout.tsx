@@ -83,6 +83,18 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
     
     if (token && stored) {
       setEmployee(JSON.parse(stored))
+      
+      employeeApi.get('/employee/manual-products/pending-count')
+        .then(res => {
+          if (res.data.count > 0) {
+            addNotification(
+              'Produits manuels en attente',
+              `${res.data.count} produit(s) en attente de validation`,
+              'warning'
+            )
+          }
+        })
+        .catch(console.error)
     } else if (pathname !== '/employee/login') {
       router.push('/employee/login')
     }
