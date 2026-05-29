@@ -4,10 +4,11 @@ import { useEffect, useState, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
-  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Search, X, Image, Edit, Trash2
+  LayoutDashboard, Package, Tag, BarChart3, Bell, LogOut, Search, X, Image, Edit, Trash2, FileSpreadsheet
 } from 'lucide-react'
 import ToastProvider from '@/components/Toast'
 import employeeApi from '@/lib/employee-api'
+import ManualProductsView from './ManualProductsView'
 
 interface Notification {
   id: string
@@ -18,12 +19,13 @@ interface Notification {
   created_at: string
 }
 
-type View = 'dashboard' | 'products' | 'categories' | 'analytics' | 'alerts'
+type View = 'dashboard' | 'products' | 'categories' | 'analytics' | 'alerts' | 'manual-products'
 
 const menuItems = [
   { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { id: 'products', icon: Package, label: 'Produits' },
   { id: 'categories', icon: Tag, label: 'Catégories' },
+  { id: 'manual-products', icon: FileSpreadsheet, label: 'Produits Manuels' },
   { id: 'analytics', icon: BarChart3, label: 'Analytics' },
   { id: 'alerts', icon: Bell, label: 'Alertes Prix' },
 ]
@@ -228,6 +230,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
             {currentView === 'dashboard' && <DashboardView />}
             {currentView === 'products' && <ProductsView />}
             {currentView === 'categories' && <CategoriesView />}
+            {currentView === 'manual-products' && <ManualProductsView />}
             {currentView === 'analytics' && <AnalyticsView />}
             {currentView === 'alerts' && <AlertsView />}
           </ToastProvider>
