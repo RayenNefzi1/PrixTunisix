@@ -25,8 +25,8 @@ function productUrl(product: Product): string {
   if (product.slug && product.category?.slug) {
     return `/produits/${product.category.slug}/${product.slug}`
   }
-  if (product.slug) {
-    return `/produits/${product.category?.name?.toLowerCase().replace(/\s+/g, '-') || 'default'}/${product.slug}`
+  if (product.slug && product.category?.name) {
+    return `/produits/${product.category.name.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
   }
   return `/products/${product.id}`
 }

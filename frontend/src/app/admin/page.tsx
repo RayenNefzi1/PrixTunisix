@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import adminApi from '@/lib/admin-api'
-import { Users, Store, Package, TrendingUp, Bell, ShoppingBag, Tag, Shield } from 'lucide-react'
+import { Users, Store, Package, Bell, ShoppingBag, Tag, Shield } from 'lucide-react'
 
 interface Stats {
   total_users: number
@@ -19,13 +19,51 @@ interface Stats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fournisseurStats, setFournisseurStats] = useState<any>(null)
+  const [categoryStats, setCategoryStats] = useState<any>(null)
 
   useEffect(() => {
     adminApi.get('/admin/dashboard')
       .then(res => setStats(res.data))
       .catch(console.error)
       .finally(() => setLoading(false))
+    
+    adminApi.get('/admin/fournisseurs')
+      .then(res => {
+        const data = res.data.data || res.data || []
+        const plans = data.reduce((acc: any, f: any) => {
+          const plan = f.subscription?.plan || 'basic'
+          acc[plan] = (acc[plan] || 0) + 1
+          return acc
+        }, {})
+        setFournisseurStats(plans)
+      })
+      .catch(console.error)
+    
+    adminApi.get('/categories')
+      .then(res => {
+        const cats = res.data || []
+        const data = Array.isArray(cats) ? cats : []
+        setCategoryStats({
+          total: data.length,
+          categories: data.reduce((acc: any, c: any) => {
+            acc[c.name] = 1
+            return acc
+          }, {})
+        })
+      })
+      .catch(console.error)
   }, [])
+
+  const fournisseurColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444']
+  const categoryColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+
+  const fournisseurPlanLabels: Record<string, string> = {
+    basic: 'Basic',
+    pro: 'Pro', 
+    max: 'Max',
+    premium_manual: 'Premium Manuel'
+  }
 
   if (loading) {
     return (
@@ -34,6 +72,9 @@ export default function AdminDashboard() {
       </div>
     )
   }
+
+  const totalFournisseur = Object.values(fournisseurStats || {}).reduce((a: any, b: any) => a + b, 0) as number
+  const totalCategory = categoryStats?.total || 0
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -66,7 +107,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Alerts Summary */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
@@ -83,23 +124,60 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick Links */}
-      <div className="flex flex-wrap gap-3">
-        <Link href="/admin/users" className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition">
-          <Users className="w-4 h-4" /> Utilisateurs
-        </Link>
-        <Link href="/admin/fournisseurs" className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">
-          <Store className="w-4 h-4" /> Fournisseurs
-        </Link>
-        <Link href="/admin/products" className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">
-          <Package className="w-4 h-4" /> Produits
-        </Link>
-        <Link href="/admin/scraping" className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">
-          <TrendingUp className="w-4 h-4" /> Scraping
-        </Link>
-        <Link href="/admin/analytics" className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition">
-          <TrendingUp className="w-4 h-4" /> Analytics
-        </Link>
+      {/* Pie Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Fournisseur by Plan */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Fournisseurs par plan</h2>
+          {totalFournisseur === 0 ? (
+            <p className="text-gray-500 text-center py-8">Aucune donnée</p>
+          ) : (
+            <div className="flex items-center gap-6">
+              <div className="w-40 h-40 rounded-full flex items-center justify-center relative" style={{ background: `conic-gradient(${fournisseurColors.join(', ')})` }}>
+                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-lg font-bold text-gray-900">{totalFournisseur}</span>
+                </div>
+              </div>
+              <div className="flex-1 space-y-2">
+                {Object.entries(fournisseurStats || {}).map(([plan, count]: [string, any], i: number) => (
+                  <div key={plan} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: fournisseurColors[i % fournisseurColors.length] }} />
+                      <span className="text-sm text-gray-600">{fournisseurPlanLabels[plan] || plan}</span>
+                    </div>
+                    <span className="font-medium text-gray-900">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Categories */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Catégories</h2>
+          {totalCategory === 0 ? (
+            <p className="text-gray-500 text-center py-8">Aucune donnée</p>
+          ) : (
+            <div className="flex items-center gap-6">
+              <div className="w-40 h-40 rounded-full flex items-center justify-center relative" style={{ background: `conic-gradient(${categoryColors.slice(0, Math.min(totalCategory, 8)).join(', ')})` }}>
+                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-lg font-bold text-gray-900">{totalCategory}</span>
+                </div>
+              </div>
+              <div className="flex-1 space-y-2 max-h-40 overflow-y-auto">
+                {Object.keys(categoryStats?.categories || {}).slice(0, 8).map((name: string, i: number) => (
+                  <div key={name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: categoryColors[i % categoryColors.length] }} />
+                      <span className="text-sm text-gray-600 truncate max-w-[120px]">{name}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

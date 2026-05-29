@@ -16,22 +16,20 @@ interface Category {
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ name: '', slug: '', parent_id: '' })
+  const [form, setForm] = useState({ name: '', slug: '', code: '', parent_id: '' })
 
   useEffect(() => {
     setLoading(true)
-    adminApi.get(`/categories?page=${page}`)
-      .then(res => res.data)
-      .then(data => {
-        setCategories(data.data || [])
-        setTotalPages(data.last_page || 1)
+    adminApi.get('/categories')
+      .then(res => {
+        const data = res.data
+        setCategories(Array.isArray(data) ? data : (data.data || []))
+        setTotalPages(1)
       })
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [page])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -72,7 +70,7 @@ export default function AdminCategoriesPage() {
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <h2 className="font-bold text-gray-900 mb-4">Nouvelle catégorie</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
                 <input
@@ -91,6 +89,16 @@ export default function AdminCategoriesPage() {
                   onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl"
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Code</label>
+                <input
+                  type="text"
+                  value={form.code}
+                  onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl"
+                  placeholder="ex: INFORMATIQUE"
                 />
               </div>
               <div>

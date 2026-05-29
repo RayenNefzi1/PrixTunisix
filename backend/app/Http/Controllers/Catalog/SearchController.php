@@ -456,7 +456,7 @@ class SearchController extends Controller
             'name'      => $p->name,
             'slug'      => $p->slug,
             'image_url' => $p->image_url,
-            'category'  => $p->category?->name,
+            'category'  => ['id' => $p->category?->id, 'name' => $p->category?->name, 'code' => $p->category?->code, 'slug' => $p->category?->slug],
             'min_price' => $p->offers->first()?->price,
         ]);
 
