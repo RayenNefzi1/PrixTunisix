@@ -418,6 +418,12 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::get('product-matches',                  [AdminController::class, 'productMatches']);
                 Route::put('product-matches/{productMatch}',   [AdminController::class, 'reviewMatch']);
                 Route::get('analytics/clicks',                 [AdminController::class, 'clickAnalytics']);
+
+                // Manual product requests
+                Route::get('manual-product-requests', [AdminController::class, 'getManualProductRequests']);
+                Route::get('manual-products/{requestId}', [AdminController::class, 'getManualProducts']);
+                Route::post('manual-products/{productId}/approve', [AdminController::class, 'approveManualProduct']);
+                Route::post('manual-products/{productId}/reject', [AdminController::class, 'rejectManualProduct']);
                 
                 // Scraping scripts management
                 Route::get('scraping',             [ScrapingController::class, 'index']);
