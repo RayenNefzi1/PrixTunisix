@@ -254,7 +254,7 @@ export default function ManualProductsView() {
       </div>
 
       {selectedProduct && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-[99999] p-4">
           <div className="bg-white rounded-xl w-full max-w-2xl p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-lg">Vérifier le produit</h3>
