@@ -467,8 +467,41 @@ class FournisseurController extends Controller
             'status' => 'pending',
         ]);
 
+        $fullPath = storage_path('app/public/' . $path);
+        $rows = [];
+        
+        if ($extension === 'csv') {
+            if (($handle = fopen($fullPath, 'r')) !== false) {
+                $headers = fgetcsv($handle);
+                while (($data = fgetcsv($handle)) !== false) {
+                    $row = array_combine($headers, $data);
+                    $rows[] = $row;
+                }
+                fclose($handle);
+            }
+        } else {
+            return response()->json([
+                'message' => 'Pour le moment, seuls les fichiers CSV sont acceptés.',
+            ], 422);
+        }
+        
+        $totalRows = count($rows);
+        $requestRecord->update(['total_rows' => $totalRows]);
+        
+        foreach ($rows as $row) {
+            \App\Models\ManualProduct::create([
+                'request_id' => $requestRecord->id,
+                'fournisseur_id' => $fournisseur->id,
+                'name' => $row['name'] ?? 'Sans nom',
+                'description' => $row['description'] ?? null,
+                'price' => isset($row['price']) ? floatval($row['price']) : null,
+                'reference' => $row['reference'] ?? null,
+                'status' => 'pending',
+            ]);
+        }
+
         return response()->json([
-            'message' => 'Fichier uploaded. En attente de validation.',
+            'message' => "Fichier uploaded. $totalRows produit(s) en attente de validation.",
             'request' => $requestRecord,
         ], 201);
     }
