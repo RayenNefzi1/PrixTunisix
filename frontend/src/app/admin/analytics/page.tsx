@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BarChart3, TrendingUp, Users, ShoppingBag } from 'lucide-react'
+import { BarChart3, TrendingUp, Users, ShoppingBag, Package, Tag, MousePointer } from 'lucide-react'
 import adminApi from '@/lib/admin-api'
 
 export default function AdminAnalyticsPage() {
@@ -22,9 +22,14 @@ export default function AdminAnalyticsPage() {
     return (
       <div className="space-y-6">
         <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-2xl animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-24 bg-gray-200 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="h-64 bg-gray-200 rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -32,13 +37,15 @@ export default function AdminAnalyticsPage() {
   }
 
   const totalClicks = analytics?.reduce((sum: number, item: any) => sum + item.total_clicks, 0) || 0
+  const clicksToday = analytics?.[analytics?.length - 1]?.total_clicks || 0
+  const clicksThisMonth = analytics?.slice(-30)?.reduce((sum: number, item: any) => sum + item.total_clicks, 0) || totalClicks
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-500">Statistiques et performances</p>
+          <p className="text-gray-500">Statistiques et performances de la plateforme</p>
         </div>
         <select
           value={dateRange}
@@ -52,55 +59,111 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Clics totaux</p>
-              <p className="text-2xl font-bold text-gray-900">{totalClicks.toLocaleString()}</p>
-            </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <MousePointer className="w-5 h-5 text-blue-500" />
+            <span className="text-xs text-gray-500">Clics aujourd'hui</span>
           </div>
+          <p className="text-2xl font-bold text-gray-900">{clicksToday.toLocaleString()}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Nouveaux utilisateurs</p>
-              <p className="text-2xl font-bold text-gray-900">+124</p>
-            </div>
+        <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Tag className="w-5 h-5 text-green-500" />
+            <span className="text-xs text-gray-500">Clics ce mois</span>
           </div>
+          <p className="text-2xl font-bold text-gray-900">{clicksThisMonth.toLocaleString()}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Offres actives</p>
-              <p className="text-2xl font-bold text-gray-900">1,234</p>
-            </div>
+        <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <BarChart3 className="w-5 h-5 text-orange-500" />
+            <span className="text-xs text-gray-500">Clics total</span>
           </div>
+          <p className="text-2xl font-bold text-gray-900">{totalClicks.toLocaleString()}</p>
+        </div>
+        <div className="bg-white rounded-2xl border border-gray-200 p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingUp className="w-5 h-5 text-purple-500" />
+            <span className="text-xs text-gray-500">Jours analysés</span>
+          </div>
+          <p className="text-2xl font-bold text-gray-900">{analytics?.length || 0}</p>
         </div>
       </div>
 
-      {/* Clicks by day */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      {/* Clicks Chart */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <h2 className="font-bold text-gray-900 mb-4">Clics par jour</h2>
         <div className="h-64 flex items-end gap-2">
-          {analytics?.slice(0, 14).map((item: any, i: number) => (
+          {analytics?.slice(0, 30).map((item: any, i: number) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-2">
               <div 
-                className="w-full bg-brand-500 rounded-t"
-                style={{ height: `${(item.total_clicks / (totalClicks || 1)) * 200}px` }}
+                className="w-full bg-brand-500 rounded-t hover:bg-brand-600 transition-colors"
+                style={{ height: `${Math.max((item.total_clicks / (totalClicks || 1)) * 240, item.total_clicks > 0 ? 4 : 0)}px` }}
+                title={`${item.total_clicks} clics le ${item.date}`}
               />
               <span className="text-xs text-gray-400">{item.date?.slice(5) || '-'}</span>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Top Products & Merchants */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Top Produits</h2>
+          <div className="space-y-3">
+            {analytics?.top_products?.slice(0, 10).map((product: any, i: number) => (
+              <div key={i} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 bg-brand-100 text-brand-700 rounded-full flex items-center justify-center text-xs font-bold">
+                    {i + 1}
+                  </span>
+                  <span className="text-gray-700 truncate max-w-[200px]">{product.name}</span>
+                </div>
+                <span className="font-medium text-brand-600">{product.clicks?.toLocaleString() || 0} clics</span>
+              </div>
+            )) || <p className="text-gray-500 text-center py-4">Aucune donnée disponible</p>}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Top Marchands</h2>
+          <div className="space-y-3">
+            {analytics?.top_merchants?.slice(0, 10).map((merchant: any, i: number) => (
+              <div key={i} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-xs font-bold">
+                    {i + 1}
+                  </span>
+                  <span className="text-gray-700">{merchant.name}</span>
+                </div>
+                <span className="font-medium text-brand-600">{merchant.clicks?.toLocaleString() || 0} clics</span>
+              </div>
+            )) || <p className="text-gray-500 text-center py-4">Aucune donnée disponible</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* Daily Data Table */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <h2 className="font-bold text-gray-900 mb-4">Détails quotidiens</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left px-4 py-2 text-gray-500">Date</th>
+                <th className="text-right px-4 py-2 text-gray-500">Clics</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {analytics?.slice(0, 14).reverse().map((item: any, i: number) => (
+                <tr key={i} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 text-gray-700">{item.date}</td>
+                  <td className="px-4 py-2 text-right font-medium text-brand-600">{item.total_clicks?.toLocaleString() || 0}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

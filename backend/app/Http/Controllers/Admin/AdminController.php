@@ -177,44 +177,66 @@ class AdminController extends Controller
     /** GET /admin/analytics/clicks — redirect click analytics (Phase 4) */
     public function clickAnalytics(Request $request): JsonResponse
     {
+        $days = $request->get('from', 30);
+        
         // Total clicks
         $totalClicks = \App\Models\RedirectClick::count();
         $clicksThisMonth = \App\Models\RedirectClick::whereMonth('clicked_at', now()->month)->count();
         $clicksToday = \App\Models\RedirectClick::whereDate('clicked_at', today())->count();
         
-        // Clicks by day (last 30 days)
+        // Clicks by day
         $clicksByDay = \App\Models\RedirectClick::select(
             DB::raw('DATE(clicked_at) as date'),
-            DB::raw('COUNT(*) as clicks')
+            DB::raw('COUNT(*) as total_clicks')
         )
-            ->where('clicked_at', '>=', now()->subDays(30))
+            ->where('clicked_at', '>=', now()->subDays($days))
             ->groupBy(DB::raw('DATE(clicked_at)'))
             ->orderBy('date')
-            ->get();
+            ->get()
+            ->toArray();
         
-        // Top offers (by merchant)
-        $topOffers = \App\Models\RedirectClick::select(
+        // Top products
+        $topProducts = \App\Models\RedirectClick::select(
             'offer_id',
             DB::raw('COUNT(*) as clicks')
         )
-            ->with('offer:id,raw_title,merchant_website_id,price')
+            ->with(['offer.product:id,name,slug'])
             ->groupBy('offer_id')
             ->orderByDesc('clicks')
-            ->limit(5)
+            ->limit(10)
             ->get()
             ->map(fn($c) => [
-                'name' => $c->offer?->raw_title ?? 'Unknown Offer',
+                'name' => $c->offer?->product?->name ?? $c->offer?->raw_title ?? 'Unknown',
                 'clicks' => $c->clicks
-            ]);
+            ])
+            ->toArray();
 
-        return response()->json([
+        // Top merchants
+        $topMerchants = \App\Models\RedirectClick::select(
+            'offer_id',
+            DB::raw('COUNT(*) as clicks')
+        )
+            ->with(['offer.merchantWebsite:id,name'])
+            ->groupBy('offer_id')
+            ->orderByDesc('clicks')
+            ->limit(10)
+            ->get()
+            ->map(fn($c) => [
+                'name' => $c->offer?->merchantWebsite?->name ?? 'Unknown Merchant',
+                'clicks' => $c->clicks
+            ])
+            ->toArray();
+
+        // Return as array with top_products and top_merchants
+        $result = array_merge($clicksByDay, [
+            'top_products' => $topProducts,
+            'top_merchants' => $topMerchants,
             'total_clicks' => $totalClicks,
             'clicks_this_month' => $clicksThisMonth,
             'clicks_today' => $clicksToday,
-            'clicks_by_day' => $clicksByDay,
-            'top_products' => $topOffers,
-            'top_merchants' => $topOffers,
         ]);
+
+        return response()->json($result);
     }
 
     public function subscriptions(Request $request): JsonResponse
