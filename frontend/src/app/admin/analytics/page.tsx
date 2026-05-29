@@ -36,9 +36,10 @@ export default function AdminAnalyticsPage() {
     )
   }
 
-  const totalClicks = analytics?.reduce((sum: number, item: any) => sum + item.total_clicks, 0) || 0
-  const clicksToday = analytics?.[analytics?.length - 1]?.total_clicks || 0
-  const clicksThisMonth = analytics?.slice(-30)?.reduce((sum: number, item: any) => sum + item.total_clicks, 0) || totalClicks
+  const clicksByDay = analytics?.clicks_by_day || []
+  const totalClicks = analytics?.total_clicks || 0
+  const clicksToday = analytics?.clicks_today || 0
+  const clicksThisMonth = analytics?.clicks_this_month || 0
 
   return (
     <div className="space-y-6">
@@ -93,8 +94,11 @@ export default function AdminAnalyticsPage() {
       {/* Clicks Chart */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <h2 className="font-bold text-gray-900 mb-4">Clics par jour</h2>
+        {clicksByDay.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">Aucune donnée disponible</p>
+        ) : (
         <div className="h-64 flex items-end gap-2">
-          {analytics?.slice(0, 30).map((item: any, i: number) => (
+          {clicksByDay.slice(0, 30).map((item: any, i: number) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-2">
               <div 
                 className="w-full bg-brand-500 rounded-t hover:bg-brand-600 transition-colors"
@@ -105,6 +109,7 @@ export default function AdminAnalyticsPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Top Products & Merchants */}
@@ -156,7 +161,7 @@ export default function AdminAnalyticsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {analytics?.slice(0, 14).reverse().map((item: any, i: number) => (
+              {clicksByDay.slice(0, 14).reverse().map((item: any, i: number) => (
                 <tr key={i} className="hover:bg-gray-50">
                   <td className="px-4 py-2 text-gray-700">{item.date}</td>
                   <td className="px-4 py-2 text-right font-medium text-brand-600">{item.total_clicks?.toLocaleString() || 0}</td>

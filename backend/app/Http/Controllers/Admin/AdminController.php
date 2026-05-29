@@ -228,15 +228,14 @@ class AdminController extends Controller
             ->toArray();
 
         // Return as array with top_products and top_merchants
-        $result = array_merge($clicksByDay, [
+        return response()->json([
+            'clicks_by_day' => $clicksByDay,
             'top_products' => $topProducts,
             'top_merchants' => $topMerchants,
             'total_clicks' => $totalClicks,
             'clicks_this_month' => $clicksThisMonth,
             'clicks_today' => $clicksToday,
         ]);
-
-        return response()->json($result);
     }
 
     public function subscriptions(Request $request): JsonResponse
