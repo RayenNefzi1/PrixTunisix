@@ -206,7 +206,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
       </header>
 
       <div className="flex min-h-0 pt-14">
-        <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-56px)] flex-shrink-0">
+        <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex-shrink-0">
           <nav className="p-4 space-y-1">
             {menuItems.map(item => (
               <button

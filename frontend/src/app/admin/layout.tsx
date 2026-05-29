@@ -118,8 +118,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-slate-800 text-white sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-100 overflow-hidden">
+      <header className="bg-slate-800 text-white fixed top-0 left-0 right-0 z-[100]">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <button 
@@ -195,7 +195,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex pt-14">
         <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} lg:w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-56px)] transition-all overflow-hidden`}>
           <nav className="p-4 space-y-1">
             {menuItems.map(item => (
