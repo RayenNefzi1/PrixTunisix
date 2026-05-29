@@ -79,6 +79,13 @@ class ProductController extends Controller
             ->first();
 
         if (!$product) {
+            // Try finding by name if slug not found
+            $product = Product::with(['category', 'brand', 'offers.merchantWebsite', 'offers.discount'])
+                ->where('name', 'ILIKE', '%' . $productSlug . '%')
+                ->first();
+        }
+
+        if (!$product) {
             return response()->json(['message' => 'Produit introuvable.'], 404);
         }
 
