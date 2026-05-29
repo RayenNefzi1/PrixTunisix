@@ -273,16 +273,23 @@ class AdminController extends Controller
         return response()->json(['products' => $products]);
     }
 
-    public function approveManualProduct(\App\Models\ManualProduct $manualProduct): JsonResponse
+    public function approveManualProduct(Request $request, \App\Models\ManualProduct $manualProduct): JsonResponse
     {
+        $matchProductId = $request->input('matched_product_id');
+        
         $manualProduct->update([
             'status' => 'approved',
+            'matched_product_id' => $matchProductId,
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
         ]);
 
         $subscription = $manualProduct->fournisseur->subscription;
-        if ($subscription && $subscription->plan === 'premium_manual') {
+        
+        if ($matchProductId) {
+            // Link to existing product - no new product created
+        } elseif ($subscription && $subscription->plan === 'premium_manual') {
+            // Create new product with manual data
             Product::create([
                 'name' => $manualProduct->name,
                 'description' => $manualProduct->description,
@@ -303,7 +310,7 @@ class AdminController extends Controller
     {
         $manualProduct->update([
             'status' => 'rejected',
-            'rejection_reason' => $request->reason,
+            'rejection_reason' => $request->input('reason'),
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
         ]);

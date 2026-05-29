@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FileSpreadsheet, Check, X, Clock, Search, Tag, Package, Eye } from 'lucide-react'
+import { FileSpreadsheet, Check, X, Clock, Search, Tag, Package, Eye, Link2, Image } from 'lucide-react'
 import employeeApi from '@/lib/employee-api'
 
 interface ManualProduct {
@@ -19,14 +19,14 @@ interface ManualProduct {
   created_at: string
 }
 
-interface Category {
+interface Product {
   id: number
   name: string
-}
-
-interface Brand {
-  id: number
-  name: string
+  image_url: string | null
+  reference: string | null
+  category?: { name: string }
+  brand?: { name: string }
+  lowest_price: number | null
 }
 
 interface Request {
@@ -45,17 +45,17 @@ export default function ManualProductsView() {
   const [requests, setRequests] = useState<Request[]>([])
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [products, setProducts] = useState<ManualProduct[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingProducts, setLoadingProducts] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<ManualProduct | null>(null)
-  const [matchBy, setMatchBy] = useState<'name' | 'reference'>('name')
-  const [suggestions, setSuggestions] = useState<{id: number, name: string}[]>([])
+  const [matchMode, setMatchMode] = useState<'name' | 'reference'>('reference')
+  const [suggestions, setSuggestions] = useState<Product[]>([])
+  const [imageUrl, setImageUrl] = useState('')
+  const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null)
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false)
 
   useEffect(() => {
     fetchRequests()
-    employeeApi.get('/employee/categories').then(res => setCategories(res.data.data || [])).catch(console.error)
   }, [])
 
   const fetchRequests = () => {
@@ -79,41 +79,56 @@ export default function ManualProductsView() {
     fetchProducts(req.id)
   }
 
-  const selectProduct = async (product: ManualProduct) => {
+  const searchSuggestions = async (product: ManualProduct, mode: 'name' | 'reference') => {
     setSelectedProduct(product)
+    setMatchMode(mode)
     setSuggestions([])
+    setSelectedMatchId(null)
+    setImageUrl(product.image_url || '')
     
-    if (matchBy === 'reference' && product.reference) {
-      try {
-        const res = await employeeApi.get(`/employee/products?q=${product.reference}&page=1`)
-        const prods = res.data.data || []
-        setSuggestions(prods.slice(0, 5).map((p: any) => ({ id: p.id, name: p.name })))
-      } catch {}
-    } else if (matchBy === 'name' && product.name) {
-      try {
-        const res = await employeeApi.get(`/employee/products?q=${encodeURIComponent(product.name)}&page=1`)
-        const prods = res.data.data || []
-        setSuggestions(prods.slice(0, 5).map((p: any) => ({ id: p.id, name: p.name })))
-      } catch {}
+    let query = ''
+    if (mode === 'reference' && product.reference) {
+      query = product.reference
+    } else if (mode === 'name' && product.name) {
+      query = product.name
+    }
+    
+    if (!query) return
+    
+    setLoadingSuggestions(true)
+    try {
+      const res = await employeeApi.get(`/employee/products?q=${encodeURIComponent(query)}&page=1`)
+      const prods = res.data.data || []
+      setSuggestions(prods)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingSuggestions(false)
     }
   }
 
-  const handleApprove = async (productId: number) => {
+  const handleApprove = async () => {
+    if (!selectedProduct) return
+    
     try {
-      await employeeApi.post(`/employee/manual-products/${productId}/approve`)
-      setProducts(products.map(p => p.id === productId ? { ...p, status: 'approved' } : p))
+      await employeeApi.post(`/employee/manual-products/${selectedProduct.id}/approve`, {
+        matched_product_id: selectedMatchId,
+        image_url: selectedMatchId ? null : imageUrl,
+      })
+      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'approved' } : p))
       setSelectedProduct(null)
     } catch (err) {
       console.error(err)
     }
   }
 
-  const handleReject = async (productId: number) => {
+  const handleReject = async () => {
+    if (!selectedProduct) return
     const reason = prompt('Raison du rejet:')
     if (!reason) return
     try {
-      await employeeApi.post(`/employee/manual-products/${productId}/reject`, { reason })
-      setProducts(products.map(p => p.id === productId ? { ...p, status: 'rejected', rejection_reason: reason } : p))
+      await employeeApi.post(`/employee/manual-products/${selectedProduct.id}/reject`, { reason })
+      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'rejected', rejection_reason: reason } : p))
       setSelectedProduct(null)
     } catch (err) {
       console.error(err)
@@ -198,23 +213,23 @@ export default function ManualProductsView() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => selectProduct(product)}
+                        onClick={() => searchSuggestions(product, 'reference')}
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                        title="Voir/Modifier"
+                        title="Rechercher par référence"
                       >
-                        <Eye className="w-5 h-5" />
+                        <Link2 className="w-5 h-5" />
                       </button>
                       {product.status === 'pending' ? (
                         <>
                           <button
-                            onClick={() => handleApprove(product.id)}
+                            onClick={() => handleApprove()}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
                             title="Approuver"
                           >
                             <Check className="w-5 h-5" />
                           </button>
                           <button
-                            onClick={() => handleReject(product.id)}
+                            onClick={handleReject}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                             title="Rejeter"
                           >
@@ -242,7 +257,7 @@ export default function ManualProductsView() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-2xl p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-lg">Détails du produit</h3>
+              <h3 className="font-bold text-lg">Vérifier le produit</h3>
               <button onClick={() => setSelectedProduct(null)} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5" />
               </button>
@@ -250,7 +265,7 @@ export default function ManualProductsView() {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nom du produit</label>
                 <input
                   type="text"
                   value={selectedProduct.name}
@@ -265,7 +280,7 @@ export default function ManualProductsView() {
                   value={selectedProduct.description || ''}
                   readOnly
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
-                  rows={3}
+                  rows={2}
                 />
               </div>
               
@@ -291,58 +306,90 @@ export default function ManualProductsView() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Rechercher par</label>
-                <div className="flex gap-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Rechercher un produit existant</label>
+                <div className="flex gap-2 mb-3">
                   <button
-                    onClick={() => { setMatchBy('name'); selectProduct(selectedProduct) }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                      matchBy === 'name' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'
+                    onClick={() => searchSuggestions(selectedProduct, 'reference')}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                      matchMode === 'reference' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'
                     }`}
                   >
-                    Nom
+                    Par référence
                   </button>
                   <button
-                    onClick={() => { setMatchBy('reference'); selectProduct(selectedProduct) }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                      matchBy === 'reference' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'
+                    onClick={() => searchSuggestions(selectedProduct, 'name')}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                      matchMode === 'name' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700'
                     }`}
                   >
-                    Référence
+                    Par nom
                   </button>
                 </div>
               </div>
 
-              {suggestions.length > 0 && (
+              {loadingSuggestions ? (
+                <div className="p-4 bg-gray-50 rounded-lg text-center text-gray-500">
+                  Recherche en cours...
+                </div>
+              ) : suggestions.length > 0 ? (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Produits suggérés</label>
-                  <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Produits trouvés (cliquez pour sélectionner)</label>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
                     {suggestions.map(s => (
-                      <div key={s.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-700">{s.name}</span>
-                        <button
-                          onClick={() => handleApprove(selectedProduct.id)}
-                          className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200"
-                        >
-                          Approuver comme ceci
-                        </button>
-                      </div>
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedMatchId(s.id)}
+                        className={`w-full text-left p-2 rounded-lg border flex items-center gap-2 ${
+                          selectedMatchId === s.id 
+                            ? 'border-green-500 bg-green-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        {s.image_url && (
+                          <img src={s.image_url} alt="" className="w-8 h-8 object-cover rounded" />
+                        )}
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{s.name}</p>
+                          {s.reference && <p className="text-xs text-gray-500">Réf: {s.reference}</p>}
+                        </div>
+                        {s.lowest_price && (
+                          <span className="text-sm font-medium text-green-600">{s.lowest_price} DT</span>
+                        )}
+                      </button>
                     ))}
                   </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-2">Aucun produit trouvé</p>
+              )}
+
+              {!selectedMatchId && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                    <Image className="w-4 h-4" /> URL de l'image (pour créer nouveau produit)
+                  </label>
+                  <input
+                    type="url"
+                    value={imageUrl}
+                    onChange={e => setImageUrl(e.target.value)}
+                    placeholder="https://exemple.com/image.jpg"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  />
                 </div>
               )}
 
               <div className="flex gap-2 pt-4 border-t">
                 <button
-                  onClick={() => handleApprove(selectedProduct.id)}
-                  className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-                >
-                  Approuver
-                </button>
-                <button
-                  onClick={() => handleReject(selectedProduct.id)}
+                  onClick={handleReject}
                   className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
                 >
                   Rejeter
+                </button>
+                <button
+                  onClick={handleApprove}
+                  className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                >
+                  {selectedMatchId ? 'Approuver (lier au produit)' : 'Approuver (créer nouveau)'}
                 </button>
               </div>
             </div>

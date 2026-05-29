@@ -16,6 +16,7 @@ class ManualProduct extends Model
         'reference',
         'category_id',
         'brand_id',
+        'matched_product_id',
         'status',
         'rejection_reason',
         'reviewed_by',
