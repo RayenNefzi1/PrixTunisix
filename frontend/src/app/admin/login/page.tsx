@@ -8,6 +8,7 @@ import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 
 const adminApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -28,7 +29,7 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      const res = await adminApi.post('/auth/login', form)
+      const res = await adminApi.post('/auth/login', { login: form.email, password: form.password })
 
       const data = res.data
 

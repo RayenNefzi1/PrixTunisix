@@ -8,6 +8,7 @@ import { AlertCircle, Loader2, Briefcase } from 'lucide-react'
 
 const employeeApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
