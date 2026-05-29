@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, createPortal } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { FileSpreadsheet, Check, X, Clock, Search, Tag, Package, Eye, Link2, Image } from 'lucide-react'
 import employeeApi from '@/lib/employee-api'
 
