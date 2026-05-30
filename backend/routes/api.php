@@ -301,7 +301,16 @@ Route::get('/test-login', function () {
         return response()->json(['message' => 'OTP already used', 'used_at' => $otp->used_at]);
     }
     
-    return response()->json(['message' => 'OTP valid', 'otp' => $otp]);
+    // Check user
+    $userByPhone = \App\Models\User::where('phone', $phone)->first();
+    $userByClient = \App\Models\Client::where('phone', $phone)->first();
+    
+    return response()->json([
+        'message' => 'OTP valid',
+        'otp' => ['phone' => $otp->phone, 'code' => $otp->code, 'expires_at' => $otp->expires_at],
+        'user_by_phone' => $userByPhone ? ['id' => $userByPhone->id, 'email' => $userByPhone->email, 'phone' => $userByPhone->phone] : null,
+        'client' => $userByClient ? ['id' => $userByClient->id, 'user_id' => $userByClient->user_id, 'phone' => $userByClient->phone] : null
+    ]);
 });
 
 // Scraping seed endpoints

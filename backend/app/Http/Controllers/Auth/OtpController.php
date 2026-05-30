@@ -75,6 +75,9 @@ class OtpController extends Controller
             'code'  => ['required', 'string', 'size:6'],
         ]);
 
+        // Debug: log what we received
+        \Illuminate\Support\Facades\Log::info('verifyLogin received', ['phone' => $data['phone'], 'code' => $data['code']]);
+
         $otp = $this->findValidOtp($data['phone'], $data['code']);
 
         // Find user by phone in either User table or Client table
