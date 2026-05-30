@@ -241,7 +241,7 @@ Route::get('/create-test-client', function () {
         ['name' => 'Test', 'prename' => 'Client', 'password' => \Illuminate\Support\Facades\Hash::make('test123'), 'role' => 'client']
     );
     
-    $client = \App\Models\Client::firstOrCreate(
+    \App\Models\Client::updateOrCreate(
         ['user_id' => $user->id],
         ['phone' => $phone]
     );
@@ -252,10 +252,9 @@ Route::get('/create-test-client', function () {
     );
     
     return response()->json([
-        'message' => 'Test client created. OTP is: ' . $code,
+        'message' => 'Client ready. Use phone: ' . $phone . ' and OTP: ' . $code,
         'phone' => $phone,
-        'code' => $code,
-        'credentials' => ['email' => 'client@test.tn', 'password' => 'test123']
+        'otp' => $code
     ]);
 });
 
