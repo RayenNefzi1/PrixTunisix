@@ -181,8 +181,10 @@ Route::get('/seed-analytics', function () {
     $totalViews = 0;
     
     foreach ($fournisseurs as $fournisseur) {
-        $offers = \App\Models\Offer::where('merchant_website_id', $fournisseur->merchant_website_id)->get();
-        $productIds = $offers->pluck('product_id')->unique()->toArray();
+        $offers = \App\Models\Offer::where('merchant_website_id', $fournisseur->merchant_website_id)
+            ->whereNotNull('product_id')
+            ->get();
+        $productIds = $offers->pluck('product_id')->unique()->filter()->toArray();
         
         if (empty($productIds)) continue;
         
