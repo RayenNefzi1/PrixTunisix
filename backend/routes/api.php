@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ScrapingController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Catalog\BrandController;
@@ -283,33 +284,12 @@ Route::get('/check-otp', function () {
     ]);
 });
 
-Route::get('/test-login', function () {
-    $phone = request('phone', '+21698000001');
-    $code = request('code', '123456');
-    
-    $otp = \App\Models\PhoneOtp::where('phone', $phone)->where('code', $code)->first();
-    
-    if (!$otp) {
-        return response()->json(['message' => 'OTP not found or code mismatch', 'phone' => $phone, 'code_sent' => '123456', 'code_received' => $code]);
-    }
-    
-    if ($otp->isExpired()) {
-        return response()->json(['message' => 'OTP expired', 'expires_at' => $otp->expires_at, 'now' => now()]);
-    }
-    
-    if ($otp->used_at) {
-        return response()->json(['message' => 'OTP already used', 'used_at' => $otp->used_at]);
-    }
-    
-    // Check user
-    $userByPhone = \App\Models\User::where('phone', $phone)->first();
-    $userByClient = \App\Models\Client::where('phone', $phone)->first();
+Route::post('/test-login', function (Request $request) {
+    $data = $request->all();
     
     return response()->json([
-        'message' => 'OTP valid',
-        'otp' => ['phone' => $otp->phone, 'code' => $otp->code, 'expires_at' => $otp->expires_at],
-        'user_by_phone' => $userByPhone ? ['id' => $userByPhone->id, 'email' => $userByPhone->email, 'phone' => $userByPhone->phone] : null,
-        'client' => $userByClient ? ['id' => $userByClient->id, 'user_id' => $userByClient->user_id, 'phone' => $userByClient->phone] : null
+        'received' => $data,
+        'otp_in_db' => \App\Models\PhoneOtp::where('phone', '+21698000001')->first()
     ]);
 });
 
