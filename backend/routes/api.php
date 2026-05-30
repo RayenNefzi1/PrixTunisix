@@ -132,6 +132,31 @@ Route::get('/seed', function () {
     return response()->json(['message' => 'Database seeded successfully']);
 });
 
+Route::get('/seed-fournisseurs', function () {
+    $fournisseurs = [
+        ['email' => 'contact@tunisiteck.com', 'name' => 'TunisiaTech', 'pass' => 'TunisiaTech@12345', 'plan' => 'max', 'merchant_id' => 4, 'merchant_url' => 'https://www.tunisiteck.com'],
+        ['email' => 'contact@nutridiet.tn', 'name' => 'Nutridiet', 'pass' => 'Nutridiet@12345', 'plan' => 'premium_manual', 'merchant_id' => null, 'merchant_url' => 'https://www.nutridiet.tn'],
+        ['email' => 'contact@ipmact.tn', 'name' => 'Ipmact Nutrition', 'pass' => 'Ipmact@12345', 'plan' => 'premium_manual', 'merchant_id' => null, 'merchant_url' => 'https://www.ipmact.tn'],
+        ['email' => 'contact@motottunisie.tn', 'name' => 'Motottunisie', 'pass' => 'Motot@12345', 'plan' => 'basic', 'merchant_id' => null, 'merchant_url' => 'https://www.motottunisie.tn'],
+        ['email' => 'contact@motor.tn', 'name' => 'Motor', 'pass' => 'Motor@12345', 'plan' => 'pro', 'merchant_id' => null, 'merchant_url' => 'https://www.motor.tn'],
+    ];
+    foreach ($fournisseurs as $f) {
+        $user = \App\Models\User::firstOrCreate(['email' => $f['email']], [
+            'name' => $f['name'], 'prename' => 'Admin', 'password' => \Illuminate\Support\Facades\Hash::make($f['pass']), 'role' => 'fournisseur'
+        ]);
+        $fournisseur = \App\Models\Fournisseur::firstOrCreate(['user_id' => $user->id], [
+            'merchant_website_id' => $f['merchant_id'], 'company_name' => $f['name'], 'contact_email' => $f['email'],
+            'merchant_url' => $f['merchant_url'], 'company_phone' => '+216 72 000 000', 'company_address' => 'Tunis, Tunisia',
+            'api_key' => \App\Models\Fournisseur::generateApiKey(), 'active' => true
+        ]);
+        \App\Models\FournisseurSubscription::firstOrCreate(['fournisseur_id' => $fournisseur->id], [
+            'plan' => $f['plan'], 'price' => in_array($f['plan'], ['basic']) ? 0 : (in_array($f['plan'], ['premium_manual']) ? 19.99 : (in_array($f['plan'], ['pro']) ? 29.99 : 49.99)),
+            'start_date' => now()->subDays(15), 'end_date' => now()->addDays(15), 'status' => 'active'
+        ]);
+    }
+    return response()->json(['message' => 'Fournisseurs seeded successfully']);
+});
+
 // Scraping seed endpoints
 Route::post('/seed-scraping', function () {
     $scripts = [
