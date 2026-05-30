@@ -391,22 +391,23 @@ Route::get('/add-motorz-offer', function () {
     }
     
     $merchantWebsite = \App\Models\MerchantWebsite::where('name', 'Motorz')->first();
+    $fournisseur = \App\Models\Fournisseur::where('company_name', 'Motor')->first();
     
-    $offer = \App\Models\Offer::updateOrCreate(
-        [
-            'product_id' => $product->id,
-            'merchant_website_id' => $merchantWebsite?->id,
-        ],
-        [
-            'raw_title' => $productName . ' - Motorz',
-            'price' => 7900.000,
-            'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
-            'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
-            'is_available' => true,
-            'scraped_at' => now(),
-            'scraped_reference' => 'MOTORZ-APRILIA-SR125',
-        ]
-    );
+    // Delete existing offers for this product
+    \App\Models\Offer::where('product_id', $product->id)->where('merchant_website_id', $merchantWebsite?->id)->delete();
+    
+    $offer = \App\Models\Offer::create([
+        'product_id' => $product->id,
+        'merchant_website_id' => $merchantWebsite?->id,
+        'merchant_id' => $fournisseur?->id,
+        'raw_title' => $productName . ' - Motorz',
+        'price' => 7900.000,
+        'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
+        'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
+        'is_available' => true,
+        'scraped_at' => now(),
+        'scraped_reference' => 'MOTORZ-APRILIA-SR125',
+    ]);
     
     return response()->json([
         'message' => 'Motorz offer added',
@@ -414,7 +415,7 @@ Route::get('/add-motorz-offer', function () {
         'product_url' => '/produits/' . $product->slug,
         'offer_price' => $offer->price,
         'merchant' => $merchantWebsite?->name,
-        'merchant_id' => $merchantWebsite?->id,
+        'fournisseur' => $fournisseur?->company_name,
     ]);
 });
 
@@ -441,22 +442,23 @@ Route::get('/add-mototunisie-offer', function () {
     }
     
     $merchantWebsite = \App\Models\MerchantWebsite::where('name', 'Motottunisie')->first();
+    $fournisseur = \App\Models\Fournisseur::where('company_name', 'Motottunisie')->first();
     
-    $offer = \App\Models\Offer::updateOrCreate(
-        [
-            'product_id' => $product->id,
-            'merchant_website_id' => $merchantWebsite?->id,
-        ],
-        [
-            'raw_title' => $productName . ' - Motottunisie',
-            'price' => 7500.000,
-            'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
-            'image_url' => 'https://www.mototunisie.tn/wp-content/uploads/2024/12/aprilia-sr125.jpg',
-            'is_available' => true,
-            'scraped_at' => now(),
-            'scraped_reference' => 'MOTOTUNISIE-APRILIA-SR125',
-        ]
-    );
+    // Delete existing offers for this product
+    \App\Models\Offer::where('product_id', $product->id)->where('merchant_website_id', $merchantWebsite?->id)->delete();
+    
+    $offer = \App\Models\Offer::create([
+        'product_id' => $product->id,
+        'merchant_website_id' => $merchantWebsite?->id,
+        'merchant_id' => $fournisseur?->id,
+        'raw_title' => $productName . ' - Motottunisie',
+        'price' => 7500.000,
+        'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
+        'image_url' => 'https://www.mototunisie.tn/wp-content/uploads/2024/12/aprilia-sr125.jpg',
+        'is_available' => true,
+        'scraped_at' => now(),
+        'scraped_reference' => 'MOTOTUNISIE-APRILIA-SR125',
+    ]);
     
     return response()->json([
         'message' => 'Motottunisie offer added',
@@ -464,7 +466,7 @@ Route::get('/add-mototunisie-offer', function () {
         'product_url' => '/produits/' . $product->slug,
         'offer_price' => $offer->price,
         'merchant' => $merchantWebsite?->name,
-        'merchant_id' => $merchantWebsite?->id,
+        'fournisseur' => $fournisseur?->company_name,
     ]);
 });
 

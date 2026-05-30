@@ -104,7 +104,7 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
-        MerchantWebsite::firstOrCreate(
+        $motottunisieMw = MerchantWebsite::firstOrCreate(
             ['name' => 'Motottunisie'],
             [
                 'base_url'  => 'https://www.motottunisie.tn',
@@ -112,7 +112,7 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
-        MerchantWebsite::firstOrCreate(
+        $motorzMw = MerchantWebsite::firstOrCreate(
             ['name' => 'Motorz'],
             [
                 'base_url'  => 'https://motorz.tn',
@@ -487,7 +487,7 @@ class DatabaseSeeder extends Seeder
         $mototFournisseur = Fournisseur::firstOrCreate(
             ['user_id' => $mototUser->id],
             [
-                'merchant_website_id' => null,
+                'merchant_website_id' => $motottunisieMw->id,
                 'company_name'        => 'Motottunisie',
                 'contact_email'       => 'contact@motottunisie.tn',
                 'merchant_url'        => 'https://www.motottunisie.tn',
@@ -523,10 +523,10 @@ class DatabaseSeeder extends Seeder
         $motorFournisseur = Fournisseur::firstOrCreate(
             ['user_id' => $motorUser->id],
             [
-                'merchant_website_id' => null,
+                'merchant_website_id' => $motorzMw->id,
                 'company_name'        => 'Motor',
                 'contact_email'       => 'contact@motor.tn',
-                'merchant_url'        => 'https://www.motor.tn',
+                'merchant_url'        => 'https://motorz.tn',
                 'company_phone'       => '+216 72 000 000',
                 'company_address'     => 'Tunis, Tunisia',
                 'api_key'            => Fournisseur::generateApiKey(),
