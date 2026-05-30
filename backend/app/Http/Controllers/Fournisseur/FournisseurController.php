@@ -135,6 +135,12 @@ class FournisseurController extends Controller
         $products = $products->map(function ($product) {
             $product->lowest_price = $product->offers->min('price');
             $product->offer_count = $product->offers->count();
+            
+            // Ensure category has code for URL generation
+            if ($product->category && !$product->category->code) {
+                $product->category->code = $product->category->slug;
+            }
+            
             return $product;
         });
 

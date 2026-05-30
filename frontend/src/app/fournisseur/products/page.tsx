@@ -11,7 +11,7 @@ interface Product {
   name: string
   slug: string
   image_url: string | null
-  category: { id: number; name: string } | null
+  category: { id: number; name: string; code?: string; slug?: string } | null
   brand: { id: number; name: string } | null
   lowest_price: number | null
   offer_count: number
@@ -126,7 +126,7 @@ export default function FournisseurProductsPage() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <Link href={`/products/${product.slug}`} className="font-semibold text-gray-900 hover:text-brand-600 truncate block">
+                  <Link href={`/produits/${product.category?.code || product.category?.slug || 'default'}/${product.slug}`} className="font-semibold text-gray-900 hover:text-brand-600 truncate block">
                     {product.name}
                   </Link>
                   <div className="flex items-center gap-2 mt-1">
@@ -176,7 +176,7 @@ export default function FournisseurProductsPage() {
 
                 {/* Actions */}
                 <Link 
-                  href={`/products/${product.slug}`} 
+                  href={`/produits/${product.category?.code || product.category?.slug || 'default'}/${product.slug}`} 
                   className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition"
                 >
                   <ExternalLink className="w-5 h-5" />
