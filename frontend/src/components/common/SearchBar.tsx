@@ -158,7 +158,14 @@ export default function SearchBar({ className = '' }: Props) {
                 {s.type === 'brand' ? (
                   <p className="text-xs text-brand-500 font-medium">Marque</p>
                 ) : (
-                  <p className="text-xs text-gray-400 truncate">{typeof s.category === 'object' && s.category?.name ? s.category.name : (s.category || '')}</p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {(() => {
+                      const cat = s.category
+                      if (typeof cat === 'object' && cat?.name) return cat.name
+                      if (typeof cat === 'string') return cat
+                      return ''
+                    })()}
+                  </p>
                 )}
               </div>
 
