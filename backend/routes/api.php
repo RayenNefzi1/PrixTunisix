@@ -283,6 +283,27 @@ Route::get('/check-otp', function () {
     ]);
 });
 
+Route::get('/test-login', function () {
+    $phone = request('phone', '+21698000001');
+    $code = request('code', '123456');
+    
+    $otp = \App\Models\PhoneOtp::where('phone', $phone)->where('code', $code)->first();
+    
+    if (!$otp) {
+        return response()->json(['message' => 'OTP not found or code mismatch', 'phone' => $phone, 'code_sent' => '123456', 'code_received' => $code]);
+    }
+    
+    if ($otp->isExpired()) {
+        return response()->json(['message' => 'OTP expired', 'expires_at' => $otp->expires_at, 'now' => now()]);
+    }
+    
+    if ($otp->used_at) {
+        return response()->json(['message' => 'OTP already used', 'used_at' => $otp->used_at]);
+    }
+    
+    return response()->json(['message' => 'OTP valid', 'otp' => $otp]);
+});
+
 // Scraping seed endpoints
 Route::post('/seed-scraping', function () {
     $scripts = [
