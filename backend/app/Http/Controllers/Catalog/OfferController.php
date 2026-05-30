@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Offer;
 use App\Models\RedirectClick;
+use App\Models\MerchantClick;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -48,7 +49,19 @@ class OfferController extends Controller
             'offer_id' => $offer->id,
             'user_id' => optional($request->user())->id,
             'ip_address' => $request->ip(),
+            'clicked_at' => now(),
         ]);
+        
+        if ($offer->fournisseur) {
+            MerchantClick::create([
+                'fournisseur_id' => $offer->fournisseur->id,
+                'product_id' => $offer->product_id,
+                'referrer' => $request->headers->get('referer', 'direct'),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'clicked_at' => now(),
+            ]);
+        }
         
         return redirect($offer->merchant_url);
     }

@@ -241,7 +241,7 @@ export default function ProductDetailPage() {
                               {displayPrice.toFixed(3)} <span className="text-sm font-semibold">TND</span>
                             </p>
                           </div>
-                          <a href={`/api/redirect/${offer.id}`} target="_blank" rel="noopener noreferrer"
+                          <a href={`/api/offers/${offer.id}/go`} target="_blank" rel="noopener noreferrer"
                             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition ${isBest ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
                             Voir <ExternalLink className="w-3.5 h-3.5" />
                           </a>

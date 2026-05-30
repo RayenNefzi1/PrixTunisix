@@ -174,26 +174,6 @@ Route::get('/update-tunisianet-logo', function () {
     return response()->json(['message' => 'Tunisianet not found'], 404);
 });
 
-Route::get('/redirect/{offerId}', function ($offerId) {
-    $offer = \App\Models\Offer::with(['product', 'fournisseur'])->find($offerId);
-    if (!$offer || !$offer->merchant_url) {
-        return redirect('/');
-    }
-    
-    if ($offer->fournisseur) {
-        \App\Models\MerchantClick::create([
-            'fournisseur_id' => $offer->fournisseur->id,
-            'product_id' => $offer->product_id,
-            'referrer' => request()->headers->get('referer', 'direct'),
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'clicked_at' => now(),
-        ]);
-    }
-    
-    return redirect()->away($offer->merchant_url);
-});
-
 // Scraping seed endpoints
 Route::post('/seed-scraping', function () {
     $scripts = [

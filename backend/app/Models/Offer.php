@@ -43,6 +43,11 @@ class Offer extends Model
         return $this->belongsTo(MerchantWebsite::class);
     }
 
+    public function fournisseur()
+    {
+        return $this->hasOneThrough(Fournisseur::class, MerchantWebsite::class, 'id', 'merchant_website_id');
+    }
+
     public function priceHistory()
     {
         return $this->hasMany(PriceHistory::class)->orderBy('recorded_at');
