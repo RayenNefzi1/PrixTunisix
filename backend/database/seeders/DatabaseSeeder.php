@@ -351,7 +351,6 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info("Tunisianet fournisseur seeded with {$totalClicks} clicks and product views.");
-    }
 
     // ── Fournisseur: TunisiaTech ───────────────────────────────────────────
     $tunisiaTechUser = User::firstOrCreate(
