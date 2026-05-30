@@ -11,7 +11,7 @@ interface Suggestion {
   name: string
   slug: string
   image_url: string | null
-  category: string | null
+  category: { id: number; name: string; code: string; slug: string } | string | null
   min_price: number | null
 }
 
@@ -133,7 +133,8 @@ export default function SearchBar({ className = '' }: Props) {
                   if (s.type === 'brand') {
                     router.push(`/marques/${s.slug}`)
                   } else {
-                    router.push(`/produits/${s.category?.slug || 'all'}/${s.slug}`)
+                    const catSlug = typeof s.category === 'object' && s.category?.slug ? s.category.slug : 'all'
+                    router.push(`/produits/${catSlug}/${s.slug}`)
                   }
                 }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-brand-50 transition ${
