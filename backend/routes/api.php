@@ -575,6 +575,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('manual-products/upload', [FournisseurController::class, 'uploadManualProducts']);
         Route::get('manual-products/requests', [FournisseurController::class, 'getManualProductRequests']);
     });
-});
 
 }); // End CORS middleware group
