@@ -13,6 +13,7 @@ use App\Models\MerchantWebsite;
 use App\Models\Product;
 use App\Models\ProductView;
 use App\Models\Offer;
+use App\Models\PriceHistory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -285,7 +286,7 @@ class DatabaseSeeder extends Seeder
                     'is_validated' => true,
                 ]);
                 
-                Offer::create([
+                $offer = Offer::create([
                     'merchant_website_id' => 2,
                     'product_id'          => $product->id,
                     'raw_title'           => $prod['name'],
@@ -295,6 +296,8 @@ class DatabaseSeeder extends Seeder
                     'image_url'           => 'https://placehold.co/400x400/f3f4f6/6b7280?text=' . urlencode($prod['name']),
                     'scraped_at'          => now(),
                 ]);
+                
+                $this->createPriceHistory($offer, $prod['price']);
                 
                 $productIds[] = $product->id;
             }
@@ -534,5 +537,27 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->command->info("Additional fournisseurs seeded: TunisiaTech (max), Nutridiet (premium_manual), Ipmact (premium_manual), Motottunisie (basic), Motor (pro)");
+    }
+
+    private function createPriceHistory(Offer $offer, float $currentPrice): void
+    {
+        $basePrice = $currentPrice * (rand(85, 115) / 100);
+        
+        $daysBack = rand(10, 30);
+        $startPrice = $basePrice * (rand(90, 110) / 100);
+        
+        for ($i = $daysBack; $i >= 0; $i--) {
+            $variation = rand(-5, 5) / 100;
+            $price = $basePrice * (1 + $variation);
+            $price = round($price, 3);
+            
+            PriceHistory::create([
+                'offer_id' => $offer->id,
+                'price' => $price,
+                'recorded_at' => now()->subDays($i),
+            ]);
+        }
+        
+        $offer->update(['price' => $currentPrice]);
     }
 }
