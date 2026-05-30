@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Tag, Plus, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Tag, Plus, Edit, Trash2 } from 'lucide-react'
 import adminApi from '@/lib/admin-api'
 
 interface Category {
@@ -25,7 +25,6 @@ export default function AdminCategoriesPage() {
       .then(res => {
         const data = res.data
         setCategories(Array.isArray(data) ? data : (data.data || []))
-        setTotalPages(1)
       })
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -34,11 +33,20 @@ export default function AdminCategoriesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await adminApi.post(`/admin/categories`, { ...form, parent_id: form.parent_id || null })
+      const res = await adminApi.post(`/admin/categories`, { 
+        name: form.name, 
+        slug: form.slug, 
+        code: form.code || null,
+        parent_id: form.parent_id || null 
+      })
       if (res.status === 201 || res.status === 200) {
         setShowForm(false)
-        setForm({ name: '', slug: '', parent_id: '' })
-        setPage(1)
+        setForm({ name: '', slug: '', code: '', parent_id: '' })
+        adminApi.get('/categories')
+          .then(res => {
+            const data = res.data
+            setCategories(Array.isArray(data) ? data : (data.data || []))
+          })
       }
     } catch { console.error() }
   }
@@ -172,20 +180,6 @@ export default function AdminCategoriesPage() {
           </tbody>
         </table>
       </div>
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">Page {page} sur {totalPages}</p>
-          <div className="flex gap-2">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50">
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

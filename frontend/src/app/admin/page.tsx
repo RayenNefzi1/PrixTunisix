@@ -43,13 +43,13 @@ export default function AdminDashboard() {
     adminApi.get('/categories')
       .then(res => {
         const cats = res.data || []
-        const data = Array.isArray(cats) ? cats : []
+        const data = Array.isArray(cats) ? cats : (cats.data || [])
         setCategoryStats({
           total: data.length,
           categories: data.reduce((acc: any, c: any) => {
             acc[c.name] = 1
             return acc
-          }, {})
+          }, {} as Record<string, number>)
         })
       })
       .catch(console.error)
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
     )
   }
 
-  const totalFournisseur = Object.values(fournisseurStats || {}).reduce((a: any, b: any) => a + b, 0) as number
+  const totalFournisseur = Object.values(fournisseurStats || {}).reduce((a: any, b: any) => a + (b || 0), 0) as number
   const totalCategory = categoryStats?.total || 0
 
   return (
