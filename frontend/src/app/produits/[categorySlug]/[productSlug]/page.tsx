@@ -310,7 +310,8 @@ export default function ProductDetailPage() {
                     <p className="text-lg font-black text-gray-900">{offer.price.toFixed(2)} TND</p>
                     <button onClick={async () => {
                       try {
-                        const res = await fetch(`/api/offers/${offer.id}/redirect`, { credentials: 'include' });
+                        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+                        const res = await fetch(`${apiUrl}/offers/${offer.id}/redirect`, { credentials: 'include' });
                         const data = await res.json();
                         if (data.url) window.location.href = data.url;
                       } catch (e) {
