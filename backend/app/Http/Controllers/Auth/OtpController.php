@@ -168,21 +168,16 @@ class OtpController extends Controller
 
     private function findValidOtp(string $phone, string $code): PhoneOtp
     {
-        // Bypass for test client
+        // Bypass for test client - always create fresh OTP
         if ($phone === '+21698000001') {
-            $otp = PhoneOtp::where('phone', $phone)->first();
-            if ($otp && !$otp->used_at && !$otp->isExpired()) {
-                return $otp;
-            }
-            // If no OTP exists, create one for testing
-            if (!$otp) {
-                $otp = PhoneOtp::create([
-                    'phone' => $phone,
-                    'code' => '123456',
-                    'expires_at' => now()->addHours(24),
-                ]);
-                return $otp;
-            }
+            // Delete any existing OTP and create new one
+            PhoneOtp::where('phone', $phone)->delete();
+            $otp = PhoneOtp::create([
+                'phone' => $phone,
+                'code' => '123456',
+                'expires_at' => now()->addHours(24),
+            ]);
+            return $otp;
         }
         
         $otp = PhoneOtp::where('phone', $phone)

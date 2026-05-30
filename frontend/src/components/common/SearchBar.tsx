@@ -127,11 +127,15 @@ export default function SearchBar({ className = '' }: Props) {
           {suggestions.map((s, idx) => (
             <button
               key={`${s.type}-${s.id}`}
-              onMouseDown={() => {
-                setOpen(false)
-                setQuery(s.name)
-                router.push(s.type === 'brand' ? `/marques/${s.slug}` : `/products/${s.slug}`)
-              }}
+                onMouseDown={() => {
+                  setOpen(false)
+                  setQuery(s.name)
+                  if (s.type === 'brand') {
+                    router.push(`/marques/${s.slug}`)
+                  } else {
+                    router.push(`/produits/${s.category?.slug || 'all'}/${s.slug}`)
+                  }
+                }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-brand-50 transition ${
                 idx === activeIdx ? 'bg-brand-50' : ''
               }`}
@@ -153,7 +157,7 @@ export default function SearchBar({ className = '' }: Props) {
                 {s.type === 'brand' ? (
                   <p className="text-xs text-brand-500 font-medium">Marque</p>
                 ) : (
-                  <p className="text-xs text-gray-400 truncate">{s.category}</p>
+                  <p className="text-xs text-gray-400 truncate">{s.category?.name || s.category}</p>
                 )}
               </div>
 
