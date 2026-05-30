@@ -122,29 +122,30 @@ Route::get('marques/{slug}', [MarqueController::class, 'show']);
 // ── Chatbot ───────────────────────────────────────────────────────────────
 Route::post('chatbot', [ChatbotController::class, 'chat']);
 
-// ── Admin: Seed database (public for easy setup) ────────────────────────
-Route::prefix('admin')->group(function () {
-    Route::post('seed', function () {
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        return response()->json(['message' => 'Database seeded successfully']);
-    });
-    Route::get('seed', function () {
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        return response()->json(['message' => 'Database seeded successfully']);
-    });
-    Route::post('seed-scraping', function () {
-        $scripts = [
-            ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'target_url' => 'https://www.tunisianet.com.tn', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'target_url' => 'https://www.tunisiteck.com', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Zoom', 'merchant_website_id' => 5, 'target_url' => 'https://zoom.com.tn', 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'target_url' => 'https://khadraouitek.tn', 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
-        ];
-        foreach ($scripts as $script) {
-            \App\Models\ScrapingScript::firstOrCreate(['name' => $script['name']], $script);
-        }
-        return response()->json(['message' => 'Scraping scripts seeded']);
-    });
-    Route::get('seed-scraping', function () {
+// ── Public seed endpoints ──────────────────────────────────────────────
+Route::post('/seed', function () {
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    return response()->json(['message' => 'Database seeded successfully']);
+});
+Route::get('/seed', function () {
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    return response()->json(['message' => 'Database seeded successfully']);
+});
+
+// Scraping seed endpoints
+Route::post('/seed-scraping', function () {
+    $scripts = [
+        ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'target_url' => 'https://www.tunisianet.com.tn', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
+        ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'target_url' => 'https://www.tunisiteck.com', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
+        ['name' => 'Zoom', 'merchant_website_id' => 5, 'target_url' => 'https://zoom.com.tn', 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
+        ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'target_url' => 'https://khadraouitek.tn', 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
+    ];
+    foreach ($scripts as $script) {
+        \App\Models\ScrapingScript::firstOrCreate(['name' => $script['name']], $script);
+    }
+    return response()->json(['message' => 'Scraping scripts seeded']);
+});
+Route::get('/seed-scraping', function () {
         $scripts = [
             ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'target_url' => 'https://www.tunisianet.com.tn', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
             ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'target_url' => 'https://www.tunisiteck.com', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
