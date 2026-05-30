@@ -352,8 +352,8 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info("Tunisianet fournisseur seeded with {$totalClicks} clicks and product views.");
 
-    // ── Fournisseur: TunisiaTech ───────────────────────────────────────────
-    $tunisiaTechUser = User::firstOrCreate(
+        // ── Fournisseur: TunisiaTech ───────────────────────────────────────────
+        $tunisiaTechUser = User::firstOrCreate(
         ['email' => 'contact@tunisiteck.com'],
         [
             'name'     => 'TunisiaTech',
