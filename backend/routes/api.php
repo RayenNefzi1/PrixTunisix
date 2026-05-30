@@ -266,6 +266,23 @@ Route::get('/create-test-client', function () {
     ]);
 });
 
+Route::get('/check-otp', function () {
+    $phone = request('phone', '+21698000001');
+    $otp = \App\Models\PhoneOtp::where('phone', $phone)->first();
+    
+    if (!$otp) {
+        return response()->json(['message' => 'No OTP found', 'phone' => $phone]);
+    }
+    
+    return response()->json([
+        'phone' => $otp->phone,
+        'code' => $otp->code,
+        'expires_at' => $otp->expires_at,
+        'used_at' => $otp->used_at,
+        'is_valid' => $otp->expires_at > now() && is_null($otp->used_at)
+    ]);
+});
+
 // Scraping seed endpoints
 Route::post('/seed-scraping', function () {
     $scripts = [
