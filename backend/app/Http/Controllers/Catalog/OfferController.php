@@ -35,9 +35,12 @@ class OfferController extends Controller
             'clicked_at' => now(),
         ]);
 
-        if ($offer->fournisseur) {
+        // Get fournisseur directly from merchant_website_id
+        $fournisseur = \App\Models\Fournisseur::where('merchant_website_id', $offer->merchant_website_id)->first();
+        
+        if ($fournisseur) {
             MerchantClick::create([
-                'fournisseur_id' => $offer->fournisseur->id,
+                'fournisseur_id' => $fournisseur->id,
                 'product_id' => $offer->product_id,
                 'referrer' => $request->headers->get('referer', 'direct'),
                 'ip_address' => $request->ip(),
@@ -64,9 +67,11 @@ class OfferController extends Controller
             'clicked_at' => now(),
         ]);
         
-        if ($offer->fournisseur) {
+        $fournisseur = \App\Models\Fournisseur::where('merchant_website_id', $offer->merchant_website_id)->first();
+        
+        if ($fournisseur) {
             MerchantClick::create([
-                'fournisseur_id' => $offer->fournisseur->id,
+                'fournisseur_id' => $fournisseur->id,
                 'product_id' => $offer->product_id,
                 'referrer' => $request->headers->get('referer', 'direct'),
                 'ip_address' => $request->ip(),
