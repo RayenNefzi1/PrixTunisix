@@ -304,22 +304,32 @@ Route::get('/test-login', function () {
 });
 
 Route::get('/add-tunisiatech-offer', function () {
-    // Find or create the product
+    // Find or create the product - use slug to find existing
     $productName = 'Tablette Samsung Galaxy Tab A11 Wi-Fi 4G 4Go 64Go Silver';
+    $slug = 'tablette-samsung-galaxy-tab-a11-4g-lte-4go-64go-87-wxga-gris-sm-a11-4-64-gr';
     
     $brand = \App\Models\Brand::firstOrCreate(['name' => 'Samsung'], ['slug' => 'samsung']);
     $category = \App\Models\Category::where('slug', 'tablettes')->first();
     
-    $product = \App\Models\Product::firstOrCreate(
-        ['name' => $productName],
-        [
-            'slug' => 'tablette-samsung-galaxy-tab-a11-4g-lte-4go-64go-87-wxga-gris-sm-a11-4-64-gr',
+    // Find existing product by slug first
+    $product = \App\Models\Product::where('slug', $slug)->first();
+    
+    if (!$product) {
+        // Try by name
+        $product = \App\Models\Product::where('name', 'like', '%Samsung Galaxy Tab A11%')->first();
+    }
+    
+    if (!$product) {
+        // Create new if not exists
+        $product = \App\Models\Product::create([
+            'name' => $productName,
+            'slug' => $slug,
             'category_id' => $category?->id,
             'brand_id' => $brand->id,
             'image_url' => 'https://www.tunisiatech.tn/16538-medium_default/tablette-samsung-galaxy-tab-a11-wi-fi-4g-4go-64go-silver.jpg',
             'is_validated' => true,
-        ]
-    );
+        ]);
+    }
     
     // Find TunisiaTech merchant website (id 4)
     $merchantWebsite = \App\Models\MerchantWebsite::find(4);
