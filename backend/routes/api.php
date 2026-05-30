@@ -169,7 +169,7 @@ Route::get('/fix-basic-subscriptions', function () {
 Route::get('/update-tunisianet-logo', function () {
     $mw = \App\Models\MerchantWebsite::where('name', 'Tunisianet')->first();
     if ($mw) {
-        $mw->update(['logo_url' => 'https://borgiphones.com/wp-content/uploads/2024/02/tunisianet-logo-400x148.png']);
+        $mw->update(['logo_url' => 'https://cdn.primini.tn/8bfdb42c-b046-4c84-9100-13b14785668d.jpg']);
         return response()->json(['message' => 'Tunisianet logo updated']);
     }
     return response()->json(['message' => 'Tunisianet not found'], 404);
