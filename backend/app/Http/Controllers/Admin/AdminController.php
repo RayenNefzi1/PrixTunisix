@@ -78,6 +78,7 @@ class AdminController extends Controller
             'recent_products' => $recentProducts,
             'top_brands' => $topBrands,
             'total_users' => User::count(),
+            'total_fournisseurs' => Fournisseur::count(),
         ];
 
         return response()->json($stats);

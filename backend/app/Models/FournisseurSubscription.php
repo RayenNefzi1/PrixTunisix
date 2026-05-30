@@ -32,6 +32,15 @@ class FournisseurSubscription extends Model
     public static function getPlanFeatures(): array
     {
         return [
+            'basic' => [
+                'name' => 'Basic',
+                'price' => 0,
+                'features' => [
+                    'Accès limité',
+                    'Pas de scraping',
+                    'Support communautaire',
+                ],
+            ],
             'pro' => [
                 'name' => 'Pro',
                 'price' => 29.99,
@@ -45,7 +54,7 @@ class FournisseurSubscription extends Model
             ],
             'max' => [
                 'name' => 'Max',
-                'price' => 45.99,
+                'price' => 49.99,
                 'features' => [
                     'Apparaître sur le site',
                     'Produits illimités',
@@ -59,7 +68,7 @@ class FournisseurSubscription extends Model
             ],
             'premium_manual' => [
                 'name' => 'Premium Manuel',
-                'price' => 59.99,
+                'price' => 19.99,
                 'features' => [
                     'Apparaître sur le site',
                     'Produits illimités',
