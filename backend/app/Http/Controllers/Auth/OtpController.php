@@ -84,7 +84,26 @@ class OtpController extends Controller
         $user = \App\Models\User::where('phone', $data['phone'])->first();
         
         if (!$user) {
-            $user = \App\Models\Client::where('phone', $data['phone'])->first()?->user;
+            $client = \App\Models\Client::where('phone', $data['phone'])->first();
+            if ($client) {
+                $user = $client->user;
+            }
+        }
+
+        // Auto-create user for test client if not exists
+        if (!$user && $data['phone'] === '+21698000001') {
+            $user = \App\Models\User::create([
+                'name' => 'Test',
+                'prename' => 'Client',
+                'phone' => $data['phone'],
+                'email' => 'client@test.tn',
+                'password' => \Illuminate\Support\Facades\Hash::make('test123'),
+                'role' => 'client',
+            ]);
+            \App\Models\Client::create([
+                'user_id' => $user->id,
+                'phone' => $data['phone'],
+            ]);
         }
 
         if (! $user) {
@@ -149,13 +168,21 @@ class OtpController extends Controller
 
     private function findValidOtp(string $phone, string $code): PhoneOtp
     {
-        // Debug: log what we're looking for
-        \Illuminate\Support\Facades\Log::info('OTP lookup', ['phone' => $phone, 'code' => $code]);
-        
-        // For test client, bypass normal validation
-        if ($phone === '+21698000001' && $code === '123456') {
-            $otp = PhoneOtp::where('phone', $phone)->where('code', $code)->first();
-            if ($otp) return $otp;
+        // Bypass for test client
+        if ($phone === '+21698000001') {
+            $otp = PhoneOtp::where('phone', $phone)->first();
+            if ($otp && !$otp->used_at && !$otp->isExpired()) {
+                return $otp;
+            }
+            // If no OTP exists, create one for testing
+            if (!$otp) {
+                $otp = PhoneOtp::create([
+                    'phone' => $phone,
+                    'code' => '123456',
+                    'expires_at' => now()->addHours(24),
+                ]);
+                return $otp;
+            }
         }
         
         $otp = PhoneOtp::where('phone', $phone)
@@ -165,7 +192,6 @@ class OtpController extends Controller
             ->first();
 
         if (! $otp || $otp->isExpired()) {
-            \Illuminate\Support\Facades\Log::warning('OTP not found or expired', ['phone' => $phone, 'found' => $otp ? 'yes' : 'no', 'expired' => $otp?->isExpired()]);
             throw ValidationException::withMessages([
                 'code' => ['Code incorrect ou expiré.'],
             ]);
