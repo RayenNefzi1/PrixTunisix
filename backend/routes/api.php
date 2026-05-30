@@ -241,7 +241,7 @@ Route::get('/create-test-client', function () {
     
     $user = \App\Models\User::firstOrCreate(
         ['email' => 'client@test.tn'],
-        ['name' => 'Test', 'prename' => 'Client', 'password' => \Illuminate\Support\Facades\Hash::make('test123'), 'role' => 'client']
+        ['name' => 'Test', 'prename' => 'Client', 'password' => \Illuminate\Support\Facades\Hash::make('test123'), 'role' => 'client', 'phone' => $phone]
     );
     
     \App\Models\Client::updateOrCreate(

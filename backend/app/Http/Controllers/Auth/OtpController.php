@@ -77,7 +77,12 @@ class OtpController extends Controller
 
         $otp = $this->findValidOtp($data['phone'], $data['code']);
 
-        $user = User::where('phone', $data['phone'])->first();
+        // Find user by phone in either User table or Client table
+        $user = \App\Models\User::where('phone', $data['phone'])->first();
+        
+        if (!$user) {
+            $user = \App\Models\Client::where('phone', $data['phone'])->first()?->user;
+        }
 
         if (! $user) {
             throw ValidationException::withMessages([
