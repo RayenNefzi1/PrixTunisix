@@ -16,7 +16,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Le comparateur de prix numéro 1 en Tunisie. Trouvez les meilleures offres sur MyTek, Tunisianet, SFax Computer et plus.
+              Le comparateur de prix numéro 1 en Tunisie. Trouvez les meilleures offres sur Tunisianet, TunisiaTech et plus.
             </p>
             <div className="flex items-center gap-2 mt-4">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
@@ -42,7 +42,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white mb-4">Nos marchands partenaires</h3>
             <ul className="space-y-2.5">
-              {['MyTek', 'Tunisianet', 'SFax Computer', 'Zoom Informatique', 'PC Market'].map(m => (
+              {['Tunisianet', 'TunisiaTech', 'SFax Computer', 'Zoom Informatique', 'PC Market'].map(m => (
                 <li key={m}>
                   <span className="text-sm text-gray-400">{m}</span>
                 </li>
@@ -64,7 +64,6 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-500">© 2026 PrixTunisix. Tous droits réservés.</p>
-          <p className="text-xs text-gray-500">Fait avec ❤️ en Tunisie 🇹🇳</p>
         </div>
       </div>
     </footer>

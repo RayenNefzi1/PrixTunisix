@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['www.mytek.tn', 'www.tunisianet.com.tn', 'www.sfaxcomputer.com.tn'],
+    domains: ['www.tunisianet.com.tn', 'www.tunisiteck.com', 'www.sfaxcomputer.com.tn'],
   },
   async rewrites() {
     return [

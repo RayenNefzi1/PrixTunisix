@@ -65,6 +65,28 @@ export default function AdminDashboard() {
     premium_manual: 'Premium Manuel'
   }
 
+  // Build conic gradient with proper percentages
+  const buildGradient = (stats: Record<string, number>, colors: string[]) => {
+    const entries = Object.entries(stats).filter(([_, v]) => v > 0)
+    if (entries.length === 0) return 'none'
+    
+    const total = entries.reduce((sum, [_, v]) => sum + v, 0)
+    let gradient = ''
+    let current = 0
+    
+    entries.forEach(([_, count], i) => {
+      const percent = (count / total) * 100
+      const next = current + percent
+      gradient += `${colors[i % colors.length]} ${current}% ${next}%${i < entries.length - 1 ? ',' : ''}`
+      current = next
+    })
+    
+    return `conic-gradient(${gradient})`
+  }
+
+  const fournisseurGradient = buildGradient(fournisseurStats || {}, fournisseurColors)
+  const categoryGradient = buildGradient(categoryStats?.categories || {}, categoryColors)
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 space-y-4">
@@ -133,7 +155,7 @@ export default function AdminDashboard() {
             <p className="text-gray-500 text-center py-8">Aucune donnée</p>
           ) : (
             <div className="flex items-center gap-6">
-              <div className="w-40 h-40 rounded-full flex items-center justify-center relative" style={{ background: `conic-gradient(${fournisseurColors.join(', ')})` }}>
+              <div className="w-40 h-40 rounded-full flex items-center justify-center" style={{ background: fournisseurGradient }}>
                 <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
                   <span className="text-lg font-bold text-gray-900">{totalFournisseur}</span>
                 </div>
@@ -160,7 +182,7 @@ export default function AdminDashboard() {
             <p className="text-gray-500 text-center py-8">Aucune donnée</p>
           ) : (
             <div className="flex items-center gap-6">
-              <div className="w-40 h-40 rounded-full flex items-center justify-center relative" style={{ background: `conic-gradient(${categoryColors.slice(0, Math.min(totalCategory, 8)).join(', ')})` }}>
+              <div className="w-40 h-40 rounded-full flex items-center justify-center" style={{ background: categoryGradient }}>
                 <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
                   <span className="text-lg font-bold text-gray-900">{totalCategory}</span>
                 </div>

@@ -4,7 +4,7 @@ import AppWrapper from '@/components/AppWrapper'
 
 export const metadata: Metadata = {
   title: 'PrixTunisix — Comparateur de prix en Tunisie',
-  description: 'Comparez les prix sur MyTek, Tunisianet, SFax Computer et plus.',
+  description: 'Comparez les prix sur Tunisianet, TunisiaTech, SFax Computer et plus.',
 }
 
 export default function RootLayout({ 

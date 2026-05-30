@@ -57,7 +57,7 @@ export default function HomePage() {
             <span className="text-yellow-300">économisez vraiment.</span>
           </h1>
           <p className="text-lg text-blue-100 mb-10 max-w-2xl mx-auto">
-            Trouvez les meilleures offres sur MyTek, Tunisianet, SFax Computer et plus — en un seul clic.
+            Trouvez les meilleures offres sur Tunisianet, TunisiaTech, SFax Computer et plus — en un seul clic.
           </p>
 
           {/* Big search */}

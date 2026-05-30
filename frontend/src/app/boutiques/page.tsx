@@ -17,7 +17,6 @@ interface Boutique {
 const MERCHANT_COLORS: Record<string, string> = {
   tunisianet:   'from-blue-50 to-blue-100 border-blue-200',
   tunisiatech:  'from-orange-50 to-orange-100 border-orange-200',
-  mytek:        'from-red-50 to-red-100 border-red-200',
   default:      'from-gray-50 to-gray-100 border-gray-200',
 }
 

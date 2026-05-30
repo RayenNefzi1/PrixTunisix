@@ -193,7 +193,7 @@ export default function Navbar() {
     <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md' : 'bg-white'}`}>
       {/* Top bar */}
       <div className="bg-brand-700 text-white text-xs py-1.5 px-4 text-center">
-        🇹🇳 Comparez les prix sur MyTek, Tunisianet, TunisiaTech et plus &mdash;{' '}
+        🇹🇳 Comparez les prix sur Tunisianet, TunisiaTech et plus &mdash;{' '}
         <span className="font-semibold">Économisez jusqu&apos;à 30%</span>
       </div>
 

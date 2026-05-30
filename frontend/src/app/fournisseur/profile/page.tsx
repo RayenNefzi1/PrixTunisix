@@ -133,7 +133,7 @@ export default function FournisseurProfilePage() {
                 onChange={e => setForm({ ...form, company_name: e.target.value })}
                 required
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none"
-                placeholder="MyTek Tunisia"
+                placeholder="Tunisianet Tunisia"
               />
             </div>
 
@@ -145,7 +145,7 @@ export default function FournisseurProfilePage() {
                 onChange={e => setForm({ ...form, contact_email: e.target.value })}
                 required
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none"
-                placeholder="contact@mytek.tn"
+                placeholder="contact@tunisianet.com.tn"
               />
             </div>
 
@@ -185,7 +185,7 @@ export default function FournisseurProfilePage() {
                 value={form.merchant_url}
                 onChange={e => setForm({ ...form, merchant_url: e.target.value })}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none"
-                placeholder="https://www.mytek.tn"
+                placeholder="https://www.tunisianet.com"
               />
             </div>
 
