@@ -308,7 +308,7 @@ export default function ProductDetailPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-black text-gray-900">{offer.price.toFixed(2)} TND</p>
-                    <a href={offer.merchant_url} target="_blank" rel="noopener noreferrer"
+                    <a href={`/api/redirect/${offer.id}`} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-brand-600 hover:underline">
                       Acheter <ExternalLink className="w-3 h-3" />
                     </a>
