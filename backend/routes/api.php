@@ -303,6 +303,52 @@ Route::get('/test-login', function () {
     ]);
 });
 
+Route::get('/add-tunisiatech-offer', function () {
+    // Find or create the product
+    $productName = 'Tablette Samsung Galaxy Tab A11 Wi-Fi 4G 4Go 64Go Silver';
+    
+    $brand = \App\Models\Brand::firstOrCreate(['name' => 'Samsung'], ['slug' => 'samsung']);
+    $category = \App\Models\Category::where('slug', 'tablettes')->first();
+    
+    $product = \App\Models\Product::firstOrCreate(
+        ['name' => $productName],
+        [
+            'slug' => 'tablette-samsung-galaxy-tab-a11-4g-lte-4go-64go-87-wxga-gris-sm-a11-4-64-gr',
+            'category_id' => $category?->id,
+            'brand_id' => $brand->id,
+            'image_url' => 'https://www.tunisiatech.tn/16538-medium_default/tablette-samsung-galaxy-tab-a11-wi-fi-4g-4go-64go-silver.jpg',
+            'is_validated' => true,
+        ]
+    );
+    
+    // Find TunisiaTech merchant website (id 4)
+    $merchantWebsite = \App\Models\MerchantWebsite::find(4);
+    
+    // Create or update offer
+    $offer = \App\Models\Offer::updateOrCreate(
+        [
+            'product_id' => $product->id,
+            'merchant_website_id' => 4,
+        ],
+        [
+            'raw_title' => $productName,
+            'price' => 469.000,
+            'merchant_url' => 'https://tunisiatech.tn/tablettes-en-tunisie/5857-tablette-samsung-galaxy-tab-a11-wi-fi-4g-4go-64go-silver.html',
+            'image_url' => 'https://www.tunisiatech.tn/16538-medium_default/tablette-samsung-galaxy-tab-a11-wi-fi-4g-4go-64go-silver.jpg',
+            'is_available' => true,
+            'scraped_at' => now(),
+            'scraped_reference' => 'TT-5857',
+        ]
+    );
+    
+    return response()->json([
+        'message' => 'TunisiaTech offer added',
+        'product' => $product->name,
+        'offer_price' => $offer->price,
+        'merchant' => $merchantWebsite?->name,
+    ]);
+});
+
 // Scraping seed endpoints
 Route::post('/seed-scraping', function () {
     $scripts = [
