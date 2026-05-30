@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Tunisianet'],
             [
                 'base_url'  => 'https://www.tunisianet.com.tn',
-                'logo_url'  => 'https://www.tunisianet.com.tn/img/logo.png',
+                'logo_url'  => 'https://borgiphones.com/wp-content/uploads/2024/02/tunisianet-logo.png',
                 'is_active' => true,
             ]
         );
