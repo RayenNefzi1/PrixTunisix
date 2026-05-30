@@ -149,12 +149,20 @@ Route::get('/seed-fournisseurs', function () {
             'merchant_url' => $f['merchant_url'], 'company_phone' => '+216 72 000 000', 'company_address' => 'Tunis, Tunisia',
             'api_key' => \App\Models\Fournisseur::generateApiKey(), 'active' => true
         ]);
-        \App\Models\FournisseurSubscription::firstOrCreate(['fournisseur_id' => $fournisseur->id], [
-            'plan' => $f['plan'], 'price' => in_array($f['plan'], ['basic']) ? 0 : (in_array($f['plan'], ['premium_manual']) ? 19.99 : (in_array($f['plan'], ['pro']) ? 29.99 : 49.99)),
+        \App\Models\FournisseurSubscription::updateOrCreate(['fournisseur_id' => $fournisseur->id], [
+            'plan' => $f['plan'], 'price' => in_array($f['plan'], ['premium_manual']) ? 19.99 : (in_array($f['plan'], ['pro']) ? 29.99 : 49.99),
             'start_date' => now()->subDays(15), 'end_date' => now()->addDays(15), 'status' => 'active'
         ]);
     }
     return response()->json(['message' => 'Fournisseurs seeded successfully']);
+});
+
+Route::get('/fix-basic-subscriptions', function () {
+    $basicSubs = \App\Models\FournisseurSubscription::where('plan', 'basic')->get();
+    foreach ($basicSubs as $sub) {
+        $sub->update(['plan' => 'premium_manual', 'price' => 19.99]);
+    }
+    return response()->json(['message' => "Updated {$basicSubs->count()} subscriptions from basic to premium_manual"]);
 });
 
 // Scraping seed endpoints
