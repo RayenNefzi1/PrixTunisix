@@ -289,7 +289,9 @@ Route::post('/test-login', function (Request $request) {
     
     return response()->json([
         'received' => $data,
-        'otp_in_db' => \App\Models\PhoneOtp::where('phone', '+21698000001')->first()
+        'otp_in_db' => \App\Models\PhoneOtp::where('phone', '+21698000001')->first(),
+        'user_by_phone' => \App\Models\User::where('phone', '+21698000001')->first(),
+        'client_by_phone' => \App\Models\Client::where('phone', '+21698000001')->first()
     ]);
 });
 
