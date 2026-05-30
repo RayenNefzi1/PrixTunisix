@@ -126,7 +126,7 @@ export default function FournisseurPage() {
             <CreditCard className={`w-5 h-5 ${appearsOnWebsite ? 'text-green-600' : 'text-gray-600'}`} />
           </div>
           <div className="flex-1">
-            <p className="font-medium text-gray-900">Abonnement: {subscription.plan === 'basic' ? 'Basic' : subscription.plan === 'pro' ? 'Pro' : subscription.plan === 'max' ? 'Max' : 'Premium Manuel'}</p>
+            <p className="font-medium text-gray-900">Abonnement: {subscription.plan === 'pro' ? 'Pro' : subscription.plan === 'max' ? 'Max' : 'Premium Manuel'}</p>
             <p className="text-sm text-gray-500">
               {appearsOnWebsite ? '✓ Apparaît sur le site' : '✗ N\'apparaît pas sur le site'}
             </p>

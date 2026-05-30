@@ -45,7 +45,6 @@ export default function AdminFournisseursPage() {
   const getPlanBadge = (plan: string, status: string) => {
     if (status !== 'active') return 'bg-gray-100 text-gray-600'
     const colors: Record<string, string> = {
-      basic: 'bg-gray-100 text-gray-600',
       pro: 'bg-blue-100 text-blue-700',
       max: 'bg-purple-100 text-purple-700',
       premium_manual: 'bg-orange-100 text-orange-700',

@@ -64,7 +64,6 @@ export default function SubscriptionPage() {
 
   const getPlanIcon = (key: string) => {
     switch (key) {
-      case 'basic': return <Shield className="w-6 h-6" />
       case 'pro': return <Zap className="w-6 h-6" />
       case 'max': return <Crown className="w-6 h-6" />
       case 'premium_manual': return <ShoppingBag className="w-6 h-6" />
@@ -74,7 +73,6 @@ export default function SubscriptionPage() {
 
   const getPlanColor = (key: string) => {
     switch (key) {
-      case 'basic': return 'border-gray-200 bg-gray-50'
       case 'pro': return 'border-blue-200 bg-blue-50'
       case 'max': return 'border-purple-200 bg-purple-50'
       case 'premium_manual': return 'border-orange-200 bg-orange-50'
@@ -84,7 +82,6 @@ export default function SubscriptionPage() {
 
   const getButtonColor = (key: string) => {
     switch (key) {
-      case 'basic': return 'bg-gray-600 hover:bg-gray-700'
       case 'pro': return 'bg-blue-600 hover:bg-blue-700'
       case 'max': return 'bg-purple-600 hover:bg-purple-700'
       case 'premium_manual': return 'bg-orange-600 hover:bg-orange-700'

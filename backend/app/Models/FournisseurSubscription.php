@@ -32,15 +32,6 @@ class FournisseurSubscription extends Model
     public static function getPlanFeatures(): array
     {
         return [
-            'basic' => [
-                'name' => 'Basic',
-                'price' => 0,
-                'features' => [
-                    'Accès limité',
-                    'Pas de scraping',
-                    'Support communautaire',
-                ],
-            ],
             'pro' => [
                 'name' => 'Pro',
                 'price' => 29.99,

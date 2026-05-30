@@ -47,7 +47,6 @@ export default function AdminSubscriptionsPage() {
 
   const getPlanBadge = (plan: string) => {
     const colors: Record<string, string> = {
-      basic: 'bg-gray-100 text-gray-600',
       pro: 'bg-blue-100 text-blue-700',
       max: 'bg-purple-100 text-purple-700',
       premium_manual: 'bg-orange-100 text-orange-700',
@@ -63,8 +62,8 @@ export default function AdminSubscriptionsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {['basic', 'pro', 'max', 'premium_manual'].map(plan => {
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {['pro', 'max', 'premium_manual'].map(plan => {
           const count = subscriptions.filter(s => s.plan === plan && s.status === 'active').length
           return (
             <div key={plan} className="bg-white rounded-xl border border-gray-100 p-4">

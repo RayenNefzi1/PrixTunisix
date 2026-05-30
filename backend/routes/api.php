@@ -137,7 +137,7 @@ Route::get('/seed-fournisseurs', function () {
         ['email' => 'contact@tunisiteck.com', 'name' => 'TunisiaTech', 'pass' => 'TunisiaTech@12345', 'plan' => 'max', 'merchant_id' => 4, 'merchant_url' => 'https://www.tunisiteck.com'],
         ['email' => 'contact@nutridiet.tn', 'name' => 'Nutridiet', 'pass' => 'Nutridiet@12345', 'plan' => 'premium_manual', 'merchant_id' => null, 'merchant_url' => 'https://www.nutridiet.tn'],
         ['email' => 'contact@ipmact.tn', 'name' => 'Ipmact Nutrition', 'pass' => 'Ipmact@12345', 'plan' => 'premium_manual', 'merchant_id' => null, 'merchant_url' => 'https://www.ipmact.tn'],
-        ['email' => 'contact@motottunisie.tn', 'name' => 'Motottunisie', 'pass' => 'Motot@12345', 'plan' => 'basic', 'merchant_id' => null, 'merchant_url' => 'https://www.motottunisie.tn'],
+        ['email' => 'contact@motottunisie.tn', 'name' => 'Motottunisie', 'pass' => 'Motot@12345', 'plan' => 'premium_manual', 'merchant_id' => null, 'merchant_url' => 'https://www.motottunisie.tn'],
         ['email' => 'contact@motor.tn', 'name' => 'Motor', 'pass' => 'Motor@12345', 'plan' => 'pro', 'merchant_id' => null, 'merchant_url' => 'https://www.motor.tn'],
     ];
     foreach ($fournisseurs as $f) {

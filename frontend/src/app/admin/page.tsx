@@ -32,7 +32,7 @@ export default function AdminDashboard() {
       .then(res => {
         const data = res.data.data || res.data || []
         const plans = data.reduce((acc: any, f: any) => {
-          const plan = f.subscription?.plan || 'basic'
+          const plan = f.subscription?.plan || 'pro'
           acc[plan] = (acc[plan] || 0) + 1
           return acc
         }, {})
@@ -59,7 +59,6 @@ export default function AdminDashboard() {
   const categoryColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
 
   const fournisseurPlanLabels: Record<string, string> = {
-    basic: 'Basic',
     pro: 'Pro', 
     max: 'Max',
     premium_manual: 'Premium Manuel'
