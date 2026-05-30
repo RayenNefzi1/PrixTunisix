@@ -174,6 +174,59 @@ Route::get('/update-tunisianet-logo', function () {
     return response()->json(['message' => 'Tunisianet not found'], 404);
 });
 
+Route::get('/seed-analytics', function () {
+    $fournisseurs = \App\Models\Fournisseur::with('subscription')->get();
+    $products = \App\Models\Product::where('is_validated', true)->with('offers')->get();
+    
+    $totalClicks = 0;
+    $totalViews = 0;
+    
+    foreach ($fournisseurs as $fournisseur) {
+        $offers = \App\Models\Offer::where('merchant_website_id', $fournisseur->merchant_website_id)->get();
+        $productIds = $offers->pluck('product_id')->unique()->toArray();
+        
+        if (empty($productIds)) continue;
+        
+        $clicksCount = rand(50, 200);
+        $totalClicks += $clicksCount;
+        
+        for ($i = 0; $i < $clicksCount; $i++) {
+            $productId = $productIds[array_rand($productIds)];
+            \App\Models\MerchantClick::create([
+                'fournisseur_id' => $fournisseur->id,
+                'product_id' => $productId,
+                'referrer' => 'https://www.google.' . ['tn', 'fr'][array_rand(['tn', 'fr'])] . '/search?q=' . urlencode(['prix', 'acheter', 'compare'][array_rand(['prix', 'acheter', 'compare'])]),
+                'ip_address' => '197.' . rand(27, 31) . '.' . rand(1, 255) . '.' . rand(1, 255),
+                'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/' . rand(110, 125) . '.0',
+                'clicked_at' => now()->subDays(rand(0, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59)),
+            ]);
+        }
+        
+        foreach ($productIds as $productId) {
+            $viewsCount = rand(20, 80);
+            $totalViews += $viewsCount;
+            
+            for ($d = 0; $d <= rand(5, 30); $d++) {
+                $dayViews = rand(1, min(20, $viewsCount));
+                
+                \App\Models\ProductView::create([
+                    'fournisseur_id' => $fournisseur->id,
+                    'product_id' => $productId,
+                    'merchant_website_id' => $fournisseur->merchant_website_id,
+                    'view_date' => now()->subDays($d)->toDateString(),
+                    'view_count' => $dayViews,
+                ]);
+            }
+        }
+    }
+    
+    return response()->json([
+        'message' => 'Analytics data seeded successfully',
+        'total_clicks' => $totalClicks,
+        'total_views' => $totalViews,
+    ]);
+});
+
 // Scraping seed endpoints
 Route::post('/seed-scraping', function () {
     $scripts = [
