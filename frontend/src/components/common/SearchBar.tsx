@@ -5,13 +5,20 @@ import { useRouter } from 'next/navigation'
 import { Search, Tag } from 'lucide-react'
 import api from '@/lib/api'
 
+interface CategoryInfo {
+  id: number
+  name: string
+  code: string
+  slug: string
+}
+
 interface Suggestion {
   type: 'product' | 'brand'
   id: number
   name: string
   slug: string
   image_url: string | null
-  category: { id: number; name: string; code: string; slug: string } | string | null
+  category: CategoryInfo | null
   min_price: number | null
 }
 
@@ -133,7 +140,7 @@ export default function SearchBar({ className = '' }: Props) {
                   if (s.type === 'brand') {
                     router.push(`/marques/${s.slug}`)
                   } else {
-                    const catSlug = typeof s.category === 'object' && s.category?.slug ? s.category.slug : 'all'
+                    const catSlug = s.category?.slug || 'all'
                     router.push(`/produits/${catSlug}/${s.slug}`)
                   }
                 }}
@@ -158,14 +165,7 @@ export default function SearchBar({ className = '' }: Props) {
                 {s.type === 'brand' ? (
                   <p className="text-xs text-brand-500 font-medium">Marque</p>
                 ) : (
-                  <p className="text-xs text-gray-400 truncate">
-                    {(() => {
-                      const cat = s.category
-                      if (typeof cat === 'object' && cat?.name) return cat.name
-                      if (typeof cat === 'string') return cat
-                      return ''
-                    })()}
-                  </p>
+                  <p className="text-xs text-gray-400 truncate">{s.category?.name || ''}</p>
                 )}
               </div>
 
