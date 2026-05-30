@@ -145,19 +145,21 @@ Route::post('/seed-scraping', function () {
     }
     return response()->json(['message' => 'Scraping scripts seeded']);
 });
+
 Route::get('/seed-scraping', function () {
-        $scripts = [
-            ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'target_url' => 'https://www.tunisianet.com.tn', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'target_url' => 'https://www.tunisiteck.com', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Zoom', 'merchant_website_id' => 5, 'target_url' => 'https://zoom.com.tn', 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
-            ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'target_url' => 'https://khadraouitek.tn', 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
-        ];
-        foreach ($scripts as $script) {
-            \App\Models\ScrapingScript::firstOrCreate(['name' => $script['name']], $script);
-        }
-        return response()->json(['message' => 'Scraping scripts seeded']);
-    });
-    Route::get('seed-products', function () {
+    $scripts = [
+        ['name' => 'Tunisianet', 'merchant_website_id' => 2, 'target_url' => 'https://www.tunisianet.com.tn', 'command' => 'scrape:all --tunisianet', 'schedule' => 'daily', 'active' => true],
+        ['name' => 'TunisiaTech', 'merchant_website_id' => 4, 'target_url' => 'https://www.tunisiteck.com', 'command' => 'scrape:all --tunisiteck', 'schedule' => 'daily', 'active' => true],
+        ['name' => 'Zoom', 'merchant_website_id' => 5, 'target_url' => 'https://zoom.com.tn', 'command' => 'scrape:all --zoom', 'schedule' => 'daily', 'active' => true],
+        ['name' => 'Khadraoui', 'merchant_website_id' => 6, 'target_url' => 'https://khadraouitek.tn', 'command' => 'scrape:all --khadraoui', 'schedule' => 'daily', 'active' => true],
+    ];
+    foreach ($scripts as $script) {
+        \App\Models\ScrapingScript::firstOrCreate(['name' => $script['name']], $script);
+    }
+    return response()->json(['message' => 'Scraping scripts seeded']);
+});
+
+Route::get('seed-products', function () {
         $products = [
             ['name' => 'MacBook Air M3 13"', 'brand' => 'Apple', 'price' => 2999.000],
             ['name' => 'iPhone 15 Pro', 'brand' => 'Apple', 'price' => 2499.000],
