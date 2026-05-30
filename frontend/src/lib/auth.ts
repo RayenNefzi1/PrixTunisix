@@ -2,12 +2,12 @@ import Cookies from 'js-cookie'
 import api from './api'
 
 export interface User {
-  id: number
-  name: string
-  prename: string
-  email?: string
-  phone?: string
-  role: 'client' | 'merchant' | 'employee' | 'admin'
+  id: number;
+  name: string | null;
+  prename: string | null;
+  email: string | null;
+  phone: string | null;
+  role: string;
 }
 
 export async function login(email: string, password: string): Promise<User> {
