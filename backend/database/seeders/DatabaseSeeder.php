@@ -71,6 +71,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'TunisiaTech'],
             [
                 'base_url'  => 'https://www.tunisiteck.com',
+                'logo_url'  => 'https://cdn.primini.tn/8bfdb42c-b046-4c84-9100-13b14785668d.jpg',
                 'is_active' => true,
             ]
         );
