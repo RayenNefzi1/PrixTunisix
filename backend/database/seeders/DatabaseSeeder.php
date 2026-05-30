@@ -108,6 +108,15 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Motottunisie'],
             [
                 'base_url'  => 'https://www.motottunisie.tn',
+                'logo_url'  => 'https://www.mototunisie.tn/wp-content/uploads/2025/12/moto-tunisie-logo-white-3.png',
+                'is_active' => true,
+            ]
+        );
+        MerchantWebsite::firstOrCreate(
+            ['name' => 'Motorz'],
+            [
+                'base_url'  => 'https://motorz.tn',
+                'logo_url'  => 'https://motorz.tn/wp-content/uploads/2025/05/LOGO-RB.png',
                 'is_active' => true,
             ]
         );

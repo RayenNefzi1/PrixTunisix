@@ -368,6 +368,104 @@ Route::get('/add-tunisiatech-offer', function () {
     ]);
 });
 
+Route::get('/add-motorz-offer', function () {
+    $productName = 'Scooter Aprilia SR 125';
+    $slug = 'aprilia-sr-125-scooter';
+    
+    $brand = \App\Models\Brand::firstOrCreate(['name' => 'Aprilia'], ['slug' => 'aprilia']);
+    $category = \App\Models\Category::where('slug', 'motos-scooters')->first();
+    
+    $product = \App\Models\Product::where('slug', $slug)->first();
+    if (!$product) {
+        $product = \App\Models\Product::where('name', 'like', '%Aprilia SR 125%')->first();
+    }
+    if (!$product) {
+        $product = \App\Models\Product::create([
+            'name' => $productName,
+            'slug' => $slug,
+            'category_id' => $category?->id,
+            'brand_id' => $brand->id,
+            'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
+            'is_validated' => true,
+        ]);
+    }
+    
+    $merchantWebsite = \App\Models\MerchantWebsite::where('name', 'Motorz')->first();
+    
+    $offer = \App\Models\Offer::updateOrCreate(
+        [
+            'product_id' => $product->id,
+            'merchant_website_id' => $merchantWebsite?->id,
+        ],
+        [
+            'raw_title' => $productName,
+            'price' => 7900.000,
+            'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
+            'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
+            'is_available' => true,
+            'scraped_at' => now(),
+            'scraped_reference' => 'MOTORZ-APRILIA-SR125',
+        ]
+    );
+    
+    return response()->json([
+        'message' => 'Motorz offer added',
+        'product' => $product->name,
+        'product_url' => '/produits/' . $product->slug,
+        'offer_price' => $offer->price,
+        'merchant' => $merchantWebsite?->name,
+    ]);
+});
+
+Route::get('/add-mototunisie-offer', function () {
+    $productName = 'Aprilia SR125 Bleu';
+    $slug = 'aprilia-sr125-bleu';
+    
+    $brand = \App\Models\Brand::firstOrCreate(['name' => 'Aprilia'], ['slug' => 'aprilia']);
+    $category = \App\Models\Category::where('slug', 'motos-scooters')->first();
+    
+    $product = \App\Models\Product::where('slug', $slug)->first();
+    if (!$product) {
+        $product = \App\Models\Product::where('name', 'like', '%Aprilia SR125%')->first();
+    }
+    if (!$product) {
+        $product = \App\Models\Product::create([
+            'name' => $productName,
+            'slug' => $slug,
+            'category_id' => $category?->id,
+            'brand_id' => $brand->id,
+            'image_url' => 'https://www.mototunisie.tn/wp-content/uploads/2024/12/aprilia-sr125.jpg',
+            'is_validated' => true,
+        ]);
+    }
+    
+    $merchantWebsite = \App\Models\MerchantWebsite::where('name', 'Motottunisie')->first();
+    
+    $offer = \App\Models\Offer::updateOrCreate(
+        [
+            'product_id' => $product->id,
+            'merchant_website_id' => $merchantWebsite?->id,
+        ],
+        [
+            'raw_title' => $productName,
+            'price' => 7500.000,
+            'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
+            'image_url' => 'https://www.mototunisie.tn/wp-content/uploads/2024/12/aprilia-sr125.jpg',
+            'is_available' => true,
+            'scraped_at' => now(),
+            'scraped_reference' => 'MOTOTUNISIE-APRILIA-SR125',
+        ]
+    );
+    
+    return response()->json([
+        'message' => 'Motottunisie offer added',
+        'product' => $product->name,
+        'product_url' => '/produits/' . $product->slug,
+        'offer_price' => $offer->price,
+        'merchant' => $merchantWebsite?->name,
+    ]);
+});
+
 // Scraping seed endpoints
 Route::post('/seed-scraping', function () {
     $scripts = [
