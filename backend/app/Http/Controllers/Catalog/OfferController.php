@@ -32,7 +32,19 @@ class OfferController extends Controller
             'offer_id' => $offer->id,
             'user_id' => optional($request->user())->id,
             'ip_address' => $request->ip(),
+            'clicked_at' => now(),
         ]);
+
+        if ($offer->fournisseur) {
+            MerchantClick::create([
+                'fournisseur_id' => $offer->fournisseur->id,
+                'product_id' => $offer->product_id,
+                'referrer' => $request->headers->get('referer', 'direct'),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'clicked_at' => now(),
+            ]);
+        }
 
         return response()->json([
             'url' => $offer->merchant_url,
