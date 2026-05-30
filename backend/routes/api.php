@@ -175,8 +175,7 @@ Route::get('/update-tunisianet-logo', function () {
 });
 
 Route::get('/seed-analytics', function () {
-    $fournisseurs = \App\Models\Fournisseur::with('subscription')->get();
-    $products = \App\Models\Product::where('is_validated', true)->with('offers')->get();
+    $fournisseurs = \App\Models\Fournisseur::whereNotNull('merchant_website_id')->get();
     
     $totalClicks = 0;
     $totalViews = 0;
@@ -203,30 +202,32 @@ Route::get('/seed-analytics', function () {
         }
         
         foreach ($productIds as $productId) {
-            $viewsCount = rand(20, 80);
-            $totalViews += $viewsCount;
-            
-            for ($d = 0; $d <= rand(5, 30); $d++) {
-                $dayViews = rand(1, min(20, $viewsCount));
+            for ($d = 0; $d <= rand(5, 15); $d++) {
                 $viewDate = now()->subDays($d)->toDateString();
+                $existing = \App\Models\ProductView::where('fournisseur_id', $fournisseur->id)
+                    ->where('product_id', $productId)
+                    ->where('view_date', $viewDate)
+                    ->first();
                 
-                \App\Models\ProductView::updateOrCreate(
-                    [
+                if ($existing) {
+                    $existing->increment('view_count', rand(1, 10));
+                    $totalViews += rand(1, 10);
+                } else {
+                    \App\Models\ProductView::create([
                         'fournisseur_id' => $fournisseur->id,
                         'product_id' => $productId,
-                        'view_date' => $viewDate,
-                    ],
-                    [
                         'merchant_website_id' => $fournisseur->merchant_website_id,
-                        'view_count' => $dayViews,
-                    ]
-                );
+                        'view_date' => $viewDate,
+                        'view_count' => rand(1, 20),
+                    ]);
+                    $totalViews += rand(1, 20);
+                }
             }
         }
     }
     
     return response()->json([
-        'message' => 'Analytics data seeded successfully',
+        'message' => 'Analytics data seeded',
         'total_clicks' => $totalClicks,
         'total_views' => $totalViews,
     ]);
