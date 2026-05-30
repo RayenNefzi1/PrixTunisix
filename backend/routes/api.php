@@ -247,15 +247,20 @@ Route::get('/create-test-client', function () {
         ['phone' => $phone]
     );
     
-    \App\Models\PhoneOtp::updateOrCreate(
-        ['phone' => $phone],
-        ['code' => $code, 'expires_at' => now()->addMinutes(10), 'used_at' => null]
-    );
+    \App\Models\PhoneOtp::where('phone', $phone)->delete();
+    
+    \App\Models\PhoneOtp::create([
+        'phone' => $phone,
+        'code' => $code,
+        'expires_at' => now()->addHours(24),
+        'used_at' => null
+    ]);
     
     return response()->json([
         'message' => 'Client ready. Use phone: ' . $phone . ' and OTP: ' . $code,
         'phone' => $phone,
-        'otp' => $code
+        'otp' => $code,
+        'expires' => now()->addHours(24)->toDateTimeString()
     ]);
 });
 
