@@ -241,10 +241,14 @@ export default function ProductDetailPage() {
                               {displayPrice.toFixed(3)} <span className="text-sm font-semibold">TND</span>
                             </p>
                           </div>
-                          <button onClick={() => {
-                            fetch(`/api/offers/${offer.id}/redirect`).then(r => r.json()).then(d => {
-                              if (d.url) window.location.href = d.url;
-                            });
+                          <button onClick={async () => {
+                            try {
+                              const res = await fetch(`/api/offers/${offer.id}/redirect`, { credentials: 'include' });
+                              const data = await res.json();
+                              if (data.url) window.location.href = data.url;
+                            } catch (e) {
+                              console.error(e);
+                            }
                           }} className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition ${isBest ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
                             Voir <ExternalLink className="w-3.5 h-3.5" />
                           </button>

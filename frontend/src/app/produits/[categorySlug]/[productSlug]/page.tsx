@@ -308,10 +308,14 @@ export default function ProductDetailPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-black text-gray-900">{offer.price.toFixed(2)} TND</p>
-                    <button onClick={() => {
-                      fetch(`/api/offers/${offer.id}/redirect`).then(r => r.json()).then(d => {
-                        if (d.url) window.location.href = d.url;
-                      });
+                    <button onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/offers/${offer.id}/redirect`, { credentials: 'include' });
+                        const data = await res.json();
+                        if (data.url) window.location.href = data.url;
+                      } catch (e) {
+                        console.error(e);
+                      }
                     }} className="inline-flex items-center gap-1 text-xs text-brand-600 hover:underline">
                       Acheter <ExternalLink className="w-3 h-3" />
                     </button>
