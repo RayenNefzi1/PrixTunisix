@@ -208,14 +208,19 @@ Route::get('/seed-analytics', function () {
             
             for ($d = 0; $d <= rand(5, 30); $d++) {
                 $dayViews = rand(1, min(20, $viewsCount));
+                $viewDate = now()->subDays($d)->toDateString();
                 
-                \App\Models\ProductView::create([
-                    'fournisseur_id' => $fournisseur->id,
-                    'product_id' => $productId,
-                    'merchant_website_id' => $fournisseur->merchant_website_id,
-                    'view_date' => now()->subDays($d)->toDateString(),
-                    'view_count' => $dayViews,
-                ]);
+                \App\Models\ProductView::updateOrCreate(
+                    [
+                        'fournisseur_id' => $fournisseur->id,
+                        'product_id' => $productId,
+                        'view_date' => $viewDate,
+                    ],
+                    [
+                        'merchant_website_id' => $fournisseur->merchant_website_id,
+                        'view_count' => $dayViews,
+                    ]
+                );
             }
         }
     }
@@ -224,6 +229,33 @@ Route::get('/seed-analytics', function () {
         'message' => 'Analytics data seeded successfully',
         'total_clicks' => $totalClicks,
         'total_views' => $totalViews,
+    ]);
+});
+
+Route::get('/create-test-client', function () {
+    $phone = request('phone', '+21698000001');
+    $code = '123456';
+    
+    $user = \App\Models\User::firstOrCreate(
+        ['email' => 'client@test.tn'],
+        ['name' => 'Test', 'prename' => 'Client', 'password' => \Illuminate\Support\Facades\Hash::make('test123'), 'role' => 'client']
+    );
+    
+    $client = \App\Models\Client::firstOrCreate(
+        ['user_id' => $user->id],
+        ['phone' => $phone]
+    );
+    
+    \App\Models\PhoneOtp::updateOrCreate(
+        ['phone' => $phone],
+        ['code' => $code, 'expires_at' => now()->addMinutes(10), 'used_at' => null]
+    );
+    
+    return response()->json([
+        'message' => 'Test client created. OTP is: ' . $code,
+        'phone' => $phone,
+        'code' => $code,
+        'credentials' => ['email' => 'client@test.tn', 'password' => 'test123']
     ]);
 });
 
