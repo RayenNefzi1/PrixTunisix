@@ -354,183 +354,184 @@ class DatabaseSeeder extends Seeder
 
         // ── Fournisseur: TunisiaTech ───────────────────────────────────────────
         $tunisiaTechUser = User::firstOrCreate(
-        ['email' => 'contact@tunisiteck.com'],
-        [
-            'name'     => 'TunisiaTech',
-            'prename'  => 'Admin',
-            'password' => Hash::make('TunisiaTech@12345'),
-            'role'     => 'fournisseur',
-        ]
-    );
+            ['email' => 'contact@tunisiteck.com'],
+            [
+                'name'     => 'TunisiaTech',
+                'prename'  => 'Admin',
+                'password' => Hash::make('TunisiaTech@12345'),
+                'role'     => 'fournisseur',
+            ]
+        );
 
-    $tunisiaTechFournisseur = Fournisseur::firstOrCreate(
-        ['user_id' => $tunisiaTechUser->id],
-        [
-            'merchant_website_id' => 4,
-            'company_name'        => 'TunisiaTech',
-            'contact_email'       => 'contact@tunisiteck.com',
-            'merchant_url'        => 'https://www.tunisiteck.com',
-            'company_phone'       => '+216 72 000 000',
-            'company_address'     => 'Tunis, Tunisia',
-            'api_key'            => Fournisseur::generateApiKey(),
-            'active'             => true,
-        ]
-    );
+        $tunisiaTechFournisseur = Fournisseur::firstOrCreate(
+            ['user_id' => $tunisiaTechUser->id],
+            [
+                'merchant_website_id' => 4,
+                'company_name'        => 'TunisiaTech',
+                'contact_email'       => 'contact@tunisiteck.com',
+                'merchant_url'        => 'https://www.tunisiteck.com',
+                'company_phone'       => '+216 72 000 000',
+                'company_address'     => 'Tunis, Tunisia',
+                'api_key'            => Fournisseur::generateApiKey(),
+                'active'             => true,
+            ]
+        );
 
-    FournisseurSubscription::firstOrCreate(
-        ['fournisseur_id' => $tunisiaTechFournisseur->id],
-        [
-            'plan'      => 'max',
-            'price'     => 49.99,
-            'start_date' => now()->subDays(20),
-            'end_date'   => now()->addDays(10),
-            'status'    => 'active',
-        ]
-    );
+        FournisseurSubscription::firstOrCreate(
+            ['fournisseur_id' => $tunisiaTechFournisseur->id],
+            [
+                'plan'      => 'max',
+                'price'     => 49.99,
+                'start_date' => now()->subDays(20),
+                'end_date'   => now()->addDays(10),
+                'status'    => 'active',
+            ]
+        );
 
-    // ── Fournisseur: Nutridiet ───────────────────────────────────────────
-    $nutriDietUser = User::firstOrCreate(
-        ['email' => 'contact@nutridiet.tn'],
-        [
-            'name'     => 'Nutridiet',
-            'prename'  => 'Admin',
-            'password' => Hash::make('Nutridiet@12345'),
-            'role'     => 'fournisseur',
-        ]
-    );
+        // ── Fournisseur: Nutridiet ───────────────────────────────────────────
+        $nutriDietUser = User::firstOrCreate(
+            ['email' => 'contact@nutridiet.tn'],
+            [
+                'name'     => 'Nutridiet',
+                'prename'  => 'Admin',
+                'password' => Hash::make('Nutridiet@12345'),
+                'role'     => 'fournisseur',
+            ]
+        );
 
-    $nutriDietFournisseur = Fournisseur::firstOrCreate(
-        ['user_id' => $nutriDietUser->id],
-        [
-            'merchant_website_id' => null,
-            'company_name'        => 'Nutridiet',
-            'contact_email'       => 'contact@nutridiet.tn',
-            'merchant_url'        => 'https://www.nutridiet.tn',
-            'company_phone'       => '+216 72 000 000',
-            'company_address'     => 'Tunis, Tunisia',
-            'api_key'            => Fournisseur::generateApiKey(),
-            'active'             => true,
-        ]
-    );
+        $nutriDietFournisseur = Fournisseur::firstOrCreate(
+            ['user_id' => $nutriDietUser->id],
+            [
+                'merchant_website_id' => null,
+                'company_name'        => 'Nutridiet',
+                'contact_email'       => 'contact@nutridiet.tn',
+                'merchant_url'        => 'https://www.nutridiet.tn',
+                'company_phone'       => '+216 72 000 000',
+                'company_address'     => 'Tunis, Tunisia',
+                'api_key'            => Fournisseur::generateApiKey(),
+                'active'             => true,
+            ]
+        );
 
-    FournisseurSubscription::firstOrCreate(
-        ['fournisseur_id' => $nutriDietFournisseur->id],
-        [
-            'plan'      => 'premium_manual',
-            'price'     => 19.99,
-            'start_date' => now()->subDays(10),
-            'end_date'   => now()->addDays(20),
-            'status'    => 'active',
-        ]
-    );
+        FournisseurSubscription::firstOrCreate(
+            ['fournisseur_id' => $nutriDietFournisseur->id],
+            [
+                'plan'      => 'premium_manual',
+                'price'     => 19.99,
+                'start_date' => now()->subDays(10),
+                'end_date'   => now()->addDays(20),
+                'status'    => 'active',
+            ]
+        );
 
-    // ── Fournisseur: Ipmact Nutrition ───────────────────────────────────────────
-    $ipmactUser = User::firstOrCreate(
-        ['email' => 'contact@ipmact.tn'],
-        [
-            'name'     => 'Ipmact Nutrition',
-            'prename'  => 'Admin',
-            'password' => Hash::make('Ipmact@12345'),
-            'role'     => 'fournisseur',
-        ]
-    );
+        // ── Fournisseur: Ipmact Nutrition ───────────────────────────────────────────
+        $ipmactUser = User::firstOrCreate(
+            ['email' => 'contact@ipmact.tn'],
+            [
+                'name'     => 'Ipmact Nutrition',
+                'prename'  => 'Admin',
+                'password' => Hash::make('Ipmact@12345'),
+                'role'     => 'fournisseur',
+            ]
+        );
 
-    $ipmactFournisseur = Fournisseur::firstOrCreate(
-        ['user_id' => $ipmactUser->id],
-        [
-            'merchant_website_id' => null,
-            'company_name'        => 'Ipmact Nutrition',
-            'contact_email'       => 'contact@ipmact.tn',
-            'merchant_url'        => 'https://www.ipmact.tn',
-            'company_phone'       => '+216 72 000 000',
-            'company_address'     => 'Tunis, Tunisia',
-            'api_key'            => Fournisseur::generateApiKey(),
-            'active'             => true,
-        ]
-    );
+        $ipmactFournisseur = Fournisseur::firstOrCreate(
+            ['user_id' => $ipmactUser->id],
+            [
+                'merchant_website_id' => null,
+                'company_name'        => 'Ipmact Nutrition',
+                'contact_email'       => 'contact@ipmact.tn',
+                'merchant_url'        => 'https://www.ipmact.tn',
+                'company_phone'       => '+216 72 000 000',
+                'company_address'     => 'Tunis, Tunisia',
+                'api_key'            => Fournisseur::generateApiKey(),
+                'active'             => true,
+            ]
+        );
 
-    FournisseurSubscription::firstOrCreate(
-        ['fournisseur_id' => $ipmactFournisseur->id],
-        [
-            'plan'      => 'premium_manual',
-            'price'     => 19.99,
-            'start_date' => now()->subDays(5),
-            'end_date'   => now()->addDays(25),
-            'status'    => 'active',
-        ]
-    );
+        FournisseurSubscription::firstOrCreate(
+            ['fournisseur_id' => $ipmactFournisseur->id],
+            [
+                'plan'      => 'premium_manual',
+                'price'     => 19.99,
+                'start_date' => now()->subDays(5),
+                'end_date'   => now()->addDays(25),
+                'status'    => 'active',
+            ]
+        );
 
-    // ── Fournisseur: Motottunisie ───────────────────────────────────────────
-    $mototUser = User::firstOrCreate(
-        ['email' => 'contact@motottunisie.tn'],
-        [
-            'name'     => 'Motottunisie',
-            'prename'  => 'Admin',
-            'password' => Hash::make('Motot@12345'),
-            'role'     => 'fournisseur',
-        ]
-    );
+        // ── Fournisseur: Motottunisie ───────────────────────────────────────────
+        $mototUser = User::firstOrCreate(
+            ['email' => 'contact@motottunisie.tn'],
+            [
+                'name'     => 'Motottunisie',
+                'prename'  => 'Admin',
+                'password' => Hash::make('Motot@12345'),
+                'role'     => 'fournisseur',
+            ]
+        );
 
-    $mototFournisseur = Fournisseur::firstOrCreate(
-        ['user_id' => $mototUser->id],
-        [
-            'merchant_website_id' => null,
-            'company_name'        => 'Motottunisie',
-            'contact_email'       => 'contact@motottunisie.tn',
-            'merchant_url'        => 'https://www.motottunisie.tn',
-            'company_phone'       => '+216 72 000 000',
-            'company_address'     => 'Tunis, Tunisia',
-            'api_key'            => Fournisseur::generateApiKey(),
-            'active'             => true,
-        ]
-    );
+        $mototFournisseur = Fournisseur::firstOrCreate(
+            ['user_id' => $mototUser->id],
+            [
+                'merchant_website_id' => null,
+                'company_name'        => 'Motottunisie',
+                'contact_email'       => 'contact@motottunisie.tn',
+                'merchant_url'        => 'https://www.motottunisie.tn',
+                'company_phone'       => '+216 72 000 000',
+                'company_address'     => 'Tunis, Tunisia',
+                'api_key'            => Fournisseur::generateApiKey(),
+                'active'             => true,
+            ]
+        );
 
-    FournisseurSubscription::firstOrCreate(
-        ['fournisseur_id' => $mototFournisseur->id],
-        [
-            'plan'      => 'basic',
-            'price'     => 0,
-            'start_date' => now()->subDays(30),
-            'end_date'   => now()->addDays(0),
-            'status'    => 'active',
-        ]
-    );
+        FournisseurSubscription::firstOrCreate(
+            ['fournisseur_id' => $mototFournisseur->id],
+            [
+                'plan'      => 'basic',
+                'price'     => 0,
+                'start_date' => now()->subDays(30),
+                'end_date'   => now()->addDays(0),
+                'status'    => 'active',
+            ]
+        );
 
-    // ── Fournisseur: Motor ───────────────────────────────────────────
-    $motorUser = User::firstOrCreate(
-        ['email' => 'contact@motor.tn'],
-        [
-            'name'     => 'Motor',
-            'prename'  => 'Admin',
-            'password' => Hash::make('Motor@12345'),
-            'role'     => 'fournisseur',
-        ]
-    );
+        // ── Fournisseur: Motor ───────────────────────────────────────────
+        $motorUser = User::firstOrCreate(
+            ['email' => 'contact@motor.tn'],
+            [
+                'name'     => 'Motor',
+                'prename'  => 'Admin',
+                'password' => Hash::make('Motor@12345'),
+                'role'     => 'fournisseur',
+            ]
+        );
 
-    $motorFournisseur = Fournisseur::firstOrCreate(
-        ['user_id' => $motorUser->id],
-        [
-            'merchant_website_id' => null,
-            'company_name'        => 'Motor',
-            'contact_email'       => 'contact@motor.tn',
-            'merchant_url'        => 'https://www.motor.tn',
-            'company_phone'       => '+216 72 000 000',
-            'company_address'     => 'Tunis, Tunisia',
-            'api_key'            => Fournisseur::generateApiKey(),
-            'active'             => true,
-        ]
-    );
+        $motorFournisseur = Fournisseur::firstOrCreate(
+            ['user_id' => $motorUser->id],
+            [
+                'merchant_website_id' => null,
+                'company_name'        => 'Motor',
+                'contact_email'       => 'contact@motor.tn',
+                'merchant_url'        => 'https://www.motor.tn',
+                'company_phone'       => '+216 72 000 000',
+                'company_address'     => 'Tunis, Tunisia',
+                'api_key'            => Fournisseur::generateApiKey(),
+                'active'             => true,
+            ]
+        );
 
-    FournisseurSubscription::firstOrCreate(
-        ['fournisseur_id' => $motorFournisseur->id],
-        [
-            'plan'      => 'pro',
-            'price'     => 29.99,
-            'start_date' => now()->subDays(8),
-            'end_date'   => now()->addDays(22),
-            'status'    => 'active',
-        ]
-    );
+        FournisseurSubscription::firstOrCreate(
+            ['fournisseur_id' => $motorFournisseur->id],
+            [
+                'plan'      => 'pro',
+                'price'     => 29.99,
+                'start_date' => now()->subDays(8),
+                'end_date'   => now()->addDays(22),
+                'status'    => 'active',
+            ]
+        );
 
-    $this->command->info("Additional fournisseurs seeded: TunisiaTech (max), Nutridiet (premium_manual), Ipmact (premium_manual), Motottunisie (basic), Motor (pro)");
+        $this->command->info("Additional fournisseurs seeded: TunisiaTech (max), Nutridiet (premium_manual), Ipmact (premium_manual), Motottunisie (basic), Motor (pro)");
+    }
 }
