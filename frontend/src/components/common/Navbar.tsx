@@ -485,12 +485,8 @@ export default function Navbar() {
             Tous les produits
           </Link>
           <span className="mx-1 text-gray-200">|</span>
-          <Link href="/products?sort=price_asc" className="text-sm text-brand-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-brand-50 transition flex items-center gap-1">
-            🔥 Meilleures offres
-          </Link>
-          <span className="mx-1 text-gray-200">|</span>
           <Link href="/stories" className="text-sm text-brand-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-brand-50 transition flex items-center gap-1">
-            ⚡ Stories
+            🔥 Meilleures offres
           </Link>
           <span className="mx-1 text-gray-200">|</span>
           <Link href="/boutiques" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-brand-600 font-medium px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">
@@ -511,8 +507,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-2">
           <Link href="/products" className="block py-2 text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}>Tous les produits</Link>
-          <Link href="/products?sort=price_asc" className="block py-2 text-sm font-medium text-brand-600" onClick={() => setMenuOpen(false)}>🔥 Meilleures offres</Link>
-          <Link href="/stories" className="block py-2 text-sm font-medium text-brand-600" onClick={() => setMenuOpen(false)}>⚡ Stories</Link>
+          <Link href="/stories" className="block py-2 text-sm font-medium text-brand-600" onClick={() => setMenuOpen(false)}>🔥 Meilleures offres</Link>
           <Link href="/boutiques" className="flex items-center gap-2 py-2 text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}><Store className="w-4 h-4" /> Boutiques</Link>
           <Link href="/marques" className="flex items-center gap-2 py-2 text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}><Tag className="w-4 h-4" /> Marques</Link>
           <Link href="/coupons" className="flex items-center gap-2 py-2 text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}><Ticket className="w-4 h-4" /> Coupons</Link>
