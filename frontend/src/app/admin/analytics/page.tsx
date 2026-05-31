@@ -40,6 +40,7 @@ export default function AdminAnalyticsPage() {
   const totalClicks = analytics?.total_clicks || 0
   const clicksToday = analytics?.clicks_today || 0
   const clicksThisMonth = analytics?.clicks_this_month || 0
+  const maxClicks = clicksByDay.length > 0 ? Math.max(...clicksByDay.map((d: any) => d.total_clicks || 0)) : 0
 
   return (
     <div className="space-y-6">
@@ -87,7 +88,7 @@ export default function AdminAnalyticsPage() {
             <TrendingUp className="w-5 h-5 text-purple-500" />
             <span className="text-xs text-gray-500">Jours analysés</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{analytics?.length || 0}</p>
+          <p className="text-2xl font-bold text-gray-900">{clicksByDay.length || 0}</p>
         </div>
       </div>
 
@@ -99,7 +100,6 @@ export default function AdminAnalyticsPage() {
         ) : (
         <div className="h-64 flex items-end gap-2">
           {clicksByDay.slice(0, 30).map((item: any, i: number) => {
-            const maxClicks = Math.max(...clicksByDay.map((d: any) => d.total_clicks))
             const height = maxClicks > 0 ? (item.total_clicks / maxClicks) * 240 : 0
             return (
               <div key={i} className="flex-1 flex flex-col items-center gap-2">
