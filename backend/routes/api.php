@@ -184,6 +184,24 @@ Route::get('/update-tunisiatech-logo', function () {
     return response()->json(['message' => 'TunisiaTech not found'], 404);
 });
 
+Route::get('/update-motorz-logo', function () {
+    $mw = \App\Models\MerchantWebsite::where('name', 'Motorz')->first();
+    if ($mw) {
+        $mw->update(['logo_url' => 'https://motorz.tn/wp-content/uploads/2025/05/LOGO-RB.png']);
+        return response()->json(['message' => 'Motorz logo updated']);
+    }
+    return response()->json(['message' => 'Motorz not found'], 404);
+});
+
+Route::get('/update-motottunisie-logo', function () {
+    $mw = \App\Models\MerchantWebsite::where('name', 'Motottunisie')->first();
+    if ($mw) {
+        $mw->update(['logo_url' => 'https://www.mototunisie.tn/wp-content/uploads/2025/12/moto-tunisie-logo-white-3.png']);
+        return response()->json(['message' => 'Motottunisie logo updated']);
+    }
+    return response()->json(['message' => 'Motottunisie not found'], 404);
+});
+
 Route::get('/seed-analytics', function () {
     $fournisseurs = \App\Models\Fournisseur::whereNotNull('merchant_website_id')->get();
     
@@ -368,37 +386,35 @@ Route::get('/add-tunisiatech-offer', function () {
     ]);
 });
 
-Route::get('/add-motorz-offer', function () {
+Route::get('/setup-aprilia-product', function () {
     $productName = 'Aprilia SR 125';
     $slug = 'aprilia-sr-125';
     
     $brand = \App\Models\Brand::firstOrCreate(['name' => 'Aprilia'], ['slug' => 'aprilia']);
     $category = \App\Models\Category::where('slug', 'motos-scooters')->first();
     
-    $product = \App\Models\Product::where('slug', $slug)->first();
-    if (!$product) {
-        $product = \App\Models\Product::where('name', 'like', '%Aprilia SR 125%')->first();
-    }
-    if (!$product) {
-        $product = \App\Models\Product::create([
-            'name' => $productName,
-            'slug' => $slug,
-            'category_id' => $category?->id,
-            'brand_id' => $brand->id,
-            'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
-            'is_validated' => true,
-        ]);
-    }
+    // Delete all offers and products with aprilia
+    $oldOffers = \App\Models\Offer::whereHas('product', function ($q) {
+        $q->where('name', 'like', '%Aprilia%')->orWhere('slug', 'like', '%aprilia%');
+    })->delete();
     
-    $merchantWebsite = \App\Models\MerchantWebsite::where('name', 'Motorz')->first();
-    $fournisseur = \App\Models\Fournisseur::where('company_name', 'Motor')->first();
+    $oldProducts = \App\Models\Product::where('name', 'like', '%Aprilia%')->orWhere('slug', 'like', '%aprilia%')->delete();
     
-    // Delete existing offers for this product
-    \App\Models\Offer::where('product_id', $product->id)->where('merchant_website_id', $merchantWebsite?->id)->delete();
+    // Create product with image
+    $product = \App\Models\Product::create([
+        'name' => $productName,
+        'slug' => $slug,
+        'category_id' => $category?->id,
+        'brand_id' => $brand->id,
+        'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
+        'is_validated' => true,
+    ]);
     
-    $offer = \App\Models\Offer::create([
+    // Motorz offer
+    $motorzMw = \App\Models\MerchantWebsite::where('name', 'Motorz')->first();
+    \App\Models\Offer::create([
         'product_id' => $product->id,
-        'merchant_website_id' => $merchantWebsite?->id,
+        'merchant_website_id' => $motorzMw?->id,
         'raw_title' => $productName . ' - Motorz',
         'price' => 7900.000,
         'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
@@ -408,47 +424,11 @@ Route::get('/add-motorz-offer', function () {
         'scraped_reference' => 'MOTORZ-APRILIA-SR125',
     ]);
     
-    return response()->json([
-        'message' => 'Motorz offer added',
-        'product' => $product->name,
-        'product_url' => '/produits/' . $product->slug,
-        'offer_price' => $offer->price,
-        'merchant' => $merchantWebsite?->name,
-        'fournisseur' => $fournisseur?->company_name,
-    ]);
-});
-
-Route::get('/add-mototunisie-offer', function () {
-    $productName = 'Aprilia SR 125';
-    $slug = 'aprilia-sr-125';
-    
-    $brand = \App\Models\Brand::firstOrCreate(['name' => 'Aprilia'], ['slug' => 'aprilia']);
-    $category = \App\Models\Category::where('slug', 'motos-scooters')->first();
-    
-    $product = \App\Models\Product::where('slug', $slug)->first();
-    if (!$product) {
-        $product = \App\Models\Product::where('name', 'like', '%Aprilia SR 125%')->first();
-    }
-    if (!$product) {
-        $product = \App\Models\Product::create([
-            'name' => $productName,
-            'slug' => $slug,
-            'category_id' => $category?->id,
-            'brand_id' => $brand->id,
-            'image_url' => 'https://www.mototunisie.tn/wp-content/uploads/2024/12/aprilia-sr125.jpg',
-            'is_validated' => true,
-        ]);
-    }
-    
-    $merchantWebsite = \App\Models\MerchantWebsite::where('name', 'Motottunisie')->first();
-    $fournisseur = \App\Models\Fournisseur::where('company_name', 'Motottunisie')->first();
-    
-    // Delete existing offers for this product
-    \App\Models\Offer::where('product_id', $product->id)->where('merchant_website_id', $merchantWebsite?->id)->delete();
-    
-    $offer = \App\Models\Offer::create([
+    // Motottunisie offer
+    $motottunisieMw = \App\Models\MerchantWebsite::where('name', 'Motottunisie')->first();
+    \App\Models\Offer::create([
         'product_id' => $product->id,
-        'merchant_website_id' => $merchantWebsite?->id,
+        'merchant_website_id' => $motottunisieMw?->id,
         'raw_title' => $productName . ' - Motottunisie',
         'price' => 7500.000,
         'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
@@ -459,12 +439,10 @@ Route::get('/add-mototunisie-offer', function () {
     ]);
     
     return response()->json([
-        'message' => 'Motottunisie offer added',
+        'message' => 'Aprilia product created with both offers',
         'product' => $product->name,
         'product_url' => '/produits/' . $product->slug,
-        'offer_price' => $offer->price,
-        'merchant' => $merchantWebsite?->name,
-        'fournisseur' => $fournisseur?->company_name,
+        'offers_count' => 2,
     ]);
 });
 
