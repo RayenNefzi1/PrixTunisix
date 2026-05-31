@@ -793,15 +793,17 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::put('scraping/{scrapingScript}', [ScrapingController::class, 'update']);
                 Route::delete('scraping/{scrapingScript}', [ScrapingController::class, 'destroy']);
                 Route::post('scraping/{scrapingScript}/toggle', [ScrapingController::class, 'toggleStatus']);
+                Route::put('scraping/{scrapingScript}/frequency', [ScrapingController::class, 'updateFrequency']);
                 Route::post('scraping/{scrapingScript}/run', [ScrapingController::class, 'runScript']);
                 Route::post('scraping/{scrapingScript}/stop', [ScrapingController::class, 'stopScript']);
                 Route::post('scraping/run-all',    [ScrapingController::class, 'runAll']);
                 Route::get('scraping/{scrapingScript}/logs', [ScrapingController::class, 'logs']);
                 Route::get('scraping/logs',        [ScrapingController::class, 'allLogs']);
                 Route::get('scraping/stats',       [ScrapingController::class, 'stats']);
+                Route::get('scraping/available-fournisseurs', [ScrapingController::class, 'availableFournisseurs']);
             });
         });
-
+    
     // ── Employee routes ─────────────────────────────────────────────────
     Route::prefix('employee')->group(function () {
         // Public test endpoint

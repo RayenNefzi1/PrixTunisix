@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ScrapingScript;
 use App\Models\ScrapingLog;
 use App\Models\MerchantWebsite;
+use App\Models\Fournisseur;
+use App\Models\FournisseurSubscription;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -85,8 +87,22 @@ class ScrapingController extends Controller
 
     public function toggleStatus(ScrapingScript $scrapingScript): JsonResponse
     {
-        $newStatus = $scrapingScript->status === 'active' ? 'inactive' : 'active';
-        $scrapingScript->update(['status' => $newStatus]);
+        // Admin can only pause (set to inactive), not activate
+        if ($scrapingScript->status === 'active') {
+            $scrapingScript->update(['status' => 'inactive']);
+        }
+
+        return response()->json($scrapingScript);
+    }
+
+    public function updateFrequency(Request $request, ScrapingScript $scrapingScript): JsonResponse
+    {
+        $validated = $request->validate([
+            'frequency' => 'required|in:hourly,daily,weekly,manual',
+            'frequency_minutes' => 'nullable|integer|min:15',
+        ]);
+
+        $scrapingScript->update($validated);
 
         return response()->json($scrapingScript);
     }
@@ -446,5 +462,29 @@ class ScrapingController extends Controller
             'errors' => $errors,
             'error_details' => $errors > 0 ? json_encode(["Spider completed with errors"]) : ($records === 0 ? json_encode([$output]) : null),
         ];
+    }
+
+    public function availableFournisseurs(): JsonResponse
+    {
+        $usedWebsiteIds = ScrapingScript::pluck('merchant_website_id')->filter()->unique();
+        
+        $fournisseurs = Fournisseur::whereNotNull('merchant_website_id')
+            ->whereNotIn('merchant_website_id', $usedWebsiteIds)
+            ->with(['subscription', 'merchantWebsite'])
+            ->whereHas('subscription', function ($q) {
+                $q->where('plan', '!=', 'premium_manual');
+            })
+            ->get()
+            ->map(function ($f) {
+                return [
+                    'id' => $f->id,
+                    'company_name' => $f->company_name,
+                    'merchant_website_id' => $f->merchant_website_id,
+                    'merchant_website_name' => $f->merchantWebsite?->name,
+                    'subscription_plan' => $f->subscription?->plan,
+                ];
+            });
+
+        return response()->json($fournisseurs);
     }
 }
