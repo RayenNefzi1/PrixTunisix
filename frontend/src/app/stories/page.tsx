@@ -244,15 +244,15 @@ export default function StoriesPage() {
             >
               Voir le prix
             </Link>
-            <a
-              href={offer.offer_url}
+            <Link
+              href={`/produits/${offer.category_code}/${offer.product_slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="py-3.5 px-5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition flex items-center gap-2"
             >
               Acheter
               <ExternalLink className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
 
           {/* Navigation arrows */}
