@@ -159,34 +159,34 @@ Route::get('/create-coupons-table', function () {
 
 Route::get('/seed-coupons', function () {
     try {
-        $offer = \App\Models\Offer::first();
+        $offer = \App\Models\Offer::whereNotNull('product_id')->where('is_available', true)->first();
         if (!$offer) {
             return response()->json(['message' => 'No offers found'], 400);
         }
-        \App\Models\Coupon::firstOrCreate(['code' => 'WELCOME10'], [
+        \App\Models\Coupon::updateOrCreate(['code' => 'WELCOME10'], [
             'description' => '10% discount for new customers',
             'discount_value' => 10,
             'discount_type' => 'percentage',
             'min_order_amount' => 100,
             'usage_limit' => 100,
-            'offer_id' => $offer->id,
+            'offer_id' => 1281,
             'valid_from' => now(),
             'valid_until' => now()->addMonths(3),
             'is_active' => true,
         ]);
-        \App\Models\Coupon::firstOrCreate(['code' => 'SAVE50'], [
+        \App\Models\Coupon::updateOrCreate(['code' => 'SAVE50'], [
             'description' => '50 DT fixed discount',
             'discount_value' => 50,
             'discount_type' => 'fixed',
             'min_order_amount' => 500,
             'max_discount' => 50,
             'usage_limit' => 50,
-            'offer_id' => $offer->id,
+            'offer_id' => 13,
             'valid_from' => now(),
             'valid_until' => now()->addMonths(2),
             'is_active' => true,
         ]);
-        \App\Models\Coupon::firstOrCreate(['code' => 'SUMMER20'], [
+        \App\Models\Coupon::updateOrCreate(['code' => 'SUMMER20'], [
             'description' => '20% summer sale',
             'discount_value' => 20,
             'discount_type' => 'percentage',
