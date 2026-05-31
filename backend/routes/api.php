@@ -389,6 +389,7 @@ Route::get('/add-tunisiatech-offer', function () {
 Route::get('/setup-aprilia-product', function () {
     $productName = 'Aprilia SR 125';
     $slug = 'aprilia-sr-125';
+    $productImage = 'https://motorz.tn/wp-content/uploads/2026/02/Aprilia-SR-125-B4-Prix-Tunisie-1080x577.webp';
     
     $brand = \App\Models\Brand::firstOrCreate(['name' => 'Aprilia'], ['slug' => 'aprilia']);
     $category = \App\Models\Category::where('slug', 'motos-scooters')->first();
@@ -425,38 +426,64 @@ Route::get('/setup-aprilia-product', function () {
         'slug' => $slug,
         'category_id' => $category?->id,
         'brand_id' => $brand->id,
-        'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
+        'image_url' => $productImage,
         'is_validated' => true,
     ]);
     
     // Motorz offer
-    \App\Models\Offer::create([
+    $motorzOffer = \App\Models\Offer::create([
         'product_id' => $product->id,
         'merchant_website_id' => $motorzMw->id,
         'raw_title' => $productName . ' - Motorz',
         'price' => 7900.000,
         'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
-        'image_url' => 'https://motorz.tn/wp-content/uploads/2024/12/WhatsApp-Image-2024-12-17-at-14.08.41-1.jpeg',
+        'image_url' => $productImage,
         'is_available' => true,
         'scraped_at' => now(),
         'scraped_reference' => 'MOTORZ-APRILIA-SR125',
     ]);
     
+    // Create price history for Motorz (6 months, fluctuating)
+    $motorzBasePrice = 7900;
+    for ($i = 180; $i >= 0; $i--) {
+        $variation = rand(-8, 8) / 100;
+        $price = $motorzBasePrice * (1 + $variation);
+        $price = round($price, 3);
+        \App\Models\PriceHistory::create([
+            'offer_id' => $motorzOffer->id,
+            'price' => $price,
+            'recorded_at' => now()->subDays($i),
+        ]);
+    }
+    
     // Motottunisie offer
-    \App\Models\Offer::create([
+    $motottunisieOffer = \App\Models\Offer::create([
         'product_id' => $product->id,
         'merchant_website_id' => $motottunisieMw->id,
         'raw_title' => $productName . ' - Motottunisie',
         'price' => 7500.000,
         'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
-        'image_url' => 'https://www.mototunisie.tn/wp-content/uploads/2024/12/aprilia-sr125.jpg',
+        'image_url' => $productImage,
         'is_available' => true,
         'scraped_at' => now(),
         'scraped_reference' => 'MOTOTUNISIE-APRILIA-SR125',
     ]);
     
+    // Create price history for Motottunisie (6 months, fluctuating)
+    $motottunisieBasePrice = 7500;
+    for ($i = 180; $i >= 0; $i--) {
+        $variation = rand(-8, 8) / 100;
+        $price = $motottunisieBasePrice * (1 + $variation);
+        $price = round($price, 3);
+        \App\Models\PriceHistory::create([
+            'offer_id' => $motottunisieOffer->id,
+            'price' => $price,
+            'recorded_at' => now()->subDays($i),
+        ]);
+    }
+    
     return response()->json([
-        'message' => 'Aprilia product created with both offers',
+        'message' => 'Aprilia product created with both offers and price history',
         'product' => $product->name,
         'product_url' => '/produits/' . $product->slug,
         'offers_count' => 2,
