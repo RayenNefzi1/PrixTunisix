@@ -167,10 +167,10 @@ export default function StoriesPage() {
       </Link>
 
       {/* Main container with prev/next visible */}
-      <div className="relative flex items-center gap-1">
+      <div className="relative flex items-center gap-0">
         {/* Previous story preview */}
         <div 
-          className="hidden md:block relative w-32 h-[75vh] cursor-pointer opacity-40 hover:opacity-60 transition rounded-l-2xl overflow-hidden"
+          className="hidden md:block relative w-48 h-[75vh] cursor-pointer opacity-30 hover:opacity-50 transition rounded-l-3xl overflow-hidden scale-95"
           onClick={prevStory}
         >
           <Image
@@ -179,11 +179,11 @@ export default function StoriesPage() {
             fill
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/60" />
         </div>
 
         {/* Current story */}
-        <div className="relative w-full max-w-md bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
+        <div className="relative w-[420px] h-[75vh] bg-black rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-800">
           {/* Progress bars */}
           <div className="absolute top-3 left-3 right-3 flex gap-1 z-10">
             {mockOffers.map((_, idx) => (
@@ -263,7 +263,7 @@ export default function StoriesPage() {
 
         {/* Next story preview */}
         <div 
-          className="hidden md:block relative w-32 h-[75vh] cursor-pointer opacity-40 hover:opacity-60 transition rounded-r-2xl overflow-hidden"
+          className="hidden md:block relative w-48 h-[75vh] cursor-pointer opacity-30 hover:opacity-50 transition rounded-r-3xl overflow-hidden scale-95"
           onClick={nextStory}
         >
           <Image
@@ -272,7 +272,7 @@ export default function StoriesPage() {
             fill
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/60" />
         </div>
       </div>
 
