@@ -204,6 +204,25 @@ Route::get('/seed-coupons', function () {
     }
 });
 
+// Public coupons endpoint (guests can see active coupons)
+Route::get('/coupons', function () {
+    $coupons = \App\Models\Coupon::where('is_active', true)
+        ->where(function ($query) {
+            $query->whereNull('valid_from')
+                  ->orWhere('valid_from', '<=', now());
+        })
+        ->where(function ($query) {
+            $query->whereNull('valid_until')
+                  ->orWhere('valid_until', '>=', now());
+        })
+        ->where(function ($query) {
+            $query->whereNull('usage_limit')
+                  ->orWhereRaw('usage_count < usage_limit');
+        })
+        ->get();
+    return response()->json($coupons);
+});
+
 Route::get('/seed-fournisseurs', function () {
     $fournisseurs = [
         ['email' => 'contact@tunisiteck.com', 'name' => 'TunisiaTech', 'pass' => 'TunisiaTech@12345', 'plan' => 'max', 'merchant_id' => 4, 'merchant_url' => 'https://www.tunisiteck.com'],
