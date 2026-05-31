@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { ChevronLeft, ChevronRight, X, Tag, ExternalLink, Sparkles, TrendingDown } from 'lucide-react'
+import { X, Tag, Sparkles, TrendingDown } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -15,7 +15,6 @@ interface StoryOffer {
   current_price: number
   original_price: number
   discount_percentage: number
-  offer_url: string
 }
 
 const mockOffers: StoryOffer[] = [
@@ -29,7 +28,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 2699,
     original_price: 3199,
     discount_percentage: 16,
-    offer_url: 'https://www.tunisianet.com.tn'
   },
   {
     id: 2,
@@ -41,7 +39,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 3299,
     original_price: 3799,
     discount_percentage: 13,
-    offer_url: 'https://www.tunisianet.com.tn'
   },
   {
     id: 3,
@@ -53,7 +50,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 2899,
     original_price: 3499,
     discount_percentage: 17,
-    offer_url: 'https://www.tunisianet.com.tn'
   },
   {
     id: 4,
@@ -65,7 +61,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 1299,
     original_price: 1599,
     discount_percentage: 19,
-    offer_url: 'https://www.tunisianet.com.tn'
   },
   {
     id: 5,
@@ -77,7 +72,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 599,
     original_price: 799,
     discount_percentage: 25,
-    offer_url: 'https://www.tunisianet.com.tn'
   },
   {
     id: 6,
@@ -89,7 +83,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 2199,
     original_price: 2999,
     discount_percentage: 27,
-    offer_url: 'https://www.tunisianet.com.tn'
   },
   {
     id: 7,
@@ -101,7 +94,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 899,
     original_price: 1099,
     discount_percentage: 18,
-    offer_url: 'https://www.tunisianet.com.tn'
   },
   {
     id: 8,
@@ -113,7 +105,6 @@ const mockOffers: StoryOffer[] = [
     current_price: 2499,
     original_price: 3199,
     discount_percentage: 22,
-    offer_url: 'https://www.tunisianet.com.tn'
   }
 ]
 
@@ -161,7 +152,12 @@ export default function StoriesPage() {
     }
   }
 
-  const offer = mockOffers[currentIndex]
+  const getPrevIndex = () => currentIndex > 0 ? currentIndex - 1 : mockOffers.length - 1
+  const getNextIndex = () => currentIndex < mockOffers.length - 1 ? currentIndex + 1 : 0
+
+  const currentOffer = mockOffers[currentIndex]
+  const prevOffer = mockOffers[getPrevIndex()]
+  const nextOffer = mockOffers[getNextIndex()]
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
@@ -170,119 +166,113 @@ export default function StoriesPage() {
         <X className="w-6 h-6 text-white" />
       </Link>
 
-      {/* Stories container */}
-      <div className="relative w-full max-w-md bg-black rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
-        {/* Progress bars */}
-        <div className="absolute top-3 left-3 right-3 flex gap-1 z-10">
-          {mockOffers.map((_, idx) => (
-            <div key={idx} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-white rounded-full transition-all duration-100"
-                style={{ 
-                  width: idx < currentIndex ? '100%' : idx === currentIndex ? `${progress}%` : '0%' 
-                }}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Story content */}
+      {/* Main container with prev/next visible */}
+      <div className="relative flex items-center gap-1">
+        {/* Previous story preview */}
         <div 
-          className="relative h-[75vh] cursor-pointer"
-          onMouseDown={() => setIsPaused(true)}
-          onMouseUp={() => setIsPaused(false)}
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => setIsPaused(false)}
+          className="hidden md:block relative w-32 h-[75vh] cursor-pointer opacity-40 hover:opacity-60 transition rounded-l-2xl overflow-hidden"
+          onClick={prevStory}
         >
-          {/* Background image */}
           <Image
-            src={offer.product_image}
-            alt={offer.product_name}
+            src={prevOffer.product_image}
+            alt={prevOffer.product_name}
             fill
             className="object-cover"
-            priority
           />
-          
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/95" />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
 
-          {/* Left click zone - previous */}
-          <div 
-            className="absolute left-0 top-0 w-1/4 h-full z-10 cursor-pointer group"
-            onClick={(e) => { e.stopPropagation(); prevStory() }}
-          >
-            <div className="w-full h-full group-hover:bg-black/20 transition flex items-center justify-center">
-              <div className="p-4 bg-black/30 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition">
-                <ChevronLeft className="w-8 h-8 text-white" />
+        {/* Current story */}
+        <div className="relative w-full max-w-md bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
+          {/* Progress bars */}
+          <div className="absolute top-3 left-3 right-3 flex gap-1 z-10">
+            {mockOffers.map((_, idx) => (
+              <div key={idx} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-white rounded-full transition-all duration-100"
+                  style={{ 
+                    width: idx < currentIndex ? '100%' : idx === currentIndex ? `${progress}%` : '0%' 
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Story content */}
+          <div className="relative h-[75vh] cursor-default">
+            {/* Background image */}
+            <Image
+              src={currentOffer.product_image}
+              alt={currentOffer.product_name}
+              fill
+              className="object-cover"
+              priority
+            />
+            
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/95" />
+
+            {/* Header with icon */}
+            <div className="absolute top-14 left-4 right-4 flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500 rounded-full">
+                <TrendingDown className="w-4 h-4 text-white" />
+                <span className="text-white font-bold text-sm">BEST DEAL</span>
+              </div>
+              <div className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-full">
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                <span className="text-white font-medium text-sm">🔥 En stock</span>
               </div>
             </div>
-          </div>
 
-          {/* Right click zone - next */}
-          <div 
-            className="absolute right-0 top-0 w-1/4 h-full z-10 cursor-pointer group"
-            onClick={(e) => { e.stopPropagation(); nextStory() }}
-          >
-            <div className="w-full h-full group-hover:bg-black/20 transition flex items-center justify-center">
-              <div className="p-4 bg-black/30 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition">
-                <ChevronRight className="w-8 h-8 text-white" />
+            {/* Product info */}
+            <div className="absolute bottom-32 left-4 right-4">
+              <h2 className="text-white text-2xl font-bold mb-3 line-clamp-3 leading-tight">
+                {currentOffer.product_name}
+              </h2>
+              
+              <div className="flex items-baseline gap-3 mb-4">
+                <span className="text-4xl font-black text-white">{currentOffer.current_price} DT</span>
+                <span className="text-xl text-white/50 line-through">{currentOffer.original_price} DT</span>
+              </div>
+              
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500 rounded-lg">
+                <Tag className="w-5 h-5 text-white" />
+                <span className="text-white font-bold text-lg">-{currentOffer.discount_percentage}%</span>
               </div>
             </div>
-          </div>
 
-          {/* Center click - previous (like Instagram) */}
-          <div 
-            className="absolute left-1/4 top-0 w-1/2 h-full z-10"
-            onClick={(e) => { e.stopPropagation(); prevStory() }}
+            {/* Actions */}
+            <div className="absolute bottom-6 left-4 right-4 flex gap-3">
+              <Link
+                href={`/produits/${currentOffer.category_code}/${currentOffer.product_slug}`}
+                className="flex-1 py-3.5 bg-white text-black font-bold text-center rounded-xl hover:bg-gray-100 transition text-base"
+              >
+                Voir le prix
+              </Link>
+              <Link
+                href={`/produits/${currentOffer.category_code}/${currentOffer.product_slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-3.5 px-5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition flex items-center gap-2"
+              >
+                Acheter
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Next story preview */}
+        <div 
+          className="hidden md:block relative w-32 h-[75vh] cursor-pointer opacity-40 hover:opacity-60 transition rounded-r-2xl overflow-hidden"
+          onClick={nextStory}
+        >
+          <Image
+            src={nextOffer.product_image}
+            alt={nextOffer.product_name}
+            fill
+            className="object-cover"
           />
-
-          {/* Header with icon */}
-          <div className="absolute top-14 left-4 right-4 flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500 rounded-full">
-              <TrendingDown className="w-4 h-4 text-white" />
-              <span className="text-white font-bold text-sm">BEST DEAL</span>
-            </div>
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-full">
-              <Sparkles className="w-4 h-4 text-yellow-400" />
-              <span className="text-white font-medium text-sm">🔥 En stock</span>
-            </div>
-          </div>
-
-          {/* Product info */}
-          <div className="absolute bottom-32 left-4 right-4">
-            <h2 className="text-white text-2xl font-bold mb-3 line-clamp-3 leading-tight">
-              {offer.product_name}
-            </h2>
-            
-            <div className="flex items-baseline gap-3 mb-4">
-              <span className="text-4xl font-black text-white">{offer.current_price} DT</span>
-              <span className="text-xl text-white/50 line-through">{offer.original_price} DT</span>
-            </div>
-            
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500 rounded-lg">
-              <Tag className="w-5 h-5 text-white" />
-              <span className="text-white font-bold text-lg">-{offer.discount_percentage}%</span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="absolute bottom-6 left-4 right-4 flex gap-3">
-            <Link
-              href={`/produits/${offer.category_code}/${offer.product_slug}`}
-              className="flex-1 py-3.5 bg-white text-black font-bold text-center rounded-xl hover:bg-gray-100 transition text-base"
-            >
-              Voir le prix
-            </Link>
-            <Link
-              href={`/produits/${offer.category_code}/${offer.product_slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="py-3.5 px-5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition flex items-center gap-2"
-            >
-              Acheter
-              <ExternalLink className="w-4 h-4" />
-            </Link>
-          </div>
+          <div className="absolute inset-0 bg-black/50" />
         </div>
       </div>
 
