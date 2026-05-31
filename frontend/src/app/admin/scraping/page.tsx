@@ -167,14 +167,6 @@ export default function ScrapingPage() {
         </div>
         <div className="flex gap-3">
           <button
-            onClick={handleRunAll}
-            disabled={runningAll}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-          >
-            {runningAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-            {runningAll ? 'Running...' : 'Run All Sites'}
-          </button>
-          <button
             onClick={() => setShowModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
           >
