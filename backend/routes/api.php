@@ -219,6 +219,7 @@ Route::get('/coupons', function () {
             $query->whereNull('usage_limit')
                   ->orWhereRaw('usage_count < usage_limit');
         })
+        ->with(['offer.product', 'offer.merchantWebsite'])
         ->get();
     return response()->json($coupons);
 });
