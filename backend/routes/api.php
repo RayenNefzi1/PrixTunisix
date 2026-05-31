@@ -435,7 +435,7 @@ Route::get('/setup-aprilia-product', function () {
         'product_id' => $product->id,
         'merchant_website_id' => $motorzMw->id,
         'raw_title' => $productName . ' - Motorz',
-        'price' => 7900.000,
+        'price' => 8900.000,
         'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
         'image_url' => $productImage,
         'is_available' => true,
@@ -444,7 +444,7 @@ Route::get('/setup-aprilia-product', function () {
     ]);
     
     // Create price history for Motorz (6 months, fluctuating)
-    $motorzBasePrice = 7900;
+    $motorzBasePrice = 8900;
     for ($i = 180; $i >= 0; $i--) {
         $variation = rand(-8, 8) / 100;
         $price = $motorzBasePrice * (1 + $variation);
@@ -461,7 +461,7 @@ Route::get('/setup-aprilia-product', function () {
         'product_id' => $product->id,
         'merchant_website_id' => $motottunisieMw->id,
         'raw_title' => $productName . ' - Motottunisie',
-        'price' => 7500.000,
+        'price' => 8699.000,
         'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
         'image_url' => $productImage,
         'is_available' => true,
@@ -470,7 +470,7 @@ Route::get('/setup-aprilia-product', function () {
     ]);
     
     // Create price history for Motottunisie (6 months, fluctuating)
-    $motottunisieBasePrice = 7500;
+    $motottunisieBasePrice = 8699;
     for ($i = 180; $i >= 0; $i--) {
         $variation = rand(-8, 8) / 100;
         $price = $motottunisieBasePrice * (1 + $variation);
