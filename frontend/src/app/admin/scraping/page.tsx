@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import adminApi from '@/lib/admin-api'
 import { 
-  Pause, Trash2, Plus, CheckCircle, 
+  Pause, Trash2, Plus, CheckCircle, XCircle,
   AlertCircle, Clock, Database, Activity, Settings, ChevronDown
 } from 'lucide-react'
 
