@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Ticket, Copy, Check, Tag } from 'lucide-react'
+import { Ticket, Copy, Check, Tag, Lock } from 'lucide-react'
+import Link from 'next/link'
+import Cookies from 'js-cookie'
 
 interface Coupon {
   id: number
@@ -17,10 +19,18 @@ export default function CouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([])
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
+    checkAuth()
     fetchCoupons()
   }, [])
+
+  const checkAuth = () => {
+    const token = Cookies.get('auth_token')
+    const stored = localStorage.getItem('user')
+    setIsAuthenticated(!!token && !!stored)
+  }
 
   const fetchCoupons = async () => {
     try {
@@ -56,6 +66,26 @@ export default function CouponsPage() {
           <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-96 mx-auto"></div>
         </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-2xl mb-6">
+          <Lock className="w-10 h-10 text-gray-400" />
+        </div>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Coupons & Promotions</h1>
+        <p className="text-gray-500 max-w-md mx-auto mb-8">
+          Connectez-vous pour accéder aux codes promo et réductions exclusives de vos marchands préférés!
+        </p>
+        <Link
+          href="/login"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 transition"
+        >
+          Se connecter
+        </Link>
       </div>
     )
   }
