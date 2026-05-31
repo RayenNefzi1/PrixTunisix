@@ -393,6 +393,25 @@ Route::get('/setup-aprilia-product', function () {
     $brand = \App\Models\Brand::firstOrCreate(['name' => 'Aprilia'], ['slug' => 'aprilia']);
     $category = \App\Models\Category::where('slug', 'motos-scooters')->first();
     
+    // Create merchant websites if not exist
+    $motorzMw = \App\Models\MerchantWebsite::firstOrCreate(
+        ['name' => 'Motorz'],
+        [
+            'base_url' => 'https://motorz.tn',
+            'logo_url' => 'https://motorz.tn/wp-content/uploads/2025/05/LOGO-RB.png',
+            'is_active' => true,
+        ]
+    );
+    
+    $motottunisieMw = \App\Models\MerchantWebsite::firstOrCreate(
+        ['name' => 'Motottunisie'],
+        [
+            'base_url' => 'https://www.mototunisie.tn',
+            'logo_url' => 'https://www.mototunisie.tn/wp-content/uploads/2025/12/moto-tunisie-logo-white-3.png',
+            'is_active' => true,
+        ]
+    );
+    
     // Delete all offers and products with aprilia
     $oldOffers = \App\Models\Offer::whereHas('product', function ($q) {
         $q->where('name', 'like', '%Aprilia%')->orWhere('slug', 'like', '%aprilia%');
@@ -411,10 +430,9 @@ Route::get('/setup-aprilia-product', function () {
     ]);
     
     // Motorz offer
-    $motorzMw = \App\Models\MerchantWebsite::where('name', 'Motorz')->first();
     \App\Models\Offer::create([
         'product_id' => $product->id,
-        'merchant_website_id' => $motorzMw?->id,
+        'merchant_website_id' => $motorzMw->id,
         'raw_title' => $productName . ' - Motorz',
         'price' => 7900.000,
         'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
@@ -425,10 +443,9 @@ Route::get('/setup-aprilia-product', function () {
     ]);
     
     // Motottunisie offer
-    $motottunisieMw = \App\Models\MerchantWebsite::where('name', 'Motottunisie')->first();
     \App\Models\Offer::create([
         'product_id' => $product->id,
-        'merchant_website_id' => $motottunisieMw?->id,
+        'merchant_website_id' => $motottunisieMw->id,
         'raw_title' => $productName . ' - Motottunisie',
         'price' => 7500.000,
         'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
