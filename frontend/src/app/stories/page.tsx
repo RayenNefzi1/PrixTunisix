@@ -189,7 +189,6 @@ export default function StoriesPage() {
         {/* Story content */}
         <div 
           className="relative h-[75vh] cursor-pointer"
-          onClick={prevStory}
           onMouseDown={() => setIsPaused(true)}
           onMouseUp={() => setIsPaused(false)}
           onTouchStart={() => setIsPaused(true)}
@@ -206,6 +205,36 @@ export default function StoriesPage() {
           
           {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/95" />
+
+          {/* Left click zone - previous */}
+          <div 
+            className="absolute left-0 top-0 w-1/4 h-full z-10 cursor-pointer group"
+            onClick={(e) => { e.stopPropagation(); prevStory() }}
+          >
+            <div className="w-full h-full group-hover:bg-black/20 transition flex items-center justify-center">
+              <div className="p-4 bg-black/30 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition">
+                <ChevronLeft className="w-8 h-8 text-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* Right click zone - next */}
+          <div 
+            className="absolute right-0 top-0 w-1/4 h-full z-10 cursor-pointer group"
+            onClick={(e) => { e.stopPropagation(); nextStory() }}
+          >
+            <div className="w-full h-full group-hover:bg-black/20 transition flex items-center justify-center">
+              <div className="p-4 bg-black/30 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition">
+                <ChevronRight className="w-8 h-8 text-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* Center click - previous (like Instagram) */}
+          <div 
+            className="absolute left-1/4 top-0 w-1/2 h-full z-10"
+            onClick={(e) => { e.stopPropagation(); prevStory() }}
+          />
 
           {/* Header with icon */}
           <div className="absolute top-14 left-4 right-4 flex items-center gap-2">
@@ -254,20 +283,6 @@ export default function StoriesPage() {
               <ExternalLink className="w-4 h-4" />
             </Link>
           </div>
-
-          {/* Navigation arrows */}
-          <button 
-            onClick={(e) => { e.stopPropagation(); prevStory() }}
-            className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition"
-          >
-            <ChevronLeft className="w-6 h-6 text-white" />
-          </button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); nextStory() }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition"
-          >
-            <ChevronRight className="w-6 h-6 text-white" />
-          </button>
         </div>
       </div>
 
