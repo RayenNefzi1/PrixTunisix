@@ -1,0 +1,337 @@
+@startuml PrixTunisix_Class_Diagram
+
+hide empty members
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+package "Authentication & Users" {
+  class Users {
+    id
+    name
+    prename
+    email
+    email_verified_at
+    password
+    role
+    rememberToken
+    created_at
+    updated_at
+  }
+
+  class Clients {
+    id
+    user_id
+    phone
+    created_at
+    updated_at
+  }
+
+  class Merchants {
+    id
+    user_id
+    company_name
+    company_address
+    company_phone
+    company_website
+    is_verified
+    verified_at
+    created_at
+    updated_at
+  }
+
+  class Employees {
+    id
+    user_id
+    position
+    created_at
+    updated_at
+  }
+
+  class Fournisseurs {
+    id
+    user_id
+    merchant_website_id
+    company_name
+    description
+    contact_email
+    api_key
+    active
+    merchant_url
+    company_phone
+    company_address
+    logo_url
+    created_at
+    updated_at
+  }
+}
+
+package "Product Catalog" {
+  class Categories {
+    id
+    name
+    slug
+    description
+    parent_id
+    created_at
+    updated_at
+  }
+
+  class Brands {
+    id
+    name
+    slug
+    logo_url
+    created_at
+    updated_at
+  }
+
+  class Products {
+    id
+    name
+    slug
+    description
+    image_url
+    is_validated
+    category_id
+    brand_id
+    specifications
+    created_at
+    updated_at
+  }
+
+  class MerchantWebsites {
+    id
+    name
+    base_url
+    logo_url
+    is_active
+    slug
+    created_at
+    updated_at
+  }
+
+  class Offers {
+    id
+    product_id
+    merchant_id
+    merchant_website_id
+    raw_title
+    price
+    is_available
+    merchant_url
+    image_url
+    scraped_at
+    reference
+    created_at
+    updated_at
+  }
+}
+
+package "Pricing & History" {
+  class PriceHistory {
+    id
+    offer_id
+    price
+    recorded_at
+  }
+
+  class ProductMatches {
+    id
+    offer_id
+    product_id
+    confidence_score
+    status
+    reviewed_by
+    reviewed_at
+    reference
+    created_at
+    updated_at
+  }
+
+  class Coupons {
+    id
+    code
+    description
+    discount_value
+    discount_type
+    min_order_amount
+    max_discount
+    usage_limit
+    usage_count
+    offer_id
+    valid_from
+    valid_until
+    is_active
+    created_at
+    updated_at
+  }
+
+  class Discounts {
+    id
+    offer_id
+    value
+    type
+    original_price
+    discounted_price
+    start_date
+    end_date
+    is_active
+    created_at
+    updated_at
+  }
+}
+
+package "User Features" {
+  class Wishlists {
+    id
+    client_id
+    name
+    created_at
+    updated_at
+  }
+
+  class WishlistItems {
+    id
+    wishlist_id
+    product_id
+    created_at
+    updated_at
+  }
+
+  class Favorites {
+    client_id
+    product_id
+    created_at
+  }
+
+  class PriceAlerts {
+    id
+    client_id
+    product_id
+    target_price
+    is_active
+    triggered_at
+    created_at
+    updated_at
+  }
+}
+
+package "Scraping" {
+  class ScrapingScripts {
+    id
+    merchant_website_id
+    name
+    target_url
+    frequency
+    frequency_minutes
+    status
+    last_run
+    created_at
+    updated_at
+  }
+
+  class ScrapingLogs {
+    id
+    scrolling_script_id
+    started_at
+    ended_at
+    records_collected
+    errors_count
+    error_details
+    result
+    queued
+    created_at
+    updated_at
+  }
+}
+
+package "Subscriptions & Analytics" {
+  class Subscriptions {
+    id
+    merchant_id
+    plan
+    start_date
+    end_date
+    status
+    created_at
+    updated_at
+  }
+
+  class FournisseurSubscriptions {
+    id
+    fournisseur_id
+    plan
+    price
+    start_date
+    end_date
+    status
+    created_at
+    updated_at
+  }
+
+  class RedirectClicks {
+    id
+    offer_id
+    user_id
+    ip_address
+    clicked_at
+  }
+
+  class ClientProductViews {
+    id
+    client_id
+    product_id
+    viewed_at
+  }
+}
+
+' Relationships
+Users --> Clients : "1:1"
+Users --> Merchants : "1:1"
+Users --> Employees : "1:1"
+Users --> Fournisseurs : "1:1"
+
+Categories --> Categories : "self-referential\n(parent_id)"
+
+Products --> Categories
+Products --> Brands
+
+Offers --> Products
+Offers --> Merchants
+Offers --> MerchantWebsites
+
+PriceHistory --> Offers
+
+ProductMatches --> Offers
+ProductMatches --> Products
+ProductMatches --> Employees
+
+Discounts --> Offers
+
+Coupons --> Offers
+
+Wishlists --> Clients
+WishlistItems --> Wishlists
+WishlistItems --> Products
+
+Favorites --> Clients
+Favorites --> Products
+
+PriceAlerts --> Clients
+PriceAlerts --> Products
+
+ScrapingScripts --> MerchantWebsites
+ScrapingLogs --> ScrapingScripts
+
+Subscriptions --> Merchants
+FournisseurSubscriptions --> Fournisseurs
+
+RedirectClicks --> Offers
+RedirectClicks --> Users
+
+ClientProductViews --> Clients
+ClientProductViews --> Products
+
+Fournisseurs --> MerchantWebsites
+
+@enduml
