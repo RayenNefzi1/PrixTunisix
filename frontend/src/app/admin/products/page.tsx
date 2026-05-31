@@ -28,9 +28,9 @@ export default function AdminProductsPage() {
   useEffect(() => {
     setLoading(true)
     const params = new URLSearchParams({ page: page.toString() })
-    if (search) params.append('search', search)
+    if (search) params.append('q', search)
 
-    adminApi.get(`/products?${params}`)
+    adminApi.get(`/employee/products?${params}`)
       .then(res => res.data)
       .then(data => {
         setProducts(data.data || [])
@@ -42,7 +42,7 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (productId: number) => {
     try {
-      await adminApi.delete(`/products/${productId}`)
+      await adminApi.delete(`/employee/products/${productId}`)
       setProducts(products.filter(p => p.id !== productId))
     } catch (err) {
       console.error('Delete failed:', err)
@@ -53,7 +53,7 @@ export default function AdminProductsPage() {
   const handleSaveEdit = async () => {
     if (!editingProduct) return
     try {
-      await adminApi.put(`/products/${editingProduct.id}`, {
+      await adminApi.put(`/employee/products/${editingProduct.id}`, {
         name: editingProduct.name,
         description: editingProduct.description,
       })
