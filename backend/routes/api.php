@@ -133,6 +133,77 @@ Route::get('/seed', function () {
     return response()->json(['message' => 'Database seeded successfully']);
 });
 
+Route::get('/create-coupons-table', function () {
+    try {
+        \Illuminate\Support\Facades\Schema::create('coupons', function ($table) {
+            $table->id();
+            $table->string('code')->unique();
+            $table->string('description')->nullable();
+            $table->decimal('discount_value', 10, 3);
+            $table->enum('discount_type', ['percentage', 'fixed'])->default('percentage');
+            $table->decimal('min_order_amount', 10, 3)->nullable();
+            $table->decimal('max_discount', 10, 3)->nullable();
+            $table->integer('usage_limit')->nullable();
+            $table->integer('usage_count')->default(0);
+            $table->foreignId('offer_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->timestamp('valid_from')->nullable();
+            $table->timestamp('valid_until')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+        return response()->json(['message' => 'Coupons table created']);
+    } catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 500);
+    }
+});
+
+Route::get('/seed-coupons', function () {
+    try {
+        $offer = \App\Models\Offer::first();
+        if (!$offer) {
+            return response()->json(['message' => 'No offers found'], 400);
+        }
+        \App\Models\Coupon::firstOrCreate(['code' => 'WELCOME10'], [
+            'description' => '10% discount for new customers',
+            'discount_value' => 10,
+            'discount_type' => 'percentage',
+            'min_order_amount' => 100,
+            'usage_limit' => 100,
+            'offer_id' => $offer->id,
+            'valid_from' => now(),
+            'valid_until' => now()->addMonths(3),
+            'is_active' => true,
+        ]);
+        \App\Models\Coupon::firstOrCreate(['code' => 'SAVE50'], [
+            'description' => '50 DT fixed discount',
+            'discount_value' => 50,
+            'discount_type' => 'fixed',
+            'min_order_amount' => 500,
+            'max_discount' => 50,
+            'usage_limit' => 50,
+            'offer_id' => $offer->id,
+            'valid_from' => now(),
+            'valid_until' => now()->addMonths(2),
+            'is_active' => true,
+        ]);
+        \App\Models\Coupon::firstOrCreate(['code' => 'SUMMER20'], [
+            'description' => '20% summer sale',
+            'discount_value' => 20,
+            'discount_type' => 'percentage',
+            'min_order_amount' => 200,
+            'max_discount' => 100,
+            'usage_limit' => 200,
+            'offer_id' => null,
+            'valid_from' => now(),
+            'valid_until' => now()->addMonths(1),
+            'is_active' => true,
+        ]);
+        return response()->json(['message' => 'Coupons seeded successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 500);
+    }
+});
+
 Route::get('/seed-fournisseurs', function () {
     $fournisseurs = [
         ['email' => 'contact@tunisiteck.com', 'name' => 'TunisiaTech', 'pass' => 'TunisiaTech@12345', 'plan' => 'max', 'merchant_id' => 4, 'merchant_url' => 'https://www.tunisiteck.com'],
