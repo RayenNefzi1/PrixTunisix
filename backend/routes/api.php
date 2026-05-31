@@ -159,46 +159,19 @@ Route::get('/create-coupons-table', function () {
 
 Route::get('/seed-coupons', function () {
     try {
-        $offer = \App\Models\Offer::whereNotNull('product_id')->where('is_available', true)->first();
-        if (!$offer) {
-            return response()->json(['message' => 'No offers found'], 400);
-        }
-        \App\Models\Coupon::updateOrCreate(['code' => 'WELCOME10'], [
-            'description' => '10% discount for new customers',
-            'discount_value' => 10,
-            'discount_type' => 'percentage',
-            'min_order_amount' => 100,
-            'usage_limit' => 100,
+        \App\Models\Coupon::where('code', 'WELCOME10')->update([
             'offer_id' => 1281,
-            'valid_from' => now(),
-            'valid_until' => now()->addMonths(3),
-            'is_active' => true,
+            'description' => '10% discount - Sacoche Dell EcoLoop',
         ]);
-        \App\Models\Coupon::updateOrCreate(['code' => 'SAVE50'], [
-            'description' => '50 DT fixed discount',
-            'discount_value' => 50,
-            'discount_type' => 'fixed',
-            'min_order_amount' => 500,
-            'max_discount' => 50,
-            'usage_limit' => 50,
+        \App\Models\Coupon::where('code', 'SAVE50')->update([
             'offer_id' => 13,
-            'valid_from' => now(),
-            'valid_until' => now()->addMonths(2),
-            'is_active' => true,
+            'description' => '50 DT discount - Carte mémoire Patriot',
         ]);
-        \App\Models\Coupon::updateOrCreate(['code' => 'SUMMER20'], [
-            'description' => '20% summer sale',
-            'discount_value' => 20,
-            'discount_type' => 'percentage',
-            'min_order_amount' => 200,
-            'max_discount' => 100,
-            'usage_limit' => 200,
+        \App\Models\Coupon::where('code', 'SUMMER20')->update([
             'offer_id' => null,
-            'valid_from' => now(),
-            'valid_until' => now()->addMonths(1),
-            'is_active' => true,
+            'description' => '20% summer sale - Valable sur tous les produits',
         ]);
-        return response()->json(['message' => 'Coupons seeded successfully']);
+        return response()->json(['message' => 'Coupons updated successfully']);
     } catch (\Exception $e) {
         return response()->json(['message' => $e->getMessage()], 500);
     }
