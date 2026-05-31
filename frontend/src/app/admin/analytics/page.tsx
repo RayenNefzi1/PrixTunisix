@@ -98,16 +98,20 @@ export default function AdminAnalyticsPage() {
           <p className="text-gray-500 text-center py-8">Aucune donnée disponible</p>
         ) : (
         <div className="h-64 flex items-end gap-2">
-          {clicksByDay.slice(0, 30).map((item: any, i: number) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-2">
-              <div 
-                className="w-full bg-brand-500 rounded-t hover:bg-brand-600 transition-colors"
-                style={{ height: `${Math.max((item.total_clicks / (totalClicks || 1)) * 240, item.total_clicks > 0 ? 4 : 0)}px` }}
-                title={`${item.total_clicks} clics le ${item.date}`}
-              />
-              <span className="text-xs text-gray-400">{item.date?.slice(5) || '-'}</span>
-            </div>
-          ))}
+          {clicksByDay.slice(0, 30).map((item: any, i: number) => {
+            const maxClicks = Math.max(...clicksByDay.map((d: any) => d.total_clicks))
+            const height = maxClicks > 0 ? (item.total_clicks / maxClicks) * 240 : 0
+            return (
+              <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                <div 
+                  className="w-full bg-brand-500 rounded-t hover:bg-brand-600 transition-colors"
+                  style={{ height: `${Math.max(height, item.total_clicks > 0 ? 4 : 0)}px` }}
+                  title={`${item.total_clicks} clics le ${item.date}`}
+                />
+                <span className="text-xs text-gray-400">{item.date?.slice(5) || '-'}</span>
+              </div>
+            )
+          })}
         </div>
         )}
       </div>
