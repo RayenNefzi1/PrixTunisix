@@ -11,6 +11,10 @@ interface Product {
   name: string
   slug: string
   image_url: string | null
+  category: {
+    code: string | null
+    slug: string | null
+  } | null
 }
 
 interface Offer {
@@ -190,7 +194,7 @@ export default function CouponsPage() {
                   Valable pour ce produit:
                 </p>
                 <Link
-                  href={`/produits/${coupon.offer.product.slug}`}
+                  href={`/produits/${coupon.offer.product.category?.code || 'default'}/${coupon.offer.product.slug}`}
                   className="flex items-center gap-3 p-2 bg-white rounded-lg hover:bg-gray-100 transition"
                 >
                   <div className="w-12 h-12 relative rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
