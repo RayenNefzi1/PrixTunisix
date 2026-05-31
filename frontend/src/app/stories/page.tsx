@@ -32,7 +32,7 @@ const mockOffers: StoryOffer[] = [
   {
     id: 2,
     product_name: 'iPhone 15 Pro Max 256GB Titane',
-    product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
+    product_slug: 'carte-m%C3%A9moire-sdxc-express-v30-uhs-i-u3-4k-uhd-patriot-ep-1-to-pef1tepexmcx',
     product_image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=80',
     category_code: '1',
     merchant_name: 'Tunisianet',
@@ -43,7 +43,7 @@ const mockOffers: StoryOffer[] = [
   {
     id: 3,
     product_name: 'Samsung Galaxy S24 Ultra 256GB',
-    product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
+    product_slug: 'bobine-ydd-50x-cd-r-700-mb-80-min-imprimable-cd-ydd-imp',
     product_image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=800&q=80',
     category_code: '1',
     merchant_name: 'Tunisianet',
@@ -54,7 +54,7 @@ const mockOffers: StoryOffer[] = [
   {
     id: 4,
     product_name: 'PC Portable HP Pavilion 15"',
-    product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
+    product_slug: 'protecteur-d%C3%A9cran-anti-lumi%C3%A8re-bleue-screenforce-curve-pour-samsung-s23-ovb035zz',
     product_image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80',
     category_code: '1',
     merchant_name: 'Tunisianet',
@@ -65,7 +65,7 @@ const mockOffers: StoryOffer[] = [
   {
     id: 5,
     product_name: 'Sony WH-1000XM5 Casque Audio',
-    product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
+    product_slug: 'tablette-graphique-xp-pen-artist-pro-24-gen-2-165-hz-noir-artist-pro-24-gen2',
     product_image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
     category_code: '1',
     merchant_name: 'Tunisianet',
@@ -76,7 +76,7 @@ const mockOffers: StoryOffer[] = [
   {
     id: 6,
     product_name: 'LG TV OLED 55" 4K Smart',
-    product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
+    product_slug: 'serveur-rack-hpe-proliant-dl380-gen10-intel-xeon-2x-gold-521864-go-sans-disques-p56964-b21',
     product_image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&q=80',
     category_code: '1',
     merchant_name: 'Tunisianet',
@@ -87,7 +87,7 @@ const mockOffers: StoryOffer[] = [
   {
     id: 7,
     product_name: 'Apple Watch Series 9 GPS 45mm',
-    product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
+    product_slug: 'serveur-rack-hpe-proliant-dl380-gen10-plus-intel-xeon-silver-4314-32-go-sans-disques-p55247-b21',
     product_image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=800&q=80',
     category_code: '1',
     merchant_name: 'Tunisianet',
@@ -98,7 +98,7 @@ const mockOffers: StoryOffer[] = [
   {
     id: 8,
     product_name: 'Dell XPS 15 Intel Core i7',
-    product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
+    product_slug: 'serveur-dell-poweredge-r750xs-dual-intel-xeon-gold-4310-4x-16-go-12-to-361843-r750',
     product_image: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80',
     category_code: '1',
     merchant_name: 'Tunisianet',
