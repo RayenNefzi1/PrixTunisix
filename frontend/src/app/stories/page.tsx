@@ -266,20 +266,12 @@ export default function StoriesPage() {
             </div>
 
             {/* Actions */}
-            <div className="absolute bottom-6 left-4 right-4 flex gap-3">
+            <div className="absolute bottom-6 left-4 right-4">
               <Link
                 href={`/produits/${currentOffer.category_code}/${currentOffer.product_slug}`}
-                className="flex-1 py-4 bg-white text-black font-bold text-center rounded-xl hover:bg-gray-100 transition hover:scale-105 active:scale-95 text-base shadow-lg"
+                className="block w-full py-4 bg-white text-black font-bold text-center rounded-xl hover:bg-gray-100 transition hover:scale-105 active:scale-95 text-base shadow-lg"
               >
                 Voir le prix
-              </Link>
-              <Link
-                href={`/produits/${currentOffer.category_code}/${currentOffer.product_slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-4 px-6 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg shadow-brand-600/30"
-              >
-                Acheter
               </Link>
             </div>
           </div>
@@ -302,20 +294,6 @@ export default function StoriesPage() {
           </div>
         </div>
       </div>
-
-      {/* Navigation arrows */}
-      <button 
-        onClick={handlePrev}
-        className="absolute left-8 top-1/2 -translate-y-1/2 p-4 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition hover:scale-110 z-20"
-      >
-        <ChevronLeft className="w-8 h-8 text-white" />
-      </button>
-      <button 
-        onClick={handleNext}
-        className="absolute right-8 top-1/2 -translate-y-1/2 p-4 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition hover:scale-110 z-20"
-      >
-        <ChevronRight className="w-8 h-8 text-white" />
-      </button>
 
       {/* Swipe hint */}
       <div className="absolute bottom-8 flex flex-col items-center gap-2">
