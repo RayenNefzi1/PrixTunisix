@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Client;
+use App\Models\Coupon;
 use App\Models\Employee;
 use App\Models\Fournisseur;
 use App\Models\FournisseurSubscription;
@@ -546,6 +547,60 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->command->info("Additional fournisseurs seeded: TunisiaTech (max), Nutridiet (premium_manual), Ipmact (premium_manual), Motottunisie (basic), Motor (pro)");
+
+        // ── Sample Coupons ────────────────────────────────────────────────────
+        $offer = Offer::first();
+        
+        if ($offer) {
+            Coupon::firstOrCreate(
+                ['code' => 'WELCOME10'],
+                [
+                    'description' => '10% discount for new customers',
+                    'discount_value' => 10,
+                    'discount_type' => 'percentage',
+                    'min_order_amount' => 100,
+                    'usage_limit' => 100,
+                    'offer_id' => $offer->id,
+                    'valid_from' => now(),
+                    'valid_until' => now()->addMonths(3),
+                    'is_active' => true,
+                ]
+            );
+
+            Coupon::firstOrCreate(
+                ['code' => 'SAVE50'],
+                [
+                    'description' => '50 DT fixed discount',
+                    'discount_value' => 50,
+                    'discount_type' => 'fixed',
+                    'min_order_amount' => 500,
+                    'max_discount' => 50,
+                    'usage_limit' => 50,
+                    'offer_id' => $offer->id,
+                    'valid_from' => now(),
+                    'valid_until' => now()->addMonths(2),
+                    'is_active' => true,
+                ]
+            );
+
+            Coupon::firstOrCreate(
+                ['code' => 'SUMMER20'],
+                [
+                    'description' => '20% summer sale',
+                    'discount_value' => 20,
+                    'discount_type' => 'percentage',
+                    'min_order_amount' => 200,
+                    'max_discount' => 100,
+                    'usage_limit' => 200,
+                    'offer_id' => null,
+                    'valid_from' => now(),
+                    'valid_until' => now()->addMonths(1),
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        $this->command->info("Coupons seeded successfully.");
     }
 
     private function createPriceHistory(Offer $offer, float $currentPrice): void
