@@ -420,13 +420,14 @@ Route::get('/setup-aprilia-product', function () {
     
     $oldProducts = \App\Models\Product::where('name', 'like', '%Aprilia%')->orWhere('slug', 'like', '%aprilia%')->delete();
     
-    // Create product with image
+    // Create product with image and description
     $product = \App\Models\Product::create([
         'name' => $productName,
         'slug' => $slug,
         'category_id' => $category?->id,
         'brand_id' => $brand->id,
         'image_url' => $productImage,
+        'description' => 'Scooter APRILIA SR 125 - Refroidissement: A air - Cylindré: 125 cc - Moteur: Monocylindre 4 Temps - Capacité du Réservoir: 6.5Litres - Puissance maximum: 7.1 Kw à 7 250 tr/min - Vitesse max: 90 Km/h - Compteur Numérique - Freinage: avant: Disque hydraulique Ø 220 mm - arrière: Frein à tambour Ø 140 mm - Pneus: avant: 120/70 - arrière: 120/70 - Dimensions: 1985 x 1261 x 806 mm - Poids: 115 kg',
         'is_validated' => true,
     ]);
     
