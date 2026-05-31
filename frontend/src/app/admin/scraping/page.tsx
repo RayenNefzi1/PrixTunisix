@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import adminApi from '@/lib/admin-api'
 import ToastProvider, { useToast } from '@/components/Toast'
 import { 
-  Play, Pause, Trash2, Plus, RefreshCw, CheckCircle, XCircle, 
-  AlertCircle, Clock, Database, Activity, Settings, ChevronDown, Loader2
+  Pause, Trash2, Plus, CheckCircle, 
+  AlertCircle, Clock, Database, Activity, Settings, ChevronDown
 } from 'lucide-react'
 
 interface MerchantWebsite {
@@ -55,8 +55,6 @@ export default function ScrapingPage() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [runningScriptId, setRunningScriptId] = useState<number | null>(null)
-  const [runningAll, setRunningAll] = useState(false)
   
   const [form, setForm] = useState({
     merchant_website_id: '',
@@ -123,33 +121,6 @@ export default function ScrapingPage() {
       fetchData()
     } catch (err) {
       console.error('Failed to delete script:', err)
-    }
-  }
-
-  const handleRun = async (script: ScrapingScript) => {
-    setRunningScriptId(script.id)
-    try {
-      const response = await adminApi.post(`/admin/scraping/${script.id}/run`)
-      showToast(response.data.message, 'success')
-      fetchData()
-    } catch (err: any) {
-      console.error('Failed to run script:', err)
-      showToast(err.response?.data?.message || 'Scraping failed. Check logs for details.', 'error')
-    } finally {
-      setRunningScriptId(null)
-    }
-  }
-
-  const handleRunAll = async () => {
-    setRunningAll(true)
-    try {
-      const response = await adminApi.post('/admin/scraping/run-all')
-      showToast(`Scraping complete! Records: ${response.data.total_records}, Errors: ${response.data.total_errors}`, response.data.total_errors > 0 ? 'warning' : 'success')
-      fetchData()
-    } catch (err) {
-      console.error('Failed to run all scripts:', err)
-    } finally {
-      setRunningAll(false)
     }
   }
 
@@ -280,25 +251,6 @@ export default function ScrapingPage() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { name: 'Tunisianet', action: () => handleRunSingle('tunisianet') },
-          { name: 'TunisiaTech', action: () => handleRunSingle('tunisiaTech') },
-          { name: 'Zoom', action: () => handleRunSingle('zoom') },
-          { name: 'Khadraoui', action: () => handleRunSingle('khadraoui') },
-        ].map((site) => (
-          <button
-            key={site.name}
-            onClick={site.action}
-            className="flex items-center justify-center gap-2 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 border border-gray-200 transition"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span className="font-medium">{site.name}</span>
-          </button>
-        ))}
-      </div>
-
       {/* Scripts Table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200">
@@ -366,29 +318,15 @@ export default function ScrapingPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleRun(script)}
-                          disabled={runningScriptId === script.id}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition"
-                          title="Run script"
-                        >
-                          {runningScriptId === script.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Play className="w-4 h-4" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleToggle(script)}
-                          className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition"
-                          title={script.status === 'active' ? 'Pause' : 'Activate'}
-                        >
-                          {script.status === 'active' ? (
+                        {script.status === 'active' && (
+                          <button
+                            onClick={() => handleToggle(script)}
+                            className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition"
+                            title="Pause script"
+                          >
                             <Pause className="w-4 h-4" />
-                          ) : (
-                            <Play className="w-4 h-4" />
-                          )}
-                        </button>
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDelete(script)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
