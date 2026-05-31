@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import adminApi from '@/lib/admin-api'
-import ToastProvider, { useToast } from '@/components/Toast'
 import { 
   Pause, Trash2, Plus, CheckCircle, 
   AlertCircle, Clock, Database, Activity, Settings, ChevronDown
@@ -64,8 +63,6 @@ export default function ScrapingPage() {
     frequency_minutes: '',
   })
 
-  const { showToast } = useToast()
-
   const fetchData = async () => {
     try {
       const [scriptsRes, logsRes, statsRes] = await Promise.all([
@@ -121,22 +118,6 @@ export default function ScrapingPage() {
       fetchData()
     } catch (err) {
       console.error('Failed to delete script:', err)
-    }
-  }
-
-  const handleRunSingle = async (siteName: string) => {
-    const script = scripts.find(s => s.merchant_website?.name?.toLowerCase().includes(siteName.toLowerCase()))
-    if (script) {
-      setRunningScriptId(script.id)
-      try {
-        const response = await adminApi.post(`/admin/scraping/${script.id}/run`)
-        showToast(`${siteName}: ${response.data.records_collected} records collected`, 'success')
-        fetchData()
-      } catch (err) {
-        console.error(`Failed to run ${siteName}:`, err)
-      } finally {
-        setRunningScriptId(null)
-      }
     }
   }
 
