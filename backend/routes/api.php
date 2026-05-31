@@ -399,7 +399,6 @@ Route::get('/add-motorz-offer', function () {
     $offer = \App\Models\Offer::create([
         'product_id' => $product->id,
         'merchant_website_id' => $merchantWebsite?->id,
-        'merchant_id' => $fournisseur?->id,
         'raw_title' => $productName . ' - Motorz',
         'price' => 7900.000,
         'merchant_url' => 'https://motorz.tn/listings/scooter-aprilia-sr-125-prix-tunisie/',
@@ -450,7 +449,6 @@ Route::get('/add-mototunisie-offer', function () {
     $offer = \App\Models\Offer::create([
         'product_id' => $product->id,
         'merchant_website_id' => $merchantWebsite?->id,
-        'merchant_id' => $fournisseur?->id,
         'raw_title' => $productName . ' - Motottunisie',
         'price' => 7500.000,
         'merchant_url' => 'https://www.mototunisie.tn/annonces/aprilia-sr125-bleu/',
