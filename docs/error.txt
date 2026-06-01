@@ -1,1 +1,19 @@
-Coupon system added and deployed successfully.
+SQLSTATE[2BP01]: Dependent objects still exist: 7 ERROR:  cannot drop table merchants because other objects depend on it
+DETAIL:  constraint subscriptions_merchant_id_foreign on table subscriptions depends on table merchants
+HINT:  Use DROP ... CASCADE to drop the dependent objects too. (Connection: pgsql, Host: dpg-d87hfguq1p3s73b6qk8g-a, Port: 5432, Database: prixtunisix, SQL: drop table if exists "merchants")
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:841
+    837▕             $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
+    838▕                 ? UniqueConstraintViolationException::class
+    839▕                 : QueryException::class;
+    840▕ 
+  ➜ 841▕             $exception = new $exceptionType(
+    842▕                 $this->getNameWithReadWriteType(),
+    843▕                 $query,
+    844▕                 $this->prepareBindings($bindings),
+    845▕                 $e,
+      +9 vendor frames 
+  10  database/migrations/2026_06_01_000002_remove_merchants_table.php:16
+      Illuminate\Support\Facades\Facade::__callStatic("dropIfExists")
+      +27 vendor frames 
+  38  artisan:16
+      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))
