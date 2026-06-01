@@ -138,6 +138,16 @@ Route::get('/migrate', function () {
     return response()->json(['message' => 'Migrations completed']);
 });
 
+Route::get('/db-tables', function () {
+    $tables = \Illuminate\Support\Facades\DB::select("
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+        ORDER BY table_name
+    ");
+    return response()->json($tables);
+});
+
 Route::get('/create-coupons-table', function () {
     try {
         \Illuminate\Support\Facades\Schema::create('coupons', function ($table) {
