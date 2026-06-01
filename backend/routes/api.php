@@ -202,6 +202,8 @@ Route::get('/db-schema', function () {
 });
 
 Route::get('/db-diagram', function () {
+    header('Content-Type: text/plain');
+    $tables = \Illuminate\Support\Facades\DB::select("
     $tables = \Illuminate\Support\Facades\DB::select("
         SELECT table_name
         FROM information_schema.tables
@@ -211,6 +213,7 @@ Route::get('/db-diagram', function () {
 
     $output = "";
     $rels = [];
+    $first = true;
 
     foreach ($tables as $t) {
         $table = $t->table_name;
@@ -244,25 +247,25 @@ Route::get('/db-diagram', function () {
             WHERE tc.table_name = ? AND tc.constraint_type = 'FOREIGN KEY'
         ", [$table]);
 
-        if (empty($output)) {
-            $output = "Table " . strtoupper($table) . "\n";
-        } else {
-            $output .= "\nTable " . strtoupper($table) . "\n";
+        if (!$first) {
+            $output .= "\n";
         }
+        $first = false;
+
+        $output .= "Table " . strtoupper($table) . " {\n";
         foreach ($columns as $col) {
             $type = $col->data_type === 'character varying' ? 'varchar' : $col->data_type;
-            $pk = $col->is_primary_key === 'YES' ? ' PK' : '';
-            $output .= "  " . $col->column_name . " : " . $type . $pk . "\n";
+            $pk = $col->is_primary_key === 'YES' ? ' [pk]' : '';
+            $output .= "  " . $col->column_name . " " . $type . $pk . "\n";
         }
+        $output .= "}\n";
 
         foreach ($foreignKeys as $fk) {
-            $rels[] = strtoupper($table) . "." . $fk->column_name . " -> " . strtoupper($fk->foreign_table_name);
+            $rels[] = strtoupper($table) . " ||--o{ " . strtoupper($fk->foreign_table_name) . " : " . $fk->column_name;
         }
     }
 
-    if (count($rels) > 0) {
-        $output .= "\n\nRELATIONSHIPS\n" . implode("\n", $rels);
-    }
+    $output .= "\n" . implode("\n", $rels);
     return response($output, 200, ['Content-Type' => 'text/plain']);
 });
 
