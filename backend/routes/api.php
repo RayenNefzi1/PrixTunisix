@@ -253,14 +253,20 @@ Route::get('/db-diagram', function () {
 
         $output .= "Table " . strtoupper($table) . " {\n";
         foreach ($columns as $col) {
-            $type = $col->data_type === 'character varying' ? 'varchar' : $col->data_type;
+            $type = $col->data_type;
+            if ($col->data_type === 'character varying') $type = 'varchar';
+            elseif ($col->data_type === 'timestamp without time zone') $type = 'timestamp';
+            elseif ($col->data_type === 'text') $type = 'text';
+            elseif ($col->data_type === 'boolean') $type = 'boolean';
+            elseif ($col->data_type === 'integer') $type = 'int';
+            elseif ($col->data_type === 'numeric') $type = 'decimal';
             $pk = $col->is_primary_key === 'YES' ? ' [pk]' : '';
             $output .= "  " . $col->column_name . " " . $type . $pk . "\n";
         }
         $output .= "}\n";
 
         foreach ($foreignKeys as $fk) {
-            $rels[] = strtoupper($table) . " ||--o{ " . strtoupper($fk->foreign_table_name) . " : " . $fk->column_name;
+            $rels[] = "Ref: " . strtoupper($fk->foreign_table_name) . ".id < " . strtoupper($table) . "." . $fk->column_name;
         }
     }
 

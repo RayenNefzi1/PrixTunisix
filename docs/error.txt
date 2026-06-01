@@ -1,17 +1,688 @@
- syntax error, unexpected identifier "SELECT", expecting ")"
-  at routes/api.php:208
-    204▕ Route::get('/db-diagram', function () {
-    205▕     header('Content-Type: text/plain');
-    206▕     $tables = \Illuminate\Support\Facades\DB::select("
-    207▕     $tables = \Illuminate\Support\Facades\DB::select("
-  ➜ 208▕         SELECT table_name
-    209▕         FROM information_schema.tables
-    210▕         WHERE table_schema = 'public' AND table_name NOT LIKE 'cache%' AND table_name NOT LIKE 'jobs%' AND table_name NOT LIKE 'sessions' AND table_name NOT LIKE 'password_reset'
-    211▕         ORDER BY table_name
-    212▕     ");
-      +19 vendor frames 
-  20  [internal]:0
-      Illuminate\Foundation\Application::Illuminate\Foundation\{closure}(Object(Illuminate\Foundation\Support\Providers\RouteServiceProvider), "Illuminate\Foundation\Support\Providers\RouteServiceProvider")
-      +6 vendor frames 
-  27  artisan:16
-      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))
+Table BRANDS {
+  id bigint [pk]
+  name varchar
+  slug varchar
+  logo_url varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table CATEGORIES {
+  id bigint [pk]
+  name varchar
+  slug varchar
+  description text
+  parent_id bigint
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+  code varchar
+}
+
+Table CLIENT_PRODUCT_VIEWS {
+  id bigint [pk]
+  client_id bigint
+  product_id bigint
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table CLIENTS {
+  id bigint [pk]
+  user_id bigint
+  phone varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table COUPONS {
+  id bigint [pk]
+  code varchar
+  description varchar
+  discount_value numeric
+  discount_type varchar
+  min_order_amount numeric
+  max_discount numeric
+  usage_limit integer
+  usage_count integer
+  offer_id bigint
+  valid_from timestamp without time zone
+  valid_until timestamp without time zone
+  is_active boolean
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table DISCOUNTS {
+  id bigint [pk]
+  offer_id bigint
+  value numeric
+  type varchar
+  original_price numeric
+  discounted_price numeric
+  start_date timestamp without time zone
+  end_date timestamp without time zone
+  is_active boolean
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table EMPLOYEES {
+  id bigint [pk]
+  user_id bigint
+  position varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+  name varchar
+  prename varchar
+  cin varchar
+  phone varchar
+  auto_id varchar
+}
+
+Table FAILED_JOBS {
+  id bigint [pk]
+  uuid varchar
+  connection text
+  queue text
+  payload text
+  exception text
+  failed_at timestamp without time zone
+}
+
+Table FAVORITES {
+  client_id bigint [pk]
+  product_id bigint [pk]
+  created_at timestamp without time zone
+}
+
+Table FOURNISSEUR_SUBSCRIPTIONS {
+  id bigint [pk]
+  fournisseur_id bigint
+  plan varchar
+  price numeric
+  start_date timestamp without time zone
+  end_date timestamp without time zone
+  status varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table FOURNISSEURS {
+  id bigint [pk]
+  user_id bigint
+  merchant_website_id bigint
+  company_name varchar
+  description text
+  contact_email varchar
+  api_key varchar
+  active boolean
+  merchant_url varchar
+  company_phone varchar
+  company_address varchar
+  logo_url varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table JOB_BATCHES {
+  id varchar [pk]
+  name varchar
+  total_jobs integer
+  pending_jobs integer
+  failed_jobs integer
+  failed_job_ids text
+  options text
+  cancelled_at integer
+  created_at integer
+  finished_at integer
+}
+
+Table MANUAL_PRODUCT_REQUESTS {
+  id bigint [pk]
+  fournisseur_id bigint
+  file_path varchar
+  file_name varchar
+  file_type varchar
+  total_rows integer
+  processed_rows integer
+  status varchar
+  notes text
+  completed_at timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table MANUAL_PRODUCTS {
+  id bigint [pk]
+  request_id bigint
+  fournisseur_id bigint
+  name varchar
+  description text
+  price numeric
+  image_url varchar
+  reference varchar
+  category_id bigint
+  brand_id bigint
+  status varchar
+  rejection_reason text
+  reviewed_by bigint
+  reviewed_at timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table MERCHANT_CLICKS {
+  id bigint [pk]
+  fournisseur_id bigint
+  product_id bigint
+  referrer varchar
+  ip_address varchar
+  user_agent text
+  clicked_at timestamp without time zone
+}
+
+Table MERCHANT_WEBSITES {
+  id bigint [pk]
+  name varchar
+  base_url varchar
+  logo_url varchar
+  is_active boolean
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+  slug varchar
+}
+
+Table MIGRATIONS {
+  id integer [pk]
+  migration varchar
+  batch integer
+}
+
+Table OFFERS {
+  id bigint [pk]
+  product_id bigint
+  merchant_website_id bigint
+  raw_title varchar
+  price numeric
+  is_available boolean
+  merchant_url varchar
+  image_url varchar
+  scraped_at timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+  scraped_reference varchar
+  fournisseur_id bigint
+}
+
+Table PASSWORD_RESET_TOKENS {
+  email varchar [pk]
+  token varchar
+  created_at timestamp without time zone
+}
+
+Table PERSONAL_ACCESS_TOKENS {
+  id bigint [pk]
+  tokenable_type varchar
+  tokenable_id bigint
+  name text
+  token varchar
+  abilities text
+  last_used_at timestamp without time zone
+  expires_at timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table PHONE_OTPS {
+  id bigint [pk]
+  phone varchar
+  code varchar
+  expires_at timestamp without time zone
+  used_at timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table PRICE_ALERTS {
+  id bigint [pk]
+  client_id bigint
+  product_id bigint
+  target_price numeric
+  is_active boolean
+  triggered_at timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table PRICE_HISTORY {
+  id bigint [pk]
+  offer_id bigint
+  price numeric
+  recorded_at timestamp without time zone
+}
+
+Table PRODUCT_MATCHES {
+  id bigint [pk]
+  offer_id bigint
+  product_id bigint
+  confidence_score double precision
+  status varchar
+  reviewed_by bigint
+  reviewed_at timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table PRODUCT_VIEWS {
+  id bigint [pk]
+  fournisseur_id bigint
+  product_id bigint
+  merchant_website_id bigint
+  view_count integer
+  view_date date
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table PRODUCTS {
+  id bigint [pk]
+  name varchar
+  slug varchar
+  description text
+  image_url varchar
+  is_validated boolean
+  category_id bigint
+  brand_id bigint
+  specifications jsonb
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+  reference varchar
+  fournisseur_id bigint
+}
+
+Table REDIRECT_CLICKS {
+  id bigint [pk]
+  offer_id bigint
+  user_id bigint
+  ip_address varchar
+  clicked_at timestamp without time zone
+}
+
+Table SCRAPING_LOGS {
+  id bigint [pk]
+  scraping_script_id bigint
+  started_at timestamp without time zone
+  ended_at timestamp without time zone
+  records_collected integer
+  errors_count integer
+  error_details text
+  result varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table SCRAPING_SCRIPTS {
+  id bigint [pk]
+  merchant_website_id bigint
+  name varchar
+  target_url varchar
+  frequency varchar
+  frequency_minutes integer
+  status varchar
+  last_run timestamp without time zone
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+  active boolean
+}
+
+Table USERS {
+  id bigint [pk]
+  name varchar
+  prename varchar
+  email varchar
+  email_verified_at timestamp without time zone
+  password varchar
+  role varchar
+  remember_token varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+  phone varchar
+  phone_verified boolean
+  phone_verified_at timestamp without time zone
+}
+
+Table WISHLIST_ITEMS {
+  id bigint [pk]
+  wishlist_id bigint
+  product_id bigint
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+Table WISHLISTS {
+  id bigint [pk]
+  client_id bigint
+  name varchar
+  created_at timestamp without time zone
+  updated_at timestamp without time zone
+}
+
+CATEGORIES ||--o{ CATEGORIES : parent_id
+CLIENT_PRODUCT_VIEWS ||--o{ CLIENTS : client_id
+CLIENT_PRODUCT_VIEWS ||--o{ PRODUCTS : product_id
+CLIENTS ||--o{ USERS : user_id
+COUPONS ||--o{ OFFERS : offer_id
+DISCOUNTS ||--o{ OFFERS : offer_id
+EMPLOYEES ||--o{ USERS : user_id
+FAVORITES ||--o{ CLIENTS : client_id
+FAVORITES ||--o{ PRODUCTS : product_id
+FOURNISSEUR_SUBSCRIPTIONS ||--o{ FOURNISSEURS : fournisseur_id
+FOURNISSEURS ||--o{ MERCHANT_WEBSITES : merchant_website_id
+FOURNISSEURS ||--o{ USERS : user_id
+MANUAL_PRODUCT_REQUESTS ||--o{ FOURNISSEURS : fournisseur_id
+MANUAL_PRODUCTS ||--o{ BRANDS : brand_id
+MANUAL_PRODUCTS ||--o{ CATEGORIES : category_id
+MANUAL_PRODUCTS ||--o{ FOURNISSEURS : fournisseur_id
+MANUAL_PRODUCTS ||--o{ MANUAL_PRODUCT_REQUESTS : request_id
+MANUAL_PRODUCTS ||--o{ USERS : reviewed_by
+MERCHANT_CLICKS ||--o{ FOURNISSEURS : fournisseur_id
+MERCHANT_CLICKS ||--o{ PRODUCTS : product_id
+OFFERS ||--o{ FOURNISSEURS : fournisseur_id
+OFFERS ||--o{ MERCHANT_WEBSITES : merchant_website_id
+OFFERS ||--o{ PRODUCTS : product_id
+PRICE_ALERTS ||--o{ CLIENTS : client_id
+PRICE_ALERTS ||--o{ PRODUCTS : product_id
+PRICE_HISTORY ||--o{ OFFERS : offer_id
+PRODUCT_MATCHES ||--o{ OFFERS : offer_id
+PRODUCT_MATCHES ||--o{ PRODUCTS : product_id
+PRODUCT_MATCHES ||--o{ EMPLOYEES : reviewed_by
+PRODUCT_VIEWS ||--o{ FOURNISSEURS : fournisseur_id
+PRODUCT_VIEWS ||--o{ MERCHANT_WEBSITES : merchant_website_id
+PRODUCT_VIEWS ||--o{ PRODUCTS : product_id
+PRODUCTS ||--o{ BRANDS : brand_id
+PRODUCTS ||--o{ CATEGORIES : category_id
+PRODUCTS ||--o{ FOURNISSEURS : fournisseur_id
+REDIRECT_CLICKS ||--o{ OFFERS : offer_id
+REDIRECT_CLICKS ||--o{ USERS : user_id
+SCRAPING_LOGS ||--o{ SCRAPING_SCRIPTS : scraping_script_id
+SCRAPING_SCRIPTS ||--o{ MERCHANT_WEBSITES : merchant_website_id
+WISHLIST_ITEMS ||--o{ PRODUCTS : product_id
+WISHLIST_ITEMS ||--o{ WISHLISTS : wishlist_id
+WISHLISTS ||--o{ CLIENTS : client_id
+
+
+
+
+
+
+
+
+(370:12) Unexpected '|' in an expression
+(371:22) Unexpected '|' in an expression
+(372:22) Unexpected '|' in an expression
+(373:9) Unexpected '|' in an expression
+(374:9) Unexpected '|' in an expression
+(375:11) Unexpected '|' in an expression
+(376:11) Unexpected '|' in an expression
+(377:11) Unexpected '|' in an expression
+(378:11) Unexpected '|' in an expression
+(379:27) Unexpected '|' in an expression
+(380:14) Unexpected '|' in an expression
+(381:14) Unexpected '|' in an expression
+(382:25) Unexpected '|' in an expression
+(383:17) Unexpected '|' in an expression
+(384:17) Unexpected '|' in an expression
+(385:17) Unexpected '|' in an expression
+(386:17) Unexpected '|' in an expression
+(387:17) Unexpected '|' in an expression
+(388:17) Unexpected '|' in an expression
+(389:17) Unexpected '|' in an expression
+(390:8) Unexpected '|' in an expression
+(391:8) Unexpected '|' in an expression
+(392:8) Unexpected '|' in an expression
+(393:14) Unexpected '|' in an expression
+(394:14) Unexpected '|' in an expression
+(395:15) Unexpected '|' in an expression
+(396:17) Unexpected '|' in an expression
+(397:17) Unexpected '|' in an expression
+(398:17) Unexpected '|' in an expression
+(399:15) Unexpected '|' in an expression
+(400:15) Unexpected '|' in an expression
+(401:15) Unexpected '|' in an expression
+(402:10) Unexpected '|' in an expression
+(403:10) Unexpected '|' in an expression
+(404:10) Unexpected '|' in an expression
+(405:17) Unexpected '|' in an expression
+(406:17) Unexpected '|' in an expression
+(407:15) Unexpected '|' in an expression
+(408:18) Unexpected '|' in an expression
+(409:16) Unexpected '|' in an expression
+(410:16) Unexpected '|' in an expression
+(411:11) Unexpected '|' in an expression
+(411:37) Expect a closing brace '}'
+(6:24) Inline column settings can only be `pk` or `unique`
+(6:32) Inline column settings can only be `pk` or `unique`
+(6:37) Inline column settings can only be `pk` or `unique`
+(7:24) Inline column settings can only be `pk` or `unique`
+(7:32) Inline column settings can only be `pk` or `unique`
+(7:37) Inline column settings can only be `pk` or `unique`
+(16:24) Inline column settings can only be `pk` or `unique`
+(16:32) Inline column settings can only be `pk` or `unique`
+(16:37) Inline column settings can only be `pk` or `unique`
+(17:24) Inline column settings can only be `pk` or `unique`
+(17:32) Inline column settings can only be `pk` or `unique`
+(17:37) Inline column settings can only be `pk` or `unique`
+(25:24) Inline column settings can only be `pk` or `unique`
+(25:32) Inline column settings can only be `pk` or `unique`
+(25:37) Inline column settings can only be `pk` or `unique`
+(26:24) Inline column settings can only be `pk` or `unique`
+(26:32) Inline column settings can only be `pk` or `unique`
+(26:37) Inline column settings can only be `pk` or `unique`
+(33:24) Inline column settings can only be `pk` or `unique`
+(33:32) Inline column settings can only be `pk` or `unique`
+(33:37) Inline column settings can only be `pk` or `unique`
+(34:24) Inline column settings can only be `pk` or `unique`
+(34:32) Inline column settings can only be `pk` or `unique`
+(34:37) Inline column settings can only be `pk` or `unique`
+(48:24) Inline column settings can only be `pk` or `unique`
+(48:32) Inline column settings can only be `pk` or `unique`
+(48:37) Inline column settings can only be `pk` or `unique`
+(49:25) Inline column settings can only be `pk` or `unique`
+(49:33) Inline column settings can only be `pk` or `unique`
+(49:38) Inline column settings can only be `pk` or `unique`
+(51:24) Inline column settings can only be `pk` or `unique`
+(51:32) Inline column settings can only be `pk` or `unique`
+(51:37) Inline column settings can only be `pk` or `unique`
+(52:24) Inline column settings can only be `pk` or `unique`
+(52:32) Inline column settings can only be `pk` or `unique`
+(52:37) Inline column settings can only be `pk` or `unique`
+(62:24) Inline column settings can only be `pk` or `unique`
+(62:32) Inline column settings can only be `pk` or `unique`
+(62:37) Inline column settings can only be `pk` or `unique`
+(63:22) Inline column settings can only be `pk` or `unique`
+(63:30) Inline column settings can only be `pk` or `unique`
+(63:35) Inline column settings can only be `pk` or `unique`
+(65:24) Inline column settings can only be `pk` or `unique`
+(65:32) Inline column settings can only be `pk` or `unique`
+(65:37) Inline column settings can only be `pk` or `unique`
+(66:24) Inline column settings can only be `pk` or `unique`
+(66:32) Inline column settings can only be `pk` or `unique`
+(66:37) Inline column settings can only be `pk` or `unique`
+(73:24) Inline column settings can only be `pk` or `unique`
+(73:32) Inline column settings can only be `pk` or `unique`
+(73:37) Inline column settings can only be `pk` or `unique`
+(74:24) Inline column settings can only be `pk` or `unique`
+(74:32) Inline column settings can only be `pk` or `unique`
+(74:37) Inline column settings can only be `pk` or `unique`
+(89:23) Inline column settings can only be `pk` or `unique`
+(89:31) Inline column settings can only be `pk` or `unique`
+(89:36) Inline column settings can only be `pk` or `unique`
+(95:24) Inline column settings can only be `pk` or `unique`
+(95:32) Inline column settings can only be `pk` or `unique`
+(95:37) Inline column settings can only be `pk` or `unique`
+(103:24) Inline column settings can only be `pk` or `unique`
+(103:32) Inline column settings can only be `pk` or `unique`
+(103:37) Inline column settings can only be `pk` or `unique`
+(104:22) Inline column settings can only be `pk` or `unique`
+(104:30) Inline column settings can only be `pk` or `unique`
+(104:35) Inline column settings can only be `pk` or `unique`
+(106:24) Inline column settings can only be `pk` or `unique`
+(106:32) Inline column settings can only be `pk` or `unique`
+(106:37) Inline column settings can only be `pk` or `unique`
+(107:24) Inline column settings can only be `pk` or `unique`
+(107:32) Inline column settings can only be `pk` or `unique`
+(107:37) Inline column settings can only be `pk` or `unique`
+(123:24) Inline column settings can only be `pk` or `unique`
+(123:32) Inline column settings can only be `pk` or `unique`
+(123:37) Inline column settings can only be `pk` or `unique`
+(124:24) Inline column settings can only be `pk` or `unique`
+(124:32) Inline column settings can only be `pk` or `unique`
+(124:37) Inline column settings can only be `pk` or `unique`
+(150:26) Inline column settings can only be `pk` or `unique`
+(150:34) Inline column settings can only be `pk` or `unique`
+(150:39) Inline column settings can only be `pk` or `unique`
+(151:24) Inline column settings can only be `pk` or `unique`
+(151:32) Inline column settings can only be `pk` or `unique`
+(151:37) Inline column settings can only be `pk` or `unique`
+(152:24) Inline column settings can only be `pk` or `unique`
+(152:32) Inline column settings can only be `pk` or `unique`
+(152:37) Inline column settings can only be `pk` or `unique`
+(169:25) Inline column settings can only be `pk` or `unique`
+(169:33) Inline column settings can only be `pk` or `unique`
+(169:38) Inline column settings can only be `pk` or `unique`
+(170:24) Inline column settings can only be `pk` or `unique`
+(170:32) Inline column settings can only be `pk` or `unique`
+(170:37) Inline column settings can only be `pk` or `unique`
+(171:24) Inline column settings can only be `pk` or `unique`
+(171:32) Inline column settings can only be `pk` or `unique`
+(171:37) Inline column settings can only be `pk` or `unique`
+(181:24) Inline column settings can only be `pk` or `unique`
+(181:32) Inline column settings can only be `pk` or `unique`
+(181:37) Inline column settings can only be `pk` or `unique`
+(190:24) Inline column settings can only be `pk` or `unique`
+(190:32) Inline column settings can only be `pk` or `unique`
+(190:37) Inline column settings can only be `pk` or `unique`
+(191:24) Inline column settings can only be `pk` or `unique`
+(191:32) Inline column settings can only be `pk` or `unique`
+(191:37) Inline column settings can only be `pk` or `unique`
+(210:24) Inline column settings can only be `pk` or `unique`
+(210:32) Inline column settings can only be `pk` or `unique`
+(210:37) Inline column settings can only be `pk` or `unique`
+(211:24) Inline column settings can only be `pk` or `unique`
+(211:32) Inline column settings can only be `pk` or `unique`
+(211:37) Inline column settings can only be `pk` or `unique`
+(212:24) Inline column settings can only be `pk` or `unique`
+(212:32) Inline column settings can only be `pk` or `unique`
+(212:37) Inline column settings can only be `pk` or `unique`
+(220:24) Inline column settings can only be `pk` or `unique`
+(220:32) Inline column settings can only be `pk` or `unique`
+(220:37) Inline column settings can only be `pk` or `unique`
+(230:26) Inline column settings can only be `pk` or `unique`
+(230:34) Inline column settings can only be `pk` or `unique`
+(230:39) Inline column settings can only be `pk` or `unique`
+(231:24) Inline column settings can only be `pk` or `unique`
+(231:32) Inline column settings can only be `pk` or `unique`
+(231:37) Inline column settings can only be `pk` or `unique`
+(232:24) Inline column settings can only be `pk` or `unique`
+(232:32) Inline column settings can only be `pk` or `unique`
+(232:37) Inline column settings can only be `pk` or `unique`
+(233:24) Inline column settings can only be `pk` or `unique`
+(233:32) Inline column settings can only be `pk` or `unique`
+(233:37) Inline column settings can only be `pk` or `unique`
+(240:24) Inline column settings can only be `pk` or `unique`
+(240:32) Inline column settings can only be `pk` or `unique`
+(240:37) Inline column settings can only be `pk` or `unique`
+(241:21) Inline column settings can only be `pk` or `unique`
+(241:29) Inline column settings can only be `pk` or `unique`
+(241:34) Inline column settings can only be `pk` or `unique`
+(242:24) Inline column settings can only be `pk` or `unique`
+(242:32) Inline column settings can only be `pk` or `unique`
+(242:37) Inline column settings can only be `pk` or `unique`
+(243:24) Inline column settings can only be `pk` or `unique`
+(243:32) Inline column settings can only be `pk` or `unique`
+(243:37) Inline column settings can only be `pk` or `unique`
+(252:26) Inline column settings can only be `pk` or `unique`
+(252:34) Inline column settings can only be `pk` or `unique`
+(252:39) Inline column settings can only be `pk` or `unique`
+(253:24) Inline column settings can only be `pk` or `unique`
+(253:32) Inline column settings can only be `pk` or `unique`
+(253:37) Inline column settings can only be `pk` or `unique`
+(254:24) Inline column settings can only be `pk` or `unique`
+(254:32) Inline column settings can only be `pk` or `unique`
+(254:37) Inline column settings can only be `pk` or `unique`
+(261:25) Inline column settings can only be `pk` or `unique`
+(261:33) Inline column settings can only be `pk` or `unique`
+(261:38) Inline column settings can only be `pk` or `unique`
+(268:27) Inline column settings can only be `pk` or `unique`
+(271:25) Inline column settings can only be `pk` or `unique`
+(271:33) Inline column settings can only be `pk` or `unique`
+(271:38) Inline column settings can only be `pk` or `unique`
+(272:24) Inline column settings can only be `pk` or `unique`
+(272:32) Inline column settings can only be `pk` or `unique`
+(272:37) Inline column settings can only be `pk` or `unique`
+(273:24) Inline column settings can only be `pk` or `unique`
+(273:32) Inline column settings can only be `pk` or `unique`
+(273:37) Inline column settings can only be `pk` or `unique`
+(283:24) Inline column settings can only be `pk` or `unique`
+(283:32) Inline column settings can only be `pk` or `unique`
+(283:37) Inline column settings can only be `pk` or `unique`
+(284:24) Inline column settings can only be `pk` or `unique`
+(284:32) Inline column settings can only be `pk` or `unique`
+(284:37) Inline column settings can only be `pk` or `unique`
+(297:24) Inline column settings can only be `pk` or `unique`
+(297:32) Inline column settings can only be `pk` or `unique`
+(297:37) Inline column settings can only be `pk` or `unique`
+(298:24) Inline column settings can only be `pk` or `unique`
+(298:32) Inline column settings can only be `pk` or `unique`
+(298:37) Inline column settings can only be `pk` or `unique`
+(308:24) Inline column settings can only be `pk` or `unique`
+(308:32) Inline column settings can only be `pk` or `unique`
+(308:37) Inline column settings can only be `pk` or `unique`
+(314:24) Inline column settings can only be `pk` or `unique`
+(314:32) Inline column settings can only be `pk` or `unique`
+(314:37) Inline column settings can only be `pk` or `unique`
+(315:22) Inline column settings can only be `pk` or `unique`
+(315:30) Inline column settings can only be `pk` or `unique`
+(315:35) Inline column settings can only be `pk` or `unique`
+(320:24) Inline column settings can only be `pk` or `unique`
+(320:32) Inline column settings can only be `pk` or `unique`
+(320:37) Inline column settings can only be `pk` or `unique`
+(321:24) Inline column settings can only be `pk` or `unique`
+(321:32) Inline column settings can only be `pk` or `unique`
+(321:37) Inline column settings can only be `pk` or `unique`
+(332:22) Inline column settings can only be `pk` or `unique`
+(332:30) Inline column settings can only be `pk` or `unique`
+(332:35) Inline column settings can only be `pk` or `unique`
+(333:24) Inline column settings can only be `pk` or `unique`
+(333:32) Inline column settings can only be `pk` or `unique`
+(333:37) Inline column settings can only be `pk` or `unique`
+(334:24) Inline column settings can only be `pk` or `unique`
+(334:32) Inline column settings can only be `pk` or `unique`
+(334:37) Inline column settings can only be `pk` or `unique`
+(343:31) Inline column settings can only be `pk` or `unique`
+(343:39) Inline column settings can only be `pk` or `unique`
+(343:44) Inline column settings can only be `pk` or `unique`
+(347:24) Inline column settings can only be `pk` or `unique`
+(347:32) Inline column settings can only be `pk` or `unique`
+(347:37) Inline column settings can only be `pk` or `unique`
+(348:24) Inline column settings can only be `pk` or `unique`
+(348:32) Inline column settings can only be `pk` or `unique`
+(348:37) Inline column settings can only be `pk` or `unique`
+(351:31) Inline column settings can only be `pk` or `unique`
+(351:39) Inline column settings can only be `pk` or `unique`
+(351:44) Inline column settings can only be `pk` or `unique`
+(358:24) Inline column settings can only be `pk` or `unique`
+(358:32) Inline column settings can only be `pk` or `unique`
+(358:37) Inline column settings can only be `pk` or `unique`
+(359:24) Inline column settings can only be `pk` or `unique`
+(359:32) Inline column settings can only be `pk` or `unique`
+(359:37) Inline column settings can only be `pk` or `unique`
+(366:24) Inline column settings can only be `pk` or `unique`
+(366:32) Inline column settings can only be `pk` or `unique`
+(366:37) Inline column settings can only be `pk` or `unique`
+(367:24) Inline column settings can only be `pk` or `unique`
+(367:32) Inline column settings can only be `pk` or `unique`
+(367:37) Inline column settings can only be `pk` or `unique`
+(370:1) A Custom element can only appear in a Project
+(370:13) A Custom element shouldn't have a name
+(370:17) A Custom element can only have an inline field
