@@ -1,19 +1,34 @@
- SQLSTATE[2BP01]: Dependent objects still exist: 7 ERROR:  cannot drop table merchants because other objects depend on it
-DETAIL:  constraint subscriptions_merchant_id_foreign on table subscriptions depends on table merchants
-HINT:  Use DROP ... CASCADE to drop the dependent objects too. (Connection: pgsql, Host: dpg-d87hfguq1p3s73b6qk8g-a, Port: 5432, Database: prixtunisix, SQL: drop table if exists "merchants")
-  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:841
-    837▕             $exceptionType = ($isUniqueConstraintError = $this->isUniqueConstraintError($e))
-    838▕                 ? UniqueConstraintViolationException::class
-    839▕                 : QueryException::class;
-    840▕ 
-  ➜ 841▕             $exception = new $exceptionType(
-    842▕                 $this->getNameWithReadWriteType(),
-    843▕                 $query,
-    844▕                 $this->prepareBindings($bindings),
-    845▕                 $e,
-      +9 vendor frames 
-  10  database/migrations/2026_06_01_000002_remove_merchants_table.php:16
-      Illuminate\Support\Facades\Facade::__callStatic("dropIfExists")
-      +27 vendor frames 
-  38  artisan:16
-      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))
+Uncaught SyntaxError: Cannot use import statement outside a module
+prixtunisix-api.onrender.com/api/admin/manual-products/1/approve:1  Failed to load resource: the server responded with a status of 500 ()
+2117-330b8256cec08b17.js:1 AxiosError: Request failed with status code 500
+    at eI (9599-2c31f0d3c1ec2de4.js:1:43606)
+    at XMLHttpRequest.g (9599-2c31f0d3c1ec2de4.js:1:48015)
+    at tf.request (9599-2c31f0d3c1ec2de4.js:1:56585)
+    at async q (page-ddbf34e7edff4810.js:1:2518)
+push.92304.window.console.error @ 2117-330b8256cec08b17.js:1
+9599-2c31f0d3c1ec2de4.js:1  POST https://prixtunisix-api.onrender.com/api/admin/manual-products/1/approve 500 (Internal Server Error)
+(anonymous) @ 9599-2c31f0d3c1ec2de4.js:1
+xhr @ 9599-2c31f0d3c1ec2de4.js:1
+to @ 9599-2c31f0d3c1ec2de4.js:1
+Promise.then
+_request @ 9599-2c31f0d3c1ec2de4.js:1
+request @ 9599-2c31f0d3c1ec2de4.js:1
+(anonymous) @ 9599-2c31f0d3c1ec2de4.js:1
+(anonymous) @ 9599-2c31f0d3c1ec2de4.js:1
+q @ page-ddbf34e7edff4810.js:1
+a_ @ fd9d1056-dc3ad9523966659c.js:1
+aR @ fd9d1056-dc3ad9523966659c.js:1
+(anonymous) @ fd9d1056-dc3ad9523966659c.js:1
+sF @ fd9d1056-dc3ad9523966659c.js:1
+sM @ fd9d1056-dc3ad9523966659c.js:1
+(anonymous) @ fd9d1056-dc3ad9523966659c.js:1
+o4 @ fd9d1056-dc3ad9523966659c.js:1
+iV @ fd9d1056-dc3ad9523966659c.js:1
+sU @ fd9d1056-dc3ad9523966659c.js:1
+uR @ fd9d1056-dc3ad9523966659c.js:1
+uM @ fd9d1056-dc3ad9523966659c.js:1
+2117-330b8256cec08b17.js:1 AxiosError: Request failed with status code 500
+    at eI (9599-2c31f0d3c1ec2de4.js:1:43606)
+    at XMLHttpRequest.g (9599-2c31f0d3c1ec2de4.js:1:48015)
+    at tf.request (9599-2c31f0d3c1ec2de4.js:1:56585)
+    at async q (page-ddbf34e7edff4810.js:1:2518)

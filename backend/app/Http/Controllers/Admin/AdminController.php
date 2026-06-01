@@ -290,16 +290,25 @@ class AdminController extends Controller
             // Link to existing product - no new product created
         } elseif ($subscription && $subscription->plan === 'premium_manual') {
             // Create new product with manual data
-            Product::create([
+            $product = Product::create([
                 'name' => $manualProduct->name,
                 'description' => $manualProduct->description,
-                'price' => $manualProduct->price,
                 'image_url' => $manualProduct->image_url,
                 'reference' => $manualProduct->reference,
                 'category_id' => $manualProduct->category_id,
                 'brand_id' => $manualProduct->brand_id,
                 'is_validated' => true,
                 'fournisseur_id' => $manualProduct->fournisseur_id,
+            ]);
+
+            // Create initial offer with the manual product price
+            Offer::create([
+                'product_id' => $product->id,
+                'fournisseur_id' => $manualProduct->fournisseur_id,
+                'raw_title' => $manualProduct->name,
+                'price' => $manualProduct->price,
+                'is_available' => true,
+                'merchant_url' => $manualProduct->fournisseur->merchant_url ?? '',
             ]);
         }
 
