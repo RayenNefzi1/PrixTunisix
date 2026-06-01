@@ -247,23 +247,23 @@ Route::get('/db-diagram', function () {
             WHERE tc.table_name = ? AND tc.constraint_type = 'FOREIGN KEY'
         ", [$table]);
 
-        $lines[] = "Table " . strtoupper($table) . " {";
+        $lines[] = strtoupper($table) . " {";
         foreach ($columns as $col) {
             $type = $col->character_maximum_length ? $col->data_type . '(' . $col->character_maximum_length . ')' : $col->data_type;
             $pk = $col->is_primary_key === 'YES' ? ' [pk]' : '';
-            $null = $col->is_nullable === 'NO' ? '' : ' [nullable]';
-            $lines[] = "  " . $col->column_name . " : " . $type . $pk . $null;
+            $null = $col->is_nullable === 'NO' ? ' not null' : '';
+            $lines[] = "  " . $col->column_name . " " . $type . $pk . $null;
         }
         $lines[] = "}";
 
         foreach ($foreignKeys as $fk) {
-            $rels[] = "Rel " . $table . "." . $fk->column_name . " -> " . $fk->foreign_table_name . "." . $fk->foreign_column_name;
+            $rels[] = strtoupper($table) . " ||--o{ " . strtoupper($fk->foreign_table_name) . " : " . $fk->column_name;
         }
     }
 
     $output = implode("\n", $lines) . "\n\n" . implode("\n", $rels);
     return response()->json([
-        'mermaid' => "erDiagram\n    " . implode("\n    ", $lines) . "\n\n    " . implode("\n    ", $rels),
+        'mermaid' => "erDiagram\n    " . implode("\n    ", $lines) . "\n    " . implode("\n    ", $rels),
         'text' => $output,
     ]);
 });
