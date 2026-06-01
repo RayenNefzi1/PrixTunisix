@@ -22,7 +22,7 @@ const mockOffers: StoryOffer[] = [
     id: 1,
     product_name: 'Sacoche Dell EcoLoop Essential 14"-16"',
     product_slug: 'sacoche-dell-ecoloop-essential-14-16-cc3624',
-    product_image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/415896-home/sacoche-dell-ecoloop-essential-14-16.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 89,
@@ -33,7 +33,7 @@ const mockOffers: StoryOffer[] = [
     id: 2,
     product_name: 'Carte mémoire SDXC Express Patriot 1To',
     product_slug: 'carte-m%C3%A9moire-sdxc-express-v30-uhs-i-u3-4k-uhd-patriot-ep-1-to-pef1tepexmcx',
-    product_image: 'https://images.unsplash.com/photo-1613534267514-46c9c3003667?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/447349-home/carte-memoire-sdxc-express-v30-uhs-i-u3-4k-uhd-patriot-ep-1-to.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 959,
@@ -44,7 +44,7 @@ const mockOffers: StoryOffer[] = [
     id: 3,
     product_name: 'Bobine YDD 50X CD-R 700MB',
     product_slug: 'bobine-ydd-50x-cd-r-700-mb-80-min-imprimable-cd-ydd-imp',
-    product_image: 'https://images.unsplash.com/photo-1605639156481-2444d654b03c?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/416548-home/bobine-ydd-50x-cd-r-700-mb-80-min-imprimable.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 30.9,
@@ -55,7 +55,7 @@ const mockOffers: StoryOffer[] = [
     id: 4,
     product_name: 'Protecteur écran Samsung S23+',
     product_slug: 'protecteur-d%C3%A9cran-anti-lumi%C3%A8re-bleue-screenforce-curve-pour-samsung-s23-ovb035zz',
-    product_image: 'https://images.unsplash.com/photo-1612442446086-3e5b05f8e71d?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/427739-home/protecteur-d-ecran-anti-lumiere-bleue-screenforce-curve-pour-samsung-s23.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 35,
@@ -66,7 +66,7 @@ const mockOffers: StoryOffer[] = [
     id: 5,
     product_name: 'Tablette XP-PEN Artist Pro 24',
     product_slug: 'tablette-graphique-xp-pen-artist-pro-24-gen-2-165-hz-noir-artist-pro-24-gen2',
-    product_image: 'https://images.unsplash.com/photo-1585790050230-60a5c3d3b5c4?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/460739-home/tablette-graphique-xp-pen-artist-pro-24-gen-2-165-hz-noir.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 4159,
@@ -77,7 +77,7 @@ const mockOffers: StoryOffer[] = [
     id: 6,
     product_name: 'Serveur HP ProLiant DL380 Gen10',
     product_slug: 'serveur-rack-hpe-proliant-dl380-gen10-intel-xeon-2x-gold-521864-go-sans-disques-p56964-b21',
-    product_image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/341585-home/serveur-rack-hpe-proliant-dl380-gen10-intel-xeon-2x-gold-521864-go-sans-disques.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 24955,
@@ -88,7 +88,7 @@ const mockOffers: StoryOffer[] = [
     id: 7,
     product_name: 'Serveur HP ProLiant DL380 Gen10 Plus',
     product_slug: 'serveur-rack-hpe-proliant-dl380-gen10-plus-intel-xeon-silver-4314-32-go-sans-disques-p55247-b21',
-    product_image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/341638-home/serveur-rack-hpe-proliant-dl380-gen10-plus-intel-xeon-silver-4314-32-go-sans-disques.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 23775,
@@ -99,7 +99,7 @@ const mockOffers: StoryOffer[] = [
     id: 8,
     product_name: 'Serveur Dell PowerEdge R750XS',
     product_slug: 'serveur-dell-poweredge-r750xs-dual-intel-xeon-gold-4310-4x-16-go-12-to-361843-r750',
-    product_image: 'https://images.unsplash.com/photo-1597872200969-2b65d56e8736?w=800&q=80',
+    product_image: 'https://www.tunisianet.com.tn/368546-home/serveur-dell-poweredge-r750xs-dual-intel-xeon-gold-4310-4x-16-go-12-to.jpg',
     category_code: '1',
     merchant_name: 'Tunisianet',
     current_price: 23279,
@@ -218,31 +218,33 @@ export default function StoriesPage() {
 
           {/* Story content */}
           <div className="relative h-full">
-            {/* Background image with zoom effect */}
-            <div className={`absolute inset-0 transition-transform duration-500 ${isPaused ? 'scale-105' : 'scale-100'}`}>
+            {/* Background image with zoom and blur effect */}
+            <div className={`absolute inset-0 transition-all duration-700 ${isPaused ? 'scale-110 blur-sm' : 'scale-100 blur-0'}`}>
               <Image
                 src={currentOffer.product_image}
                 alt={currentOffer.product_name}
                 fill
-                className="object-cover"
+                className="object-cover object-center"
                 priority
               />
             </div>
             
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/95" />
+            {/* Beautiful gradient overlay with vignette */}
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-900/60 via-black/30 to-black/90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-900/40 via-transparent to-brand-900/40" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
             
             {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer pointer-events-none" />
 
             {/* Header with icon */}
             <div className="absolute top-14 left-4 right-4 flex items-center gap-2">
-              <div className="flex items-center gap-2 px-4 py-2 bg-red-500 rounded-full shadow-lg shadow-red-500/30">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-lg shadow-red-500/50">
                 <TrendingDown className="w-5 h-5 text-white" />
                 <span className="text-white font-bold text-sm">BEST DEAL</span>
               </div>
-              <div className="flex items-center gap-1 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <Sparkles className="w-4 h-4 text-yellow-400" />
+              <div className="flex items-center gap-1 px-3 py-2 bg-white/30 backdrop-blur-md rounded-full">
+                <Sparkles className="w-4 h-4 text-yellow-300" />
                 <span className="text-white font-medium text-sm">🔥 En stock</span>
               </div>
             </div>
@@ -250,12 +252,12 @@ export default function StoriesPage() {
             {/* Product info */}
             <div className="absolute bottom-32 left-4 right-4">
               {/* Animated price tag */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 rounded-lg mb-3 animate-bounce">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 rounded-lg mb-3 shadow-lg shadow-red-500/50 animate-bounce">
                 <Tag className="w-5 h-5 text-white" />
                 <span className="text-white font-bold text-xl">-{currentOffer.discount_percentage}%</span>
               </div>
               
-              <h2 className="text-white text-2xl font-bold mb-3 line-clamp-3 leading-tight drop-shadow-lg">
+              <h2 className="text-white text-2xl font-bold mb-3 line-clamp-3 leading-tight drop-shadow-lg text-shadow-md">
                 {currentOffer.product_name}
               </h2>
               
