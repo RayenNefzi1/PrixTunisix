@@ -13,6 +13,7 @@ return new class extends Migration
             $table->dropColumn('merchant_id');
         });
 
+        Schema::dropIfExists('subscriptions');
         Schema::dropIfExists('merchants');
     }
 
