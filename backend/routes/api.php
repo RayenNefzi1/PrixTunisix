@@ -260,6 +260,7 @@ Route::get('/db-diagram', function () {
             elseif ($col->data_type === 'boolean') $type = 'boolean';
             elseif ($col->data_type === 'integer') $type = 'int';
             elseif ($col->data_type === 'numeric') $type = 'decimal';
+            elseif ($col->data_type === 'double precision') $type = 'float';
             $pk = $col->is_primary_key === 'YES' ? ' [pk]' : '';
             $output .= "  " . $col->column_name . " " . $type . $pk . "\n";
         }
