@@ -205,11 +205,11 @@ Route::get('/db-diagram', function () {
     $tables = \Illuminate\Support\Facades\DB::select("
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema = 'public'
+        WHERE table_schema = 'public' AND table_name NOT LIKE 'cache%' AND table_name NOT LIKE 'jobs%' AND table_name NOT LIKE 'sessions' AND table_name NOT LIKE 'password_reset'
         ORDER BY table_name
     ");
 
-    $lines = [];
+    $output = "";
     $rels = [];
 
     foreach ($tables as $t) {
@@ -219,8 +219,6 @@ Route::get('/db-diagram', function () {
                 c.column_name,
                 c.data_type,
                 c.character_maximum_length,
-                c.is_nullable,
-                c.column_default,
                 CASE WHEN pk.column_name IS NOT NULL THEN 'YES' ELSE 'NO' END as is_primary_key
             FROM information_schema.columns c
             LEFT JOIN (
@@ -237,8 +235,7 @@ Route::get('/db-diagram', function () {
         $foreignKeys = \Illuminate\Support\Facades\DB::select("
             SELECT
                 kcu.column_name,
-                ccu.table_name as foreign_table_name,
-                ccu.column_name as foreign_column_name
+                ccu.table_name as foreign_table_name
             FROM information_schema.table_constraints tc
             JOIN information_schema.key_column_usage kcu
                 ON tc.constraint_name = kcu.constraint_name
@@ -247,25 +244,20 @@ Route::get('/db-diagram', function () {
             WHERE tc.table_name = ? AND tc.constraint_type = 'FOREIGN KEY'
         ", [$table]);
 
-        $lines[] = strtoupper($table) . " {";
+        $output .= "\nTable " . strtoupper($table) . "\n";
         foreach ($columns as $col) {
-            $type = $col->character_maximum_length ? $col->data_type . '(' . $col->character_maximum_length . ')' : $col->data_type;
-            $pk = $col->is_primary_key === 'YES' ? ' [pk]' : '';
-            $null = $col->is_nullable === 'NO' ? ' not null' : '';
-            $lines[] = "  " . $col->column_name . " " . $type . $pk . $null;
+            $type = $col->data_type === 'character varying' ? 'varchar' : $col->data_type;
+            $pk = $col->is_primary_key === 'YES' ? ' PK' : '';
+            $output .= "  " . $col->column_name . " : " . $type . $pk . "\n";
         }
-        $lines[] = "}";
 
         foreach ($foreignKeys as $fk) {
-            $rels[] = strtoupper($table) . " ||--o{ " . strtoupper($fk->foreign_table_name) . " : " . $fk->column_name;
+            $rels[] = strtoupper($table) . "." . $fk->column_name . " -> " . strtoupper($fk->foreign_table_name);
         }
     }
 
-    $output = implode("\n", $lines) . "\n\n" . implode("\n", $rels);
-    return response()->json([
-        'mermaid' => "erDiagram\n    " . implode("\n    ", $lines) . "\n    " . implode("\n    ", $rels),
-        'text' => $output,
-    ]);
+    $output .= "\n\nRELATIONSHIPS\n" . implode("\n", $rels);
+    return response()->json(['diagram' => $output]);
 });
 
 Route::get('/create-coupons-table', function () {
