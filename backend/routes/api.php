@@ -244,8 +244,11 @@ Route::get('/db-diagram', function () {
             WHERE tc.table_name = ? AND tc.constraint_type = 'FOREIGN KEY'
         ", [$table]);
 
-        $prefix = $output === "" ? "" : "\n";
-        $output .= $prefix . "Table " . strtoupper($table) . "\n";
+        if (empty($output)) {
+            $output = "Table " . strtoupper($table) . "\n";
+        } else {
+            $output .= "\nTable " . strtoupper($table) . "\n";
+        }
         foreach ($columns as $col) {
             $type = $col->data_type === 'character varying' ? 'varchar' : $col->data_type;
             $pk = $col->is_primary_key === 'YES' ? ' PK' : '';
@@ -257,8 +260,10 @@ Route::get('/db-diagram', function () {
         }
     }
 
-    $output .= "\n\nRELATIONSHIPS\n" . implode("\n", $rels);
-    return response()->json(['diagram' => $output]);
+    if (count($rels) > 0) {
+        $output .= "\n\nRELATIONSHIPS\n" . implode("\n", $rels);
+    }
+    return response($output, 200, ['Content-Type' => 'text/plain']);
 });
 
 Route::get('/create-coupons-table', function () {
