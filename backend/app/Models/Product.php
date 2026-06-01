@@ -19,6 +19,7 @@ class Product extends Model
         'category_id',
         'brand_id',
         'specifications',
+        'fournisseur_id',
     ];
 
     protected function casts(): array
@@ -37,6 +38,11 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function fournisseur()
+    {
+        return $this->belongsTo(Fournisseur::class);
     }
 
     public function offers()
