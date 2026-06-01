@@ -44,11 +44,6 @@ class User extends Authenticatable
         return $this->hasOne(Client::class);
     }
 
-    public function merchant()
-    {
-        return $this->hasOne(Merchant::class);
-    }
-
     public function employee()
     {
         return $this->hasOne(Employee::class);
@@ -57,11 +52,6 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
-    }
-
-    public function isMerchant(): bool
-    {
-        return $this->role === 'merchant';
     }
 
     public function isEmployee(): bool

@@ -8,7 +8,7 @@ class Offer extends Model
 {
     protected $fillable = [
         'product_id',
-        'merchant_id',
+        'fournisseur_id',
         'merchant_website_id',
         'raw_title',
         'scraped_reference',
@@ -33,11 +33,6 @@ class Offer extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function merchant()
-    {
-        return $this->belongsTo(Merchant::class);
-    }
-
     public function merchantWebsite()
     {
         return $this->belongsTo(MerchantWebsite::class);
@@ -45,7 +40,7 @@ class Offer extends Model
 
     public function fournisseur()
     {
-        return $this->hasOneThrough(Fournisseur::class, MerchantWebsite::class, 'id', 'merchant_website_id');
+        return $this->belongsTo(Fournisseur::class);
     }
 
     public function priceHistory()

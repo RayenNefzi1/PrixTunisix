@@ -133,6 +133,11 @@ Route::get('/seed', function () {
     return response()->json(['message' => 'Database seeded successfully']);
 });
 
+Route::get('/migrate', function () {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    return response()->json(['message' => 'Migrations completed']);
+});
+
 Route::get('/create-coupons-table', function () {
     try {
         \Illuminate\Support\Facades\Schema::create('coupons', function ($table) {
@@ -870,8 +875,6 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::get('users',                 [AdminController::class, 'users']);
                 Route::put('users/{user}/role',     [AdminController::class, 'updateRole']);
 
-                Route::get('merchants',                        [AdminController::class, 'merchants']);
-                Route::post('merchants/{merchant}/verify',     [AdminController::class, 'verifyMerchant']);
                 Route::get('product-matches',                  [AdminController::class, 'productMatches']);
                 Route::put('product-matches/{productMatch}',   [AdminController::class, 'reviewMatch']);
                 Route::get('analytics/clicks',                 [AdminController::class, 'clickAnalytics']);
@@ -1004,17 +1007,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('favorites/{productId}',     [FavoriteController::class, 'destroy']);
     });
 
-// ── Merchant routes ───────────────────────────────────────────────────
-    Route::middleware('role:merchant')->prefix('merchant')->group(function () {
-        Route::get('profile',                [MerchantController::class, 'profile']);
-        Route::put('profile',                [MerchantController::class, 'updateProfile']);
-        Route::get('offers',                 [MerchantController::class, 'offers']);
-        Route::post('offers',                 [MerchantController::class, 'storeOffer']);
-        Route::put('offers/{offer}',         [MerchantController::class, 'updateOffer']);
-        Route::delete('offers/{offer}',      [MerchantController::class, 'deleteOffer']);
-    });
-
-    // ── Fournisseur (supplier portal) - Authenticated routes ──────────────────
+// ── Fournisseur (supplier portal) - Authenticated routes ──────────────────
     Route::middleware('auth:sanctum')->prefix('fournisseur')->group(function () {
         Route::post('logout',               [FournisseurAuthController::class, 'logout']);
         Route::get('dashboard',              [FournisseurController::class, 'dashboard']);

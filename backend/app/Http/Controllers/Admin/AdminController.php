@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 
-use App\Models\Merchant;
 use App\Models\ProductMatch;
 use App\Models\Product;
 use App\Models\Offer;
@@ -118,27 +117,6 @@ class AdminController extends Controller
         $user->update(['role' => $data['role']]);
 
         return response()->json($user->fresh());
-    }
-
-    /** GET /admin/merchants — list merchants with verification status */
-    public function merchants(): JsonResponse
-    {
-        $merchants = Merchant::with('user')
-            ->orderBy('is_verified')
-            ->paginate(20);
-
-        return response()->json($merchants);
-    }
-
-    /** POST /admin/merchants/{merchant}/verify */
-    public function verifyMerchant(Merchant $merchant): JsonResponse
-    {
-        $merchant->update([
-            'is_verified' => true,
-            'verified_at' => now(),
-        ]);
-
-        return response()->json($merchant->fresh());
     }
 
     /** GET /admin/product-matches — pending match review queue */
