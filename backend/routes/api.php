@@ -201,6 +201,73 @@ Route::get('/db-schema', function () {
     return response()->json($schema);
 });
 
+Route::get('/db-diagram', function () {
+    $tables = \Illuminate\Support\Facades\DB::select("
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+        ORDER BY table_name
+    ");
+
+    $lines = [];
+    $rels = [];
+
+    foreach ($tables as $t) {
+        $table = $t->table_name;
+        $columns = \Illuminate\Support\Facades\DB::select("
+            SELECT
+                c.column_name,
+                c.data_type,
+                c.character_maximum_length,
+                c.is_nullable,
+                c.column_default,
+                CASE WHEN pk.column_name IS NOT NULL THEN 'YES' ELSE 'NO' END as is_primary_key
+            FROM information_schema.columns c
+            LEFT JOIN (
+                SELECT kcu.column_name
+                FROM information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                    ON tc.constraint_name = kcu.constraint_name
+                WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY'
+            ) pk ON c.column_name = pk.column_name
+            WHERE c.table_name = ? AND c.table_schema = 'public'
+            ORDER BY c.ordinal_position
+        ", [$table, $table]);
+
+        $foreignKeys = \Illuminate\Support\Facades\DB::select("
+            SELECT
+                kcu.column_name,
+                ccu.table_name as foreign_table_name,
+                ccu.column_name as foreign_column_name
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+                ON tc.constraint_name = kcu.constraint_name
+            JOIN information_schema.constraint_column_usage ccu
+                ON tc.constraint_name = ccu.constraint_name
+            WHERE tc.table_name = ? AND tc.constraint_type = 'FOREIGN KEY'
+        ", [$table]);
+
+        $lines[] = "Table " . strtoupper($table) . " {";
+        foreach ($columns as $col) {
+            $type = $col->character_maximum_length ? $col->data_type . '(' . $col->character_maximum_length . ')' : $col->data_type;
+            $pk = $col->is_primary_key === 'YES' ? ' [pk]' : '';
+            $null = $col->is_nullable === 'NO' ? '' : ' [nullable]';
+            $lines[] = "  " . $col->column_name . " : " . $type . $pk . $null;
+        }
+        $lines[] = "}";
+
+        foreach ($foreignKeys as $fk) {
+            $rels[] = "Rel " . $table . "." . $fk->column_name . " -> " . $fk->foreign_table_name . "." . $fk->foreign_column_name;
+        }
+    }
+
+    $output = implode("\n", $lines) . "\n\n" . implode("\n", $rels);
+    return response()->json([
+        'mermaid' => "erDiagram\n    " . implode("\n    ", $lines) . "\n\n    " . implode("\n    ", $rels),
+        'text' => $output,
+    ]);
+});
+
 Route::get('/create-coupons-table', function () {
     try {
         \Illuminate\Support\Facades\Schema::create('coupons', function ($table) {
