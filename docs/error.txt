@@ -1,3 +1,17 @@
-(2:3) Expect an opening brace '{' or a colon ':'
-(10:3) Expect an opening brace '{' or a colon ':'
-(20:3) Expect an opening brace '{' or a colon ':'
+ syntax error, unexpected identifier "SELECT", expecting ")"
+  at routes/api.php:208
+    204▕ Route::get('/db-diagram', function () {
+    205▕     header('Content-Type: text/plain');
+    206▕     $tables = \Illuminate\Support\Facades\DB::select("
+    207▕     $tables = \Illuminate\Support\Facades\DB::select("
+  ➜ 208▕         SELECT table_name
+    209▕         FROM information_schema.tables
+    210▕         WHERE table_schema = 'public' AND table_name NOT LIKE 'cache%' AND table_name NOT LIKE 'jobs%' AND table_name NOT LIKE 'sessions' AND table_name NOT LIKE 'password_reset'
+    211▕         ORDER BY table_name
+    212▕     ");
+      +19 vendor frames 
+  20  [internal]:0
+      Illuminate\Foundation\Application::Illuminate\Foundation\{closure}(Object(Illuminate\Foundation\Support\Providers\RouteServiceProvider), "Illuminate\Foundation\Support\Providers\RouteServiceProvider")
+      +6 vendor frames 
+  27  artisan:16
+      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))

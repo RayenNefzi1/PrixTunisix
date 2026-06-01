@@ -204,7 +204,6 @@ Route::get('/db-schema', function () {
 Route::get('/db-diagram', function () {
     header('Content-Type: text/plain');
     $tables = \Illuminate\Support\Facades\DB::select("
-    $tables = \Illuminate\Support\Facades\DB::select("
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'public' AND table_name NOT LIKE 'cache%' AND table_name NOT LIKE 'jobs%' AND table_name NOT LIKE 'sessions' AND table_name NOT LIKE 'password_reset'
