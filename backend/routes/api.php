@@ -244,7 +244,8 @@ Route::get('/db-diagram', function () {
             WHERE tc.table_name = ? AND tc.constraint_type = 'FOREIGN KEY'
         ", [$table]);
 
-        $output .= "\nTable " . strtoupper($table) . "\n";
+        $prefix = $output === "" ? "" : "\n";
+        $output .= $prefix . "Table " . strtoupper($table) . "\n";
         foreach ($columns as $col) {
             $type = $col->data_type === 'character varying' ? 'varchar' : $col->data_type;
             $pk = $col->is_primary_key === 'YES' ? ' PK' : '';
