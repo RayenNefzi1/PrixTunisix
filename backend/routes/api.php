@@ -148,6 +148,59 @@ Route::get('/db-tables', function () {
     return response()->json($tables);
 });
 
+Route::get('/db-schema', function () {
+    $tables = \Illuminate\Support\Facades\DB::select("
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+        ORDER BY table_name
+    ");
+
+    $schema = [];
+    foreach ($tables as $t) {
+        $table = $t->table_name;
+        $columns = \Illuminate\Support\Facades\DB::select("
+            SELECT
+                c.column_name,
+                c.data_type,
+                c.character_maximum_length,
+                c.is_nullable,
+                c.column_default,
+                CASE WHEN pk.column_name IS NOT NULL THEN 'YES' ELSE 'NO' END as is_primary_key
+            FROM information_schema.columns c
+            LEFT JOIN (
+                SELECT kcu.column_name
+                FROM information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                    ON tc.constraint_name = kcu.constraint_name
+                WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY'
+            ) pk ON c.column_name = pk.column_name
+            WHERE c.table_name = ? AND c.table_schema = 'public'
+            ORDER BY c.ordinal_position
+        ", [$table, $table]);
+
+        $foreignKeys = \Illuminate\Support\Facades\DB::select("
+            SELECT
+                kcu.column_name,
+                ccu.table_name as foreign_table_name,
+                ccu.column_name as foreign_column_name
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+                ON tc.constraint_name = kcu.constraint_name
+            JOIN information_schema.constraint_column_usage ccu
+                ON tc.constraint_name = ccu.constraint_name
+            WHERE tc.table_name = ? AND tc.constraint_type = 'FOREIGN KEY'
+        ", [$table]);
+
+        $schema[$table] = [
+            'columns' => $columns,
+            'foreign_keys' => $foreignKeys,
+        ];
+    }
+
+    return response()->json($schema);
+});
+
 Route::get('/create-coupons-table', function () {
     try {
         \Illuminate\Support\Facades\Schema::create('coupons', function ($table) {
