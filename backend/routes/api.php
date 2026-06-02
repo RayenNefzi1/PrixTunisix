@@ -143,6 +143,11 @@ Route::get('/debug-products-columns', function () {
     return response()->json($cols);
 });
 
+Route::get('/debug-offers-columns', function () {
+    $cols = \Illuminate\Support\Facades\DB::select("SELECT column_name FROM information_schema.columns WHERE table_name = 'offers'");
+    return response()->json($cols);
+});
+
 Route::get('/db-tables', function () {
     $tables = \Illuminate\Support\Facades\DB::select("
         SELECT table_name
