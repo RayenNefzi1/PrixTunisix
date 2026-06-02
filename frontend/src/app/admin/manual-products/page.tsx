@@ -55,6 +55,8 @@ export default function AdminManualProductsPage() {
   const [imageUrl, setImageUrl] = useState('')
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null)
   const [loadingSuggestions, setLoadingSuggestions] = useState(false)
+  const [showRejectModal, setShowRejectModal] = useState(false)
+  const [rejectReason, setRejectReason] = useState('')
 
   useEffect(() => {
     fetchRequests()
@@ -126,12 +128,17 @@ export default function AdminManualProductsPage() {
 
   const handleReject = async () => {
     if (!selectedProduct) return
-    const reason = prompt('Raison du rejet:')
-    if (!reason) return
+    setShowRejectModal(true)
+  }
+
+  const confirmReject = async () => {
+    if (!selectedProduct || !rejectReason.trim()) return
     try {
-      await adminApi.post(`/admin/manual-products/${selectedProduct.id}/reject`, { reason })
-      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'rejected', rejection_reason: reason } : p))
+      await adminApi.post(`/admin/manual-products/${selectedProduct.id}/reject`, { reason: rejectReason })
+      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'rejected', rejection_reason: rejectReason } : p))
       setSelectedProduct(null)
+      setShowRejectModal(false)
+      setRejectReason('')
     } catch (err) {
       console.error(err)
     }
@@ -421,4 +428,50 @@ function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMat
     </div>,
     document.body
   )
+
+  if (showRejectModal && selectedProduct) {
+    return createPortal(
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+              <X className="w-6 h-6 text-red-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Rejeter le produit</h3>
+              <p className="text-sm text-gray-500">Veuillez fournir la raison du rejet</p>
+            </div>
+          </div>
+
+          <textarea
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            placeholder="Expliquez pourquoi ce produit est rejeté..."
+            className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            rows={4}
+            autoFocus
+          />
+
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => { setShowRejectModal(false); setRejectReason('') }}
+              className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-medium"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={confirmReject}
+              disabled={!rejectReason.trim()}
+              className="flex-1 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Confirmer le rejet
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    )
+  }
+
+  return null
 }
