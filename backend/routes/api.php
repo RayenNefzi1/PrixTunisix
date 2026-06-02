@@ -138,6 +138,11 @@ Route::get('/migrate', function () {
     return response()->json(['message' => 'Migrations completed']);
 });
 
+Route::get('/debug-products-columns', function () {
+    $cols = \Illuminate\Support\Facades\DB::select("SELECT column_name FROM information_schema.columns WHERE table_name = 'products'");
+    return response()->json($cols);
+});
+
 Route::get('/db-tables', function () {
     $tables = \Illuminate\Support\Facades\DB::select("
         SELECT table_name
