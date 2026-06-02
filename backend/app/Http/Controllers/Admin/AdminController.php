@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -290,8 +291,10 @@ class AdminController extends Controller
             // Link to existing product - no new product created
         } elseif ($subscription && $subscription->plan === 'premium_manual') {
             // Create new product with manual data
+            $slug = \Illuminate\Support\Str::slug($manualProduct->name) . '-' . uniqid();
             $product = Product::create([
                 'name' => $manualProduct->name,
+                'slug' => $slug,
                 'description' => $manualProduct->description,
                 'image_url' => $manualProduct->image_url,
                 'reference' => $manualProduct->reference,

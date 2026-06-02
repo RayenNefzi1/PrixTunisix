@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ScrapingController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\AuthController;
@@ -159,6 +160,7 @@ Route::get('/test-approve', function () {
         
         $product = \App\Models\Product::create([
             'name' => $manualProduct->name,
+            'slug' => Str::slug($manualProduct->name) . '-' . uniqid(),
             'description' => $manualProduct->description,
             'image_url' => $manualProduct->image_url,
             'reference' => $manualProduct->reference,
