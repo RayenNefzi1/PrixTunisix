@@ -148,6 +148,41 @@ Route::get('/debug-offers-columns', function () {
     return response()->json($cols);
 });
 
+Route::get('/test-approve', function () {
+    try {
+        $manualProduct = \App\Models\ManualProduct::find(1);
+        if (!$manualProduct) {
+            return response()->json(['error' => 'Manual product not found']);
+        }
+        
+        $subscription = $manualProduct->fournisseur->subscription;
+        
+        $product = \App\Models\Product::create([
+            'name' => $manualProduct->name,
+            'description' => $manualProduct->description,
+            'image_url' => $manualProduct->image_url,
+            'reference' => $manualProduct->reference,
+            'category_id' => $manualProduct->category_id,
+            'brand_id' => $manualProduct->brand_id,
+            'is_validated' => true,
+            'fournisseur_id' => $manualProduct->fournisseur_id,
+        ]);
+
+        $offer = \App\Models\Offer::create([
+            'product_id' => $product->id,
+            'fournisseur_id' => $manualProduct->fournisseur_id,
+            'raw_title' => $manualProduct->name,
+            'price' => $manualProduct->price,
+            'is_available' => true,
+            'merchant_url' => $manualProduct->fournisseur->merchant_url ?? '',
+        ]);
+
+        return response()->json(['success' => true, 'product_id' => $product->id, 'offer_id' => $offer->id]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage(), 'trace' => $e->getTrace()]);
+    }
+});
+
 Route::get('/db-tables', function () {
     $tables = \Illuminate\Support\Facades\DB::select("
         SELECT table_name
