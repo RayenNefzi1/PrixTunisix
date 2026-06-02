@@ -1,27 +1,11 @@
-Uncaught SyntaxError: Cannot use import statement outside a module (at webpage_content_reporter.js:1:115955)
-9599-2c31f0d3c1ec2de4.js:1  POST https://prixtunisix-api.onrender.com/api/admin/manual-products/1/approve 500 (Internal Server Error)
-(anonymous) @ 9599-2c31f0d3c1ec2de4.js:1
-xhr @ 9599-2c31f0d3c1ec2de4.js:1
-to @ 9599-2c31f0d3c1ec2de4.js:1
-Promise.then
-_request @ 9599-2c31f0d3c1ec2de4.js:1
-request @ 9599-2c31f0d3c1ec2de4.js:1
-(anonymous) @ 9599-2c31f0d3c1ec2de4.js:1
-(anonymous) @ 9599-2c31f0d3c1ec2de4.js:1
-q @ page-ddbf34e7edff4810.js:1
-a_ @ fd9d1056-dc3ad9523966659c.js:1
-aR @ fd9d1056-dc3ad9523966659c.js:1
-(anonymous) @ fd9d1056-dc3ad9523966659c.js:1
-sF @ fd9d1056-dc3ad9523966659c.js:1
-sM @ fd9d1056-dc3ad9523966659c.js:1
-(anonymous) @ fd9d1056-dc3ad9523966659c.js:1
-o4 @ fd9d1056-dc3ad9523966659c.js:1
-iV @ fd9d1056-dc3ad9523966659c.js:1
-sU @ fd9d1056-dc3ad9523966659c.js:1
-uR @ fd9d1056-dc3ad9523966659c.js:1
-uM @ fd9d1056-dc3ad9523966659c.js:1
-2117-330b8256cec08b17.js:1 AxiosError: Request failed with status code 500
-    at eI (9599-2c31f0d3c1ec2de4.js:1:43606)
-    at XMLHttpRequest.g (9599-2c31f0d3c1ec2de4.js:1:48015)
-    at tf.request (9599-2c31f0d3c1ec2de4.js:1:56585)
-    at async q (page-ddbf34e7edff4810.js:1:2518)
+Failed to compile.
+./src/app/admin/manual-products/page.tsx:432:7
+Type error: Cannot find name 'showRejectModal'.
+  430 |   )
+  431 |
+> 432 |   if (showRejectModal && selectedProduct) {
+      |       ^
+  433 |     return createPortal(
+  434 |       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  435 |         <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+Error: Command "npm run build" exited with 1

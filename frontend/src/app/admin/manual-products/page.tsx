@@ -277,13 +277,18 @@ export default function AdminManualProductsPage() {
           imageUrl={imageUrl}
           setImageUrl={setImageUrl}
           loadingSuggestions={loadingSuggestions}
+          showRejectModal={showRejectModal}
+          setShowRejectModal={setShowRejectModal}
+          rejectReason={rejectReason}
+          setRejectReason={setRejectReason}
+          confirmReject={confirmReject}
         />
       )}
     </div>
   )
 }
 
-function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMatchMode, searchSuggestions, suggestions, selectedMatchId, setSelectedMatchId, imageUrl, setImageUrl, loadingSuggestions }: any) {
+function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMatchMode, searchSuggestions, suggestions, selectedMatchId, setSelectedMatchId, imageUrl, setImageUrl, loadingSuggestions, showRejectModal, setShowRejectModal, rejectReason, setRejectReason, confirmReject }: any) {
   return createPortal(
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center" style={{ zIndex: 999999 }}>
       <div className="bg-white rounded-xl w-full max-w-2xl p-6 max-h-[80vh] overflow-y-auto">
@@ -429,7 +434,7 @@ function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMat
     document.body
   )
 
-  if (showRejectModal && selectedProduct) {
+  if (showRejectModal) {
     return createPortal(
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
