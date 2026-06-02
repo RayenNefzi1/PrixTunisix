@@ -158,9 +158,11 @@ Route::get('/test-approve', function () {
         
         $subscription = $manualProduct->fournisseur->subscription;
         
+        $slug = Str::slug($manualProduct->name) . '-' . uniqid();
+        
         $product = \App\Models\Product::create([
             'name' => $manualProduct->name,
-            'slug' => Str::slug($manualProduct->name) . '-' . uniqid(),
+            'slug' => $slug,
             'description' => $manualProduct->description,
             'image_url' => $manualProduct->image_url,
             'reference' => $manualProduct->reference,
@@ -181,7 +183,7 @@ Route::get('/test-approve', function () {
 
         return response()->json(['success' => true, 'product_id' => $product->id, 'offer_id' => $offer->id]);
     } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage(), 'trace' => $e->getTrace()]);
+        return response()->json(['error' => $e->getMessage(), 'line' => $e->getLine()]);
     }
 });
 
