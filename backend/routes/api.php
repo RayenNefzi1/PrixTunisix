@@ -127,45 +127,44 @@ Route::post('chatbot', [ChatbotController::class, 'chat']);
 // ── Fix categorizations ─────────────────────────────────────────────────
 Route::get('/fix-categories', function () {
     $categoryMapping = [
-        // Smartphones
-        'smartphone' => 10, 'phone' => 10, 'téléphone' => 10, 'iphone' => 10, 'samsung galaxy' => 10, 'xiaomi' => 10, 'huawei' => 10, 'oppo' => 10, 'vivo' => 10, 'realme' => 10, 'tecno' => 10, 'itel' => 10,
-        // Tablettes
+        // Smartphones (10)
+        'smartphone' => 10, ' phone ' => 10, ' iphone' => 10, 'samsung galaxy' => 10, 'xiaomi' => 10, 'huawei' => 10, 'oppo' => 10, 'vivo' => 10, 'realme' => 10, 'tecno' => 10, 'itel' => 10,
+        // Tablettes (11)
         'tablette' => 11, 'tablet' => 11, 'ipad' => 11, 'galaxy tab' => 11,
-        // PC Portables
+        // PC Portables (7)
         'laptop' => 7, 'pc portable' => 7, 'macbook' => 7, 'notebook' => 7, 'ultrabook' => 7,
-        // PC Portables Gaming
-        'gaming' => 8, 'gamer' => 8, 'rog' => 8, 'predator' => 8, 'legion' => 8,
-        // PC Bureau
+        // PC Portables Gaming (8)
+        'gaming' => 8, 'gamer' => 8, 'rog ' => 8, 'predator' => 8, 'legion' => 8,
+        // PC Bureau (9)
         'pc bureau' => 9, 'desktop' => 9, 'tour' => 9,
-        // Audio & Son
+        // Audio & Son (14)
         'casque' => 14, 'headphone' => 14, 'écouteur' => 14, 'airpod' => 14, 'speaker' => 14, 'bluetooth' => 14, 'soundbar' => 14, 'home cinema' => 14, 'enceintes' => 14,
-        // Ecrans PC
-        'écran' => 15, 'moniteur' => 15, 'monitor' => 15, 'tv' => 15, 'téléviseur' => 15,
-        // Imprimantes
+        // Ecrans PC (15)
+        'écran' => 15, 'moniteur' => 15, 'monitor' => 15,
+        // Imprimantes (17)
         'imprimante' => 17, 'printer' => 17, 'toner' => 17, 'cartouche' => 17,
-        // Composants PC
-        'processeur' => 16, 'cpu' => 16, 'carte mère' => 16, 'motherboard' => 16, 'ram' => 16, 'mémoire' => 16, 'disque' => 16, 'ssd' => 16, 'hdd' => 16, 'carte graphique' => 16, 'gpu' => 16, 'rtx' => 16, 'gtx' => 16, 'ventirad' => 16, 'watercooling' => 16, 'alimentation' => 16, ' PSU' => 16, 'serveur' => 16, 'rack' => 16,
-        // Périphériques
-        'souris' => 18, 'clavier' => 18, 'keyboard' => 18, 'mouse' => 18, 'webcam' => 18, 'micro' => 18, 'hub' => 18, 'usb' => 18, 'cable' => 18, 'chargeur' => 18, 'disque externe' => 18, 'clé usb' => 18, 'flash disk' => 18, 'sacoche' => 18, 'sac à dos' => 18, 'pochette' => 18, 'protège écran' => 18, 'film' => 18, 'piles' => 18, 'batterie' => 18, 'reliure' => 18, 'spirale' => 18, ' CD ' => 18, 'dvd' => 18, 'règle' => 18,
-        // Photo & Vidéo
+        // Composants PC (16)
+        'processeur' => 16, ' cpu ' => 16, 'carte mère' => 16, 'motherboard' => 16, ' ram ' => 16, 'mémoire' => 16, 'disque dur' => 16, ' ssd' => 16, ' hdd' => 16, 'carte graphique' => 16, ' gpu ' => 16, 'rtx' => 16, 'gtx' => 16, 'ventirad' => 16, 'watercooling' => 16, 'alimentation' => 16, 'psu' => 16, 'serveur' => 16, 'rack' => 16, 'synology' => 16,
+        // Périphériques (18) - Accessories
+        'souris' => 18, 'clavier' => 18, 'keyboard' => 18, 'mouse' => 18, 'webcam' => 18, 'micro' => 18, 'hub' => 18, ' usb' => 18, 'cable' => 18, 'chargeur' => 18, 'disque externe' => 18, 'clé usb' => 18, 'flash disk' => 18, 'sacoche' => 18, 'sac à dos' => 18, 'pochette' => 18, 'protège écran' => 18, 'film de protection' => 18, 'piles' => 18, 'batterie' => 18, 'reliure' => 18, 'spirale' => 18, 'cd-r' => 18, 'dvd' => 18, 'règle' => 18, 'chemises' => 18,
+        // Photo & Vidéo (19)
         'appareil photo' => 19, 'camera' => 19, 'caméra' => 19, 'reflex' => 19, 'gopro' => 19, 'polaroid' => 19,
-        // Smartwatches
+        // Smartwatches (12)
         'montre' => 12, 'smartwatch' => 12, 'apple watch' => 12, 'galaxy watch' => 12, 'fitbit' => 12,
-        // Téléviseurs
-        'téléviseur' => 13, 'smart tv' => 13, 'oled' => 13, 'qled' => 13,
+        // Téléviseurs (13)
+        'téléviseur' => 13, 'smart tv' => 13, 'televiseur' => 13, 'oled' => 13, 'qled' => 13,
     ];
     
-    $categoryId = 1; // Default to Informatique
-    
     $updated = 0;
+    $skipped = 0;
     $products = \App\Models\Product::where('is_validated', true)->get();
     
     foreach ($products as $product) {
-        $name = strtolower($product->name);
+        $name = mb_strtolower($product->name, 'UTF-8');
         $foundCategory = null;
         
         foreach ($categoryMapping as $keyword => $catId) {
-            if (str_contains($name, $keyword)) {
+            if (mb_stripos($name, $keyword) !== false) {
                 $foundCategory = $catId;
                 break;
             }
@@ -175,10 +174,33 @@ Route::get('/fix-categories', function () {
             $product->category_id = $foundCategory;
             $product->save();
             $updated++;
+        } elseif (!$foundCategory) {
+            $skipped++;
         }
     }
     
-    return response()->json(['message' => "Fixed {$updated} products categorizations"]);
+    return response()->json([
+        'message' => "Fixed {$updated} products categorizations",
+        'skipped' => $skipped,
+        'total' => $products->count()
+    ]);
+});
+
+// ── Show miscategorized products ────────────────────────────────────────
+Route::get('/mis-categorized', function () {
+    $products = \App\Models\Product::where('is_validated', true)
+        ->where('category_id', 1)
+        ->orWhereNull('category_id')
+        ->with('category')
+        ->limit(50)
+        ->get()
+        ->map(fn($p) => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'current_category' => $p->category?->name,
+        ]);
+    
+    return response()->json($products);
 });
 
 // ── Public seed endpoints ──────────────────────────────────────────────
