@@ -138,6 +138,8 @@ class DatabaseSeeder extends Seeder
         $loisir = Category::create(['name' => 'Loisirs & Sports', 'slug' => 'loisirs-sports']);
 
         // ── Informatique ──────────────────────────────────────────────────
+        $bureauCat = Category::create(['name' => 'Fournitures Bureau', 'slug' => 'fournitures-bureau']);
+
         foreach ([
             ['PC Portables',        'pc-portables'],
             ['PC Portables Gaming', 'pc-portables-gaming'],
@@ -152,8 +154,19 @@ class DatabaseSeeder extends Seeder
             ['Imprimantes',         'imprimantes'],
             ['Périphériques',       'peripheriques'],
             ['Photo & Vidéo',       'photo-video'],
+            ['Fournitures Bureau',  'fournitures-bureau'],
         ] as [$name, $slug]) {
             Category::create(['name' => $name, 'slug' => $slug, 'parent_id' => $info->id]);
+        }
+
+        foreach ([
+            ['Stylos & Marqueurs',  'stylos-marqueurs'],
+            ['Piles & Batteries',   'piles-batteries'],
+            ['Reliures & Spirales', 'reliures-spirales'],
+            ['Papeterie',           'papeterie'],
+            ['Classement',          'classement'],
+        ] as [$name, $slug]) {
+            Category::create(['name' => $name, 'slug' => $slug, 'parent_id' => $bureauCat->id]);
         }
 
         // ── Electroménager ────────────────────────────────────────────────
