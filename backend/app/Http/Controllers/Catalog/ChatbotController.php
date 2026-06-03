@@ -137,7 +137,7 @@ class ChatbotController extends Controller
 
         // Check for greetings
         $greetingWords = $this->greetings[$this->detectedLanguage] ?? $this->greetings['fr'];
-        $cleanMessage = preg_replace('/[^a-zA-Z\u0600-\u06FF]/u', ' ', $messageLower);
+        $cleanMessage = preg_replace('/[^a-zA-Z]/u', ' ', $messageLower);
         $words = preg_split('/\s+/', trim($cleanMessage));
         $messageWords = array_filter($words, fn($w) => mb_strlen($w) > 1);
         
@@ -253,7 +253,8 @@ class ChatbotController extends Controller
 
     private function detectLanguage(string $message): string
     {
-        if (preg_match('/[\x{0600}-\x{06FF}]/u', $message)) {
+        // Simple Arabic detection - check for Arabic characters
+        if (preg_match('/[\p{Arabic}]/u', $message)) {
             return 'ar';
         }
 
