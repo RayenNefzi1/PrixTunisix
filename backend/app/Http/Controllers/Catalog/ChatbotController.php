@@ -18,8 +18,8 @@ class ChatbotController extends Controller
 
     public function __construct()
     {
-        $this->ollamaUrl = env('OLLAMA_API_URL', null);
-        $this->groqApiKey = env('GROQ_API_KEY', null);
+        $this->ollamaUrl = config('services.ollama.url', null);
+        $this->groqApiKey = config('services.groq.api_key', null);
     }
     private array $categoryKeywords = [
         'téléphones' => [

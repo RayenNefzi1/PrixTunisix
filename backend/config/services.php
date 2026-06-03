@@ -49,4 +49,13 @@ return [
         'ultramsg_token'    => env('ULTRAMSG_TOKEN'),
     ],
 
+    // ── Chatbot AI APIs ─────────────────────────────────────────────────
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+    ],
+
+    'ollama' => [
+        'url' => env('OLLAMA_API_URL'),
+    ],
+
 ];
