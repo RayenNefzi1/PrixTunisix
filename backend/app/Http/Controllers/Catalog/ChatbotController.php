@@ -95,6 +95,18 @@ class ChatbotController extends Controller
 
     private string $detectedLanguage = 'fr';
 
+    private array $greetings = [
+        'fr' => ['bonjour', 'salut', 'bonsoir', 'coucou', 'hello', 'hi', 'hey', 'salutations', 'bjr', 'svp', 's\'il vous plait'],
+        'en' => ['hello', 'hi', 'hey', 'good morning', 'good evening', 'good afternoon', 'greetings', 'hi there'],
+        'ar' => ['مرحبا', 'اهلا', 'السلام عليكم', 'سلام', 'ما اسمك', 'كيف حالك'],
+    ];
+
+    private array $helpQueries = [
+        'fr' => ['aide', 'help', 'comment ça marche', 'que peux-tu faire', 'quoi', 'que fait', 'qu\'est ce que'],
+        'en' => ['help', 'what can you do', 'how does it work', 'what'],
+        'ar' => ['ماذا يمكنك ان تفعل', 'مساعدة', 'كيف'],
+    ];
+
     public function chat(Request $request)
     {
         $message = $request->input('message', '');
@@ -109,6 +121,32 @@ class ChatbotController extends Controller
 
         $this->detectedLanguage = $this->detectLanguage($message);
         $messageLower = mb_strtolower($message, 'UTF-8');
+
+        // Check for greetings
+        $greetingWords = $this->greetings[$this->detectedLanguage] ?? $this->greetings['fr'];
+        $cleanMessage = preg_replace('/[^a-zA-Z\u0600-\u06FF]/u', ' ', $messageLower);
+        $words = preg_split('/\s+/', trim($cleanMessage));
+        $messageWords = array_filter($words, fn($w) => mb_strlen($w) > 1);
+        
+        foreach ($messageWords as $word) {
+            if (in_array($word, $greetingWords)) {
+                return response()->json([
+                    'reply' => $this->getGreetingResponse(),
+                    'language' => $this->detectedLanguage,
+                ]);
+            }
+        }
+
+        // Check for help queries
+        $helpWords = $this->helpQueries[$this->detectedLanguage] ?? $this->helpQueries['fr'];
+        foreach ($helpWords as $pattern) {
+            if (str_contains($messageLower, $pattern)) {
+                return response()->json([
+                    'reply' => $this->getHelpResponse(),
+                    'language' => $this->detectedLanguage,
+                ]);
+            }
+        }
 
         // Detect comparison intent
         $comparisonPatterns = [
@@ -216,6 +254,24 @@ class ChatbotController extends Controller
             'en'    => "Hello! I'm your shopping assistant. Tell me what you're looking for (product, budget, features)...",
             'ar'    => "مرحباً! أنا مساعد التسوق الخاص بك. أخبرني بما تبحث عنه...",
             default => "Bonjour ! Je suis votre assistant d'achat. Décrivez ce que vous recherchez (produit, budget, caractéristiques)...",
+        };
+    }
+
+    private function getGreetingResponse(): string
+    {
+        return match ($this->detectedLanguage) {
+            'en'    => "Hello! 👋 I'm Prixy, your shopping assistant!\n\nI can help you find the best prices for products in Tunisia. Just tell me:\n• What you're looking for (phone, laptop, etc.)\n• Your budget\n• Any specific features\n\nWhat would you like to find today?",
+            'ar'    => "مرحباً! 👋 أنا Prixy، مساعد التسوق الخاص بك!\n\nيمكنني مساعدتك في finding أفضل الأسعار في تونس. أخبرني:\n• ما تبحث عنه\n• ميزانيتك\n• أي مواصفات خاصة\n\nماذا تريد أن تجد اليوم؟",
+            default => "Salut! 👋 Je suis Prixy, votre assistant shopping!\n\nJe peux vous aider à trouver les meilleurs prix en Tunisie. Dites-moi:\n• Ce que vous recherchez (téléphone, laptop, etc.)\n• Votre budget\n• Cualquier caractéristique particulière\n\nQu'est-ce que vous voulez trouver aujourd'hui?",
+        };
+    }
+
+    private function getHelpResponse(): string
+    {
+        return match ($this->detectedLanguage) {
+            'en'    => "I'm Prixy, your shopping assistant! 🎯\n\nHere's what I can do:\n• Search products by name or category\n• Filter by budget (ex: \"less than 500 TND\")\n• Compare products and recommend the best ones\n• Find specific brands (Samsung, Apple, Dell...)\n\nJust tell me what you need!",
+            'ar'    => "أنا Prixy، مساعد التسوق الخاص بك! 🎯\n\nما يمكنني فعله:\n• البحث عن_products بالاسم أو الفئة\n• التصفية حسب الميزانية\n• مقارنة المنتجات والتوصية بأفضلها\n•Find علامات تجارية محددة\n\nأخبرني بما تحتاجه!",
+            default => "Je suis Prixy, votre assistant shopping! 🎯\n\nVoici ce que je peux faire:\n• Rechercher des produits par nom ou catégorie\n• Filtrer par budget (ex: \"moins de 500 TND\")\n• Comparer les produits et recommander les meilleurs\n• Trouver des marques spécifiques (Samsung, Apple, Dell...)\n\nDites-moi juste ce dont vous avez besoin!",
         };
     }
 
