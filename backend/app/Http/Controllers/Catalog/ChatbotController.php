@@ -18,11 +18,8 @@ class ChatbotController extends Controller
 
     public function __construct()
     {
-        // Try multiple ways to get env vars
         $this->groqApiKey = $_ENV['GROQ_API_KEY'] ?? $_SERVER['GROQ_API_KEY'] ?? getenv('GROQ_API_KEY') ?? '';
         $this->ollamaUrl = $_ENV['OLLAMA_API_URL'] ?? $_SERVER['OLLAMA_API_URL'] ?? getenv('OLLAMA_API_URL') ?? null;
-        
-        \Illuminate\Support\Facades\Log::info('Chatbot init - Groq key status: ' . (strlen($this->groqApiKey) > 0 ? 'present (' . strlen($this->groqApiKey) . ' chars)' : 'MISSING'));
     }
     private array $categoryKeywords = [
         'téléphones' => [
@@ -591,17 +588,19 @@ class ChatbotController extends Controller
                 'max_tokens' => 200,
             ]);
 
+            \Illuminate\Support\Facades\Log::info('Groq response status: ' . $response->status());
+            
             if ($response->successful()) {
                 $result = $response->json();
                 return trim($result['choices'][0]['message']['content'] ?? '');
             } else {
-                \Illuminate\Support\Facades\Log::error('Groq API error: ' . $response->body());
+                \Illuminate\Support\Facades\Log::error('Groq API error: ' . $response->status() . ' - ' . $response->body());
+                return 'Groq error: ' . $response->status();
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Groq exception: ' . $e->getMessage());
+            return 'Groq exception: ' . $e->getMessage();
         }
-
-        return null;
     }
 
     private function generateNoResultsMessage(array $criteria): string
