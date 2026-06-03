@@ -123,6 +123,8 @@ class ChatbotController extends Controller
         $message = $request->input('message', '');
         $context = $request->input('context', null);
 
+        \Illuminate\Support\Facades\Log::info('Chatbot received: ' . $message);
+
         if (empty($message)) {
             return response()->json([
                 'reply'    => $this->getWelcomeMessage(),
@@ -557,6 +559,11 @@ class ChatbotController extends Controller
 
     private function callGroq(string $message, string $language): ?string
     {
+        if (empty($this->groqApiKey)) {
+            \Illuminate\Support\Facades\Log::error('Groq API key is empty');
+            return null;
+        }
+
         $systemPrompt = match ($language) {
             'ar' => 'أنت Prixy، مساعد تسوق ودود. ساعد المستخدم في إيجاد المنتجات في Tunisia. كن مختصرا وودودا. إذا لم تجد منتجا، اعتذر واقترح كلمات بديلة.',
             'en' => 'You are Prixy, a friendly shopping assistant. Help users find products in Tunisia. Be concise and friendly. If no product found, apologize and suggest alternatives.',
@@ -580,9 +587,11 @@ class ChatbotController extends Controller
             if ($response->successful()) {
                 $result = $response->json();
                 return trim($result['choices'][0]['message']['content'] ?? '');
+            } else {
+                \Illuminate\Support\Facades\Log::error('Groq API error: ' . $response->body());
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Groq error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Groq exception: ' . $e->getMessage());
         }
 
         return null;
