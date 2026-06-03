@@ -96,6 +96,7 @@ class ChatbotController extends Controller
         'min'      => '/(?:plus|minimum|min|au dessus|above|over|supérieur|plus de)\s*(\d+)/i',
         'range'    => '/(\d+)\s*(?:à|-|et|to|from|~)\s*(\d+)/i',
         'range_dt' => '/(\d+)\s*-\s*(\d+)\s*(?:dt|tnd|dinars?)/i',
+        'between'  => '/entre\s*(\d+)\s*et\s*(\d+)/i',
     ];
 
     private array $stopWords = [
@@ -197,18 +198,33 @@ class ChatbotController extends Controller
         }
 
         $extracted = $this->extractCriteria($messageLower);
+        
+        \Illuminate\Support\Facades\Log::info('Extracted criteria: ' . json_encode($extracted));
+        
         $products  = $this->searchProducts($extracted);
+        
+        \Illuminate\Support\Facades\Log::info('Found products: ' . $products->count());
 
         if ($products->isEmpty()) {
+            // Even if no products, try to find related products without strict price filtering
+            $relaxedCriteria = $extracted;
+            unset($relaxedCriteria['min_price'], $relaxedCriteria['max_price']);
+            $relaxedProducts = $this->searchProducts($relaxedCriteria);
+            
             $aiReply = $this->callOllama($message, $this->detectedLanguage);
-            if ($aiReply) {
-                return response()->json([
-                    'reply'    => $aiReply,
-                    'language' => $this->detectedLanguage,
-                ]);
-            }
+            
             return response()->json([
-                'reply'    => $this->generateNoResultsMessage($extracted),
+                'reply'    => $aiReply ?: $this->generateNoResultsMessage($extracted),
+                'products' => $relaxedProducts->take(5)->map(fn($p) => [
+                    'id'        => $p->id,
+                    'name'      => $p->name,
+                    'slug'      => $p->slug,
+                    'image_url' => $p->image_url,
+                    'price'     => $p->lowest_price,
+                    'category'  => $p->category?->name,
+                    'brand'     => $p->brand?->name,
+                ]),
+                'criteria' => $extracted,
                 'language' => $this->detectedLanguage,
             ]);
         }
@@ -340,7 +356,9 @@ class ChatbotController extends Controller
             '/budget\s*(?:de)?\s*(\d+)/i',
             '/under\s*(\d+)/i',
             '/entre\s*(\d+)\s*et\s*(\d+)/i',
+            '/entre\s*(\d+)\s*et\s*(\d+)\s*(?:dt|tnd|dinars?)/i',
             '/(\d+)\s*(?:à|a)\s*(\d+)\s*(?:dt|tnd|dinars?)?/i',
+            '/(\d+)\s*-\s*(\d+)\s*(?:dt|tnd|dinars?)/i',
             '/(\d+)\s*(?:dt|tnd|dinars?)/i',
         ];
         foreach ($extras as $p) {
