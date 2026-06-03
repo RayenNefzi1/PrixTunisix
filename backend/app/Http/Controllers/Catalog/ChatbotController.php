@@ -224,7 +224,7 @@ class ChatbotController extends Controller
             'brand'     => $p->brand?->name,
         ]);
 
-        // If we have products, generate a response
+        // ALWAYS return products from database - NEVER make up products with AI
         if (!$products->isEmpty()) {
             $reply = $this->generateResponse($products, $extracted);
             return response()->json([
@@ -235,11 +235,9 @@ class ChatbotController extends Controller
             ]);
         }
 
-        // Only if NO products at all, use AI
-        $aiReply = $this->callOllama($message, $this->detectedLanguage);
-        
+        // If still no products, return no products message (no AI fake products)
         return response()->json([
-            'reply'    => $aiReply ?: $this->generateNoResultsMessage($extracted),
+            'reply'    => $this->generateNoResultsMessage($extracted),
             'products' => [],
             'criteria' => $extracted,
             'language' => $this->detectedLanguage,
