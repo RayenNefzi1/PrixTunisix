@@ -60,7 +60,7 @@ export default function ChatbotWidget() {
       <button
         onClick={() => setOpen(v => !v)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all"
-        title="Assistant d'achat"
+        title="Prixy - Assistant shopping"
       >
         {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </button>
@@ -72,8 +72,8 @@ export default function ChatbotWidget() {
           <div className="flex items-center gap-2.5 px-4 py-3.5 bg-brand-600 text-white">
             <Bot className="w-5 h-5" />
             <div>
-              <p className="font-bold text-sm">Assistant PrixTunisix</p>
-              <p className="text-xs text-brand-200">Trouvez le meilleur prix</p>
+              <p className="font-bold text-sm">Prixy</p>
+              <p className="text-xs text-brand-200">Votre assistant shopping</p>
             </div>
           </div>
 
