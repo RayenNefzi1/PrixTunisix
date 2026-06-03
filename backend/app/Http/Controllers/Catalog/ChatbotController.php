@@ -421,12 +421,12 @@ class ChatbotController extends Controller
             });
         }
 
-        if ($criteria['min_price'] || $criteria['max_price']) {
+        if (isset($criteria['min_price']) && $criteria['min_price'] || isset($criteria['max_price']) && $criteria['max_price']) {
             $query->whereHas('offers', function ($q) use ($criteria) {
-                if ($criteria['min_price']) {
+                if (isset($criteria['min_price']) && $criteria['min_price']) {
                     $q->where('price', '>=', $criteria['min_price']);
                 }
-                if ($criteria['max_price']) {
+                if (isset($criteria['max_price']) && $criteria['max_price']) {
                     $q->where('price', '<=', $criteria['max_price']);
                 }
                 $q->where('is_available', true);
