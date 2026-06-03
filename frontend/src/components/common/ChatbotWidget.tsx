@@ -90,19 +90,19 @@ export default function ChatbotWidget() {
 
                   {m.products && m.products.length > 0 && (
                     <div className="mt-2 space-y-1.5">
-                      {m.products.slice(0, 3).map(p => (
+                      <p className="text-xs text-gray-500 mb-1">Cliquez pour voir les détails:</p>
+                      {m.products.slice(0, 5).map(p => (
                         <Link
                           key={p.id}
-                          href={`/products/${p.slug || p.id}`}
-                          className="flex items-center gap-2 bg-white rounded-xl p-2 hover:bg-brand-50 transition"
-                          onClick={() => setOpen(false)}
+                          href={'/products/' + (p.slug || p.id)}
+                          className="flex items-center gap-2 bg-white rounded-xl p-2 hover:bg-brand-50 transition cursor-pointer"
                         >
                           {p.image_url && (
                             <img src={p.image_url} alt={p.name} className="w-10 h-10 object-contain rounded-lg bg-gray-50" />
                           )}
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium text-gray-800 truncate">{p.name}</p>
-                            {p.price && <p className="text-xs text-brand-600 font-bold">{p.price.toFixed(2)} TND</p>}
+                            {p.price !== null && p.price !== undefined && <p className="text-xs text-brand-600 font-bold">{Number(p.price).toFixed(2)} TND</p>}
                           </div>
                         </Link>
                       ))}

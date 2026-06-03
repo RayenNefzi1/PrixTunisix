@@ -591,9 +591,9 @@ class ChatbotController extends Controller
         }
 
         $systemPrompt = match ($language) {
-            'ar' => 'أنت Prixy، مساعد تسوق لموقع PrixTunisix. ساعد المستخدم في إيجاد المنتجات في تونس.Prices are in TND (دينار تونسي). Mention product prices in TND. Keep it short and friendly. If no product found, apologize and suggest alternatives.',
-            'en' => 'You are Prixy, a shopping assistant for PrixTunisix.com. Help users find products in Tunisia. Prices are in TND (Tunisian Dinar). Mention prices with TND. Be concise and friendly. If no product found, apologize and suggest alternatives.',
-            default => 'Tu es Prixy, assistant shopping pour PrixTunisix.com. Tu aides les utilisateurs à trouver des produits en Tunisie. Les prix sont en TND (Dinar Tunisien). Mentionne toujours les prix en TND. Sois concis et amical. Si tu ne trouves pas de produit, excuse-toi et suggère des alternatives.',
+            'ar' => 'أنت Prixy، مساعد تسوق لموقع PrixTunisix.com. ابحث عن المنتجات في Tunisia. افهم طلبات البحث مثل "smartphone entre 400 et 500 dt" يعني بين 400 و 500 دينار. Prices are in TND. Mention prices in TND. If user asks for links, tell them to click the products shown below.',
+            'en' => 'You are Prixy, shopping assistant for PrixTunisix.com. Search products in Tunisia. Understand queries like "smartphone between 400 and 500" means between 400 and 500 TND. Prices in TND. If user asks for links, tell them to click the products shown below.',
+            default => 'Tu es Prixy, assistant shopping pour PrixTunisix.com. Recherche des produits en Tunisie. Comprends les requêtes comme "smartphone entre 400 et 500 dt" signifie entre 400 et 500 TND. Les prix sont en TND. Si l\'utilisateur demande des liens, dis-lui de cliquer sur les produits affichés ci-dessous.',
         };
 
         try {
