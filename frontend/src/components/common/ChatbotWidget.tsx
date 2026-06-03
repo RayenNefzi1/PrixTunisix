@@ -8,7 +8,7 @@ import Link from 'next/link'
 interface Message {
   role: 'user' | 'bot'
   text: string
-  products?: Array<{ id: number; name: string; image_url: string | null; price: number | null }>
+  products?: Array<{ id: number; name: string; slug: string; image_url: string | null; price: number | null }>
 }
 
 export default function ChatbotWidget() {
@@ -93,7 +93,7 @@ export default function ChatbotWidget() {
                       {m.products.slice(0, 3).map(p => (
                         <Link
                           key={p.id}
-                          href={`/products/${p.id}`}
+                          href={`/products/${p.slug || p.id}`}
                           className="flex items-center gap-2 bg-white rounded-xl p-2 hover:bg-brand-50 transition"
                           onClick={() => setOpen(false)}
                         >

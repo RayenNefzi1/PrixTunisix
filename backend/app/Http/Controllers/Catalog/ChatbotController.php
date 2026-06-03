@@ -222,6 +222,7 @@ class ChatbotController extends Controller
                 'products'      => ($showOnlyOne ? $ranked->take(1) : $ranked->take(5))->map(fn($p) => [
                     'id'        => $p['id'],
                     'name'      => $p['name'],
+                    'slug'      => $p['slug'],
                     'image_url' => $p['image_url'],
                     'price'     => $p['lowest_price'],
                     'category'  => $p['category'],
@@ -241,6 +242,7 @@ class ChatbotController extends Controller
             'products' => $products->take(5)->map(fn($p) => [
                 'id'        => $p->id,
                 'name'      => $p->name,
+                'slug'      => $p->slug,
                 'image_url' => $p->image_url,
                 'price'     => $p->lowest_price,
                 'category'  => $p->category?->name,
@@ -443,6 +445,7 @@ class ChatbotController extends Controller
             return [
                 'id'           => $p->id,
                 'name'         => $p->name,
+                'slug'         => $p->slug,
                 'image_url'    => $p->image_url,
                 'lowest_price' => $p->lowest_price,
                 'category'     => $p->category?->name,
@@ -570,9 +573,9 @@ class ChatbotController extends Controller
         }
 
         $systemPrompt = match ($language) {
-            'ar' => 'أنت Prixy، مساعد تسوق ودود. ساعد المستخدم في إيجاد المنتجات في Tunisia. كن مختصرا وودودا. إذا لم تجد منتجا، اعتذر واقترح كلمات بديلة.',
-            'en' => 'You are Prixy, a friendly shopping assistant. Help users find products in Tunisia. Be concise and friendly. If no product found, apologize and suggest alternatives.',
-            default => 'Tu es Prixy, un assistant shopping amical. Aide les utilisateurs à trouver des produits en Tunisie. Sois concis et amical. Si tu ne trouves pas de produit, excuse-toi et suggère des alternatives.',
+            'ar' => 'أنت Prixy، مساعد تسوق لموقع PrixTunisix. ساعد المستخدم في إيجاد المنتجات في تونس.Prices are in TND (دينار تونسي). Mention product prices in TND. Keep it short and friendly. If no product found, apologize and suggest alternatives.',
+            'en' => 'You are Prixy, a shopping assistant for PrixTunisix.com. Help users find products in Tunisia. Prices are in TND (Tunisian Dinar). Mention prices with TND. Be concise and friendly. If no product found, apologize and suggest alternatives.',
+            default => 'Tu es Prixy, assistant shopping pour PrixTunisix.com. Tu aides les utilisateurs à trouver des produits en Tunisie. Les prix sont en TND (Dinar Tunisien). Mentionne toujours les prix en TND. Sois concis et amical. Si tu ne trouves pas de produit, excuse-toi et suggère des alternatives.',
         };
 
         try {
