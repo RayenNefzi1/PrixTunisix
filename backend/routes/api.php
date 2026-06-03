@@ -157,7 +157,7 @@ Route::get('/fix-all-categories', function () {
         // Tablettes (11)
         ['tablette', 11], ['tablet', 11], ['ipad', 11], ['galaxy tab', 11],
         // PC Portables (7)
-        ['laptop', 7], ['pc portable', 7], ['macbook', 7], ['notebook', 7], ['ultrabook', 7], ['chromebook', 7],
+        ['laptop', 7], ['pc portable', 7], ['macbook', 7], ['notebook', 7], ['ultrabook', 7], ['chromebook', 7], ['macbook air', 7], ['macbook pro', 7], ['thinkpad', 7], ['surface', 7], ['ordinnateur portable', 7], ['ordenateur portable', 7],
         // PC Portables Gaming (8)
         ['gaming', 8], ['gamer', 8], ['rog ', 8], ['predator', 8], ['legion', 8], ['tuf', 8],
         // PC Bureau (9)
