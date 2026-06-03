@@ -201,33 +201,49 @@ class ChatbotController extends Controller
         
         \Illuminate\Support\Facades\Log::info('Extracted criteria: ' . json_encode($extracted));
         
+        // ALWAYS search products from database first
         $products  = $this->searchProducts($extracted);
         
         \Illuminate\Support\Facades\Log::info('Found products: ' . $products->count());
 
+        // If no products found with strict criteria, relax the search
         if ($products->isEmpty()) {
-            // Even if no products, try to find related products without strict price filtering
             $relaxedCriteria = $extracted;
             unset($relaxedCriteria['min_price'], $relaxedCriteria['max_price']);
-            $relaxedProducts = $this->searchProducts($relaxedCriteria);
-            
-            $aiReply = $this->callOllama($message, $this->detectedLanguage);
-            
+            $products = $this->searchProducts($relaxedCriteria);
+        }
+        
+        // Build product data for response
+        $productData = $products->take(5)->map(fn($p) => [
+            'id'        => $p->id,
+            'name'      => $p->name,
+            'slug'      => $p->slug,
+            'image_url' => $p->image_url,
+            'price'     => $p->lowest_price,
+            'category'  => $p->category?->name,
+            'brand'     => $p->brand?->name,
+        ]);
+
+        // If we have products, generate a response
+        if (!$products->isEmpty()) {
+            $reply = $this->generateResponse($products, $extracted);
             return response()->json([
-                'reply'    => $aiReply ?: $this->generateNoResultsMessage($extracted),
-                'products' => $relaxedProducts->take(5)->map(fn($p) => [
-                    'id'        => $p->id,
-                    'name'      => $p->name,
-                    'slug'      => $p->slug,
-                    'image_url' => $p->image_url,
-                    'price'     => $p->lowest_price,
-                    'category'  => $p->category?->name,
-                    'brand'     => $p->brand?->name,
-                ]),
+                'reply'    => $reply,
+                'products' => $productData,
                 'criteria' => $extracted,
                 'language' => $this->detectedLanguage,
             ]);
         }
+
+        // Only if NO products at all, use AI
+        $aiReply = $this->callOllama($message, $this->detectedLanguage);
+        
+        return response()->json([
+            'reply'    => $aiReply ?: $this->generateNoResultsMessage($extracted),
+            'products' => [],
+            'criteria' => $extracted,
+            'language' => $this->detectedLanguage,
+        ]);
 
         if ($isComparison) {
             $ranked = $this->rankProducts($products);
@@ -351,24 +367,25 @@ class ChatbotController extends Controller
 
         // Extra number patterns for price
         $extras = [
+            '/entre\s*(\d+)\s*et\s*(\d+)/i',
+            '/entre\s*(\d+)\s*et\s*(\d+)\s*(?:dt|tnd|dinars?)/i',
+            '/(\d+)\s*-\s*(\d+)\s*(?:dt|tnd|dinars?)/i',
+            '/(\d+)\s*(?:à|a)\s*(\d+)/i',
             '/jusqu\'?à?\s*(\d+)/i',
             '/moins\s*de\s*(\d+)/i',
             '/budget\s*(?:de)?\s*(\d+)/i',
             '/under\s*(\d+)/i',
-            '/entre\s*(\d+)\s*et\s*(\d+)/i',
-            '/entre\s*(\d+)\s*et\s*(\d+)\s*(?:dt|tnd|dinars?)/i',
-            '/(\d+)\s*(?:à|a)\s*(\d+)\s*(?:dt|tnd|dinars?)?/i',
-            '/(\d+)\s*-\s*(\d+)\s*(?:dt|tnd|dinars?)/i',
             '/(\d+)\s*(?:dt|tnd|dinars?)/i',
         ];
         foreach ($extras as $p) {
             if (preg_match($p, $message, $m)) {
-                if (count($m) === 3) {
-                    $criteria['min_price'] = $criteria['min_price'] ?? (float) $m[1];
-                    $criteria['max_price'] = $criteria['max_price'] ?? (float) $m[2];
-                } elseif (count($m) === 2 && !$criteria['max_price']) {
+                if (count($m) >= 3) {
+                    $criteria['min_price'] = (float) $m[1];
+                    $criteria['max_price'] = (float) $m[2];
+                } elseif (count($m) === 2) {
                     $criteria['max_price'] = (float) $m[1];
                 }
+                break;
             }
         }
 
