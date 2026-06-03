@@ -7,9 +7,20 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ChatbotController extends Controller
 {
+    private ?string $ollamaUrl = null;
+    private string $ollamaModel = 'llama3.2';
+    private ?string $groqApiKey = null;
+    private string $groqModel = 'llama-3.1-8b-instant';
+
+    public function __construct()
+    {
+        $this->ollamaUrl = env('OLLAMA_API_URL', null);
+        $this->groqApiKey = env('GROQ_API_KEY', null);
+    }
     private array $categoryKeywords = [
         'téléphones' => [
             'téléphone', 'téléphones', 'phone', 'mobile', 'smartphone', 'telephone', 'telephones',
@@ -187,6 +198,13 @@ class ChatbotController extends Controller
         $products  = $this->searchProducts($extracted);
 
         if ($products->isEmpty()) {
+            $aiReply = $this->callOllama($message, $this->detectedLanguage);
+            if ($aiReply) {
+                return response()->json([
+                    'reply'    => $aiReply,
+                    'language' => $this->detectedLanguage,
+                ]);
+            }
             return response()->json([
                 'reply'    => $this->generateNoResultsMessage($extracted),
                 'language' => $this->detectedLanguage,
@@ -494,6 +512,79 @@ class ChatbotController extends Controller
         };
 
         return $response;
+    }
+
+    private function callOllama(string $message, string $language): ?string
+    {
+        // Try Groq first (free, fast, reliable)
+        if ($this->groqApiKey) {
+            $reply = $this->callGroq($message, $language);
+            if ($reply) {
+                return $reply;
+            }
+        }
+
+        // Fallback to Ollama if configured
+        if (!$this->ollamaUrl) {
+            return null;
+        }
+
+        $systemPrompt = match ($language) {
+            'ar' => 'أنت Prixy، مساعد تسوق ودود. ساعد المستخدم في إيجاد المنتجات في Tunisia. كن مختصرا وودودا.',
+            'en' => 'You are Prixy, a friendly shopping assistant. Help users find products in Tunisia. Be concise and friendly.',
+            default => 'Tu es Prixy, un assistant shopping amical. Aide les utilisateurs à trouver des produits en Tunisie. Sois concis et amical.',
+        };
+
+        $prompt = "{$systemPrompt}\n\nUtilisateur: {$message}\nPrixy:";
+
+        try {
+            $response = Http::timeout(30)->post($this->ollamaUrl . '/api/generate', [
+                'model' => $this->ollamaModel,
+                'prompt' => $prompt,
+                'stream' => false,
+            ]);
+
+            if ($response->successful()) {
+                $result = $response->json();
+                return trim($result['response'] ?? '');
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Ollama error: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    private function callGroq(string $message, string $language): ?string
+    {
+        $systemPrompt = match ($language) {
+            'ar' => 'أنت Prixy، مساعد تسوق ودود. ساعد المستخدم في إيجاد المنتجات في Tunisia. كن مختصرا وودودا. إذا لم تجد منتجا، اعتذر واقترح كلمات بديلة.',
+            'en' => 'You are Prixy, a friendly shopping assistant. Help users find products in Tunisia. Be concise and friendly. If no product found, apologize and suggest alternatives.',
+            default => 'Tu es Prixy, un assistant shopping amical. Aide les utilisateurs à trouver des produits en Tunisie. Sois concis et amical. Si tu ne trouves pas de produit, excuse-toi et suggère des alternatives.',
+        };
+
+        try {
+            $response = Http::timeout(30)->post('https://api.groq.com/openai/v1/chat/completions', [
+                'model' => $this->groqModel,
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $message],
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => 200,
+            ], [
+                'Authorization' => 'Bearer ' . $this->groqApiKey,
+            ]);
+
+            if ($response->successful()) {
+                $result = $response->json();
+                return trim($result['choices'][0]['message']['content'] ?? '');
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Groq error: ' . $e->getMessage());
+        }
+
+        return null;
     }
 
     private function generateNoResultsMessage(array $criteria): string
