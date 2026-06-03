@@ -245,6 +245,53 @@ Route::get('/quick-fix-categories', function () {
     return response()->json(['message' => "Fixed {$updated} products (quick fix)"]);
 });
 
+// ── Fix ALL remaining piles, stylos, etc ──────────────────────────────────
+Route::get('/fix-all-office-supplies', function () {
+    $piles = \App\Models\Category::where('slug', 'piles-batteries')->first();
+    $stylos = \App\Models\Category::where('slug', 'stylos-marqueurs')->first();
+    
+    if (!$piles) {
+        return response()->json(['error' => 'Run /create-office-categories first'], 400);
+    }
+    
+    $updated = 0;
+    
+    // Fix all products with "pile" in name
+    $pileProducts = \App\Models\Product::where('is_validated', true)
+        ->where('category_id', 1)
+        ->where('name', 'like', '%pile%')
+        ->orWhere('name', 'like', '%Pile%')
+        ->orWhere('name', 'like', '%PILE%')
+        ->get();
+    
+    foreach ($pileProducts as $product) {
+        $product->category_id = $piles->id;
+        $product->save();
+        $updated++;
+    }
+    
+    // Fix products with "stylo", "marqueur", "stabilo", etc
+    $styloProducts = \App\Models\Product::where('is_validated', true)
+        ->where('category_id', 1)
+        ->where(function($q) {
+            $q->where('name', 'like', '%stylo%')
+              ->orWhere('name', 'like', '%marqueur%')
+              ->orWhere('like', '%stabilo%')
+              ->orWhere('name', 'like', '%surligneur%')
+              ->orWhere('name', 'like', '%crayon%')
+              ->orWhere('name', 'like', '%gomme%');
+        })
+        ->get();
+    
+    foreach ($styloProducts as $product) {
+        $product->category_id = $stylos ? $stylos->id : $piles->id;
+        $product->save();
+        $updated++;
+    }
+    
+    return response()->json(['message' => "Fixed {$updated} office supply products"]);
+});
+
 // ── Fix ALL categorizations ─────────────────────────────────────────────
 Route::get('/fix-categories', function () {
     $categoryMapping = [
