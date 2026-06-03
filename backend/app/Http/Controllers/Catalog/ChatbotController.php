@@ -540,15 +540,19 @@ class ChatbotController extends Controller
 
     private function callOllama(string $message, string $language): ?string
     {
-        // Always try Groq first (free, fast, reliable)
-        \Illuminate\Support\Facades\Log::info('Calling Groq, key length: ' . strlen($this->groqApiKey ?? ''));
+        \Illuminate\Support\Facades\Log::info('=== GROQ CALL START ===');
+        \Illuminate\Support\Facades\Log::info('Groq key length: ' . strlen($this->groqApiKey ?? ''));
         
         if (!empty($this->groqApiKey)) {
+            \Illuminate\Support\Facades\Log::info('Calling Groq API...');
             $reply = $this->callGroq($message, $language);
             if ($reply) {
-                \Illuminate\Support\Facades\Log::info('Groq returned: ' . substr($reply, 0, 100));
+                \Illuminate\Support\Facades\Log::info('Groq success: ' . substr($reply, 0, 100));
                 return $reply;
             }
+            \Illuminate\Support\Facades\Log::info('Groq returned null');
+        } else {
+            \Illuminate\Support\Facades\Log::info('Groq key is empty, skipping');
         }
 
         // Fallback to Ollama if configured
