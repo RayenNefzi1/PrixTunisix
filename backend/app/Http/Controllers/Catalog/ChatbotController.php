@@ -18,10 +18,11 @@ class ChatbotController extends Controller
 
     public function __construct()
     {
-        $this->ollamaUrl = config('services.ollama.url', null) ?: env('OLLAMA_API_URL');
-        $this->groqApiKey = config('services.groq.api_key', null) ?: env('GROQ_API_KEY');
+        // Try multiple ways to get env vars
+        $this->groqApiKey = $_ENV['GROQ_API_KEY'] ?? $_SERVER['GROQ_API_KEY'] ?? getenv('GROQ_API_KEY') ?? '';
+        $this->ollamaUrl = $_ENV['OLLAMA_API_URL'] ?? $_SERVER['OLLAMA_API_URL'] ?? getenv('OLLAMA_API_URL') ?? null;
         
-        \Illuminate\Support\Facades\Log::info('Chatbot init - Groq key present: ' . (!empty($this->groqApiKey) ? 'yes' : 'NO'));
+        \Illuminate\Support\Facades\Log::info('Chatbot init - Groq key status: ' . (strlen($this->groqApiKey) > 0 ? 'present (' . strlen($this->groqApiKey) . ' chars)' : 'MISSING'));
     }
     private array $categoryKeywords = [
         'téléphones' => [

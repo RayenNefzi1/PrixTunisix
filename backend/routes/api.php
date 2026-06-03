@@ -124,6 +124,14 @@ Route::get('marques/{slug}', [MarqueController::class, 'show']);
 // ── Chatbot ───────────────────────────────────────────────────────────────
 Route::post('chatbot', [ChatbotController::class, 'chat']);
 
+Route::get('chatbot-test', function() {
+    $key = getenv('GROQ_API_KEY') ?: $_ENV['GROQ_API_KEY'] ?? 'NOT_FOUND';
+    return response()->json([
+        'groq_key' => strlen($key) > 0 ? 'present (' . strlen($key) . ' chars)' : 'MISSING',
+        'raw_key_first_10' => substr($key, 0, 10) ?? 'null',
+    ]);
+});
+
 // ── Public seed endpoints ──────────────────────────────────────────────
 Route::post('/seed', function () {
     \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
