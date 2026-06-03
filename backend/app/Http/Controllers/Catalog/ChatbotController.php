@@ -18,8 +18,10 @@ class ChatbotController extends Controller
 
     public function __construct()
     {
-        $this->ollamaUrl = config('services.ollama.url', null);
-        $this->groqApiKey = config('services.groq.api_key', null);
+        $this->ollamaUrl = config('services.ollama.url', null) ?: env('OLLAMA_API_URL');
+        $this->groqApiKey = config('services.groq.api_key', null) ?: env('GROQ_API_KEY');
+        
+        \Illuminate\Support\Facades\Log::info('Chatbot init - Groq key present: ' . (!empty($this->groqApiKey) ? 'yes' : 'NO'));
     }
     private array $categoryKeywords = [
         'téléphones' => [
@@ -518,16 +520,20 @@ class ChatbotController extends Controller
 
     private function callOllama(string $message, string $language): ?string
     {
-        // Try Groq first (free, fast, reliable)
-        if ($this->groqApiKey) {
+        // Always try Groq first (free, fast, reliable)
+        \Illuminate\Support\Facades\Log::info('Calling Groq, key length: ' . strlen($this->groqApiKey ?? ''));
+        
+        if (!empty($this->groqApiKey)) {
             $reply = $this->callGroq($message, $language);
             if ($reply) {
+                \Illuminate\Support\Facades\Log::info('Groq returned: ' . substr($reply, 0, 100));
                 return $reply;
             }
         }
 
         // Fallback to Ollama if configured
-        if (!$this->ollamaUrl) {
+        if (empty($this->ollamaUrl)) {
+            \Illuminate\Support\Facades\Log::info('No Ollama URL configured');
             return null;
         }
 
