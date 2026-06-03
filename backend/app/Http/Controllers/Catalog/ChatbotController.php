@@ -564,7 +564,10 @@ class ChatbotController extends Controller
         };
 
         try {
-            $response = Http::timeout(30)->post('https://api.groq.com/openai/v1/chat/completions', [
+            $response = Http::timeout(30)->withHeaders([
+                'Authorization' => 'Bearer ' . $this->groqApiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.groq.com/openai/v1/chat/completions', [
                 'model' => $this->groqModel,
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
@@ -572,8 +575,6 @@ class ChatbotController extends Controller
                 ],
                 'temperature' => 0.7,
                 'max_tokens' => 200,
-            ], [
-                'Authorization' => 'Bearer ' . $this->groqApiKey,
             ]);
 
             if ($response->successful()) {
