@@ -35,6 +35,7 @@ export default function ChatbotWidget() {
     try {
       const res = await api.post('/chatbot', { message: text })
       const data = res.data
+      console.log('Chatbot response:', data)
       setMessages(m => [...m, {
         role: 'bot',
         text: data.reply,
