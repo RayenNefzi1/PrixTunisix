@@ -418,15 +418,10 @@ class ChatbotController extends Controller
 
     private function searchProducts(array $criteria)
     {
-        $query = Product::with(['offers', 'category', 'brand']);
+        $query = Product::with(['offers', 'category', 'brand'])
+            ->where('is_validated', true);
 
-        if ($criteria['category']) {
-            $cat = Category::where('name', 'ilike', '%' . $criteria['category'] . '%')->first();
-            if ($cat) {
-                $query->where('category_id', $cat->id);
-            }
-        }
-
+        // Search by keywords first (most important)
         if (!empty($criteria['keywords'])) {
             $query->where(function ($q) use ($criteria) {
                 foreach ($criteria['keywords'] as $kw) {
@@ -434,6 +429,14 @@ class ChatbotController extends Controller
                       ->orWhere('description', 'ilike', "%{$kw}%");
                 }
             });
+        }
+
+        // Only filter by category if no keywords (fallback)
+        if (empty($criteria['keywords']) && $criteria['category']) {
+            $cat = Category::where('name', 'ilike', '%' . $criteria['category'] . '%')->first();
+            if ($cat) {
+                $query->where('category_id', $cat->id);
+            }
         }
 
         if (isset($criteria['min_price']) && $criteria['min_price'] || isset($criteria['max_price']) && $criteria['max_price']) {

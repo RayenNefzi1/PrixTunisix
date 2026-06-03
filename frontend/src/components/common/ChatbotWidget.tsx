@@ -93,19 +93,21 @@ export default function ChatbotWidget() {
                     <div className="mt-2 space-y-1.5">
                       <p className="text-xs text-gray-500 mb-1">Cliquez pour voir les détails:</p>
                       {m.products.slice(0, 5).map(p => (
-                        <Link
+                        <a
                           key={p.id}
                           href={'/products/' + (p.slug || p.id)}
-                          className="flex items-center gap-2 bg-white rounded-xl p-2 hover:bg-brand-50 transition cursor-pointer"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 bg-white rounded-xl p-2 hover:bg-brand-50 transition cursor-pointer border border-gray-200"
                         >
                           {p.image_url && (
-                            <img src={p.image_url} alt={p.name} className="w-10 h-10 object-contain rounded-lg bg-gray-50" />
+                            <img src={p.image_url} alt={p.name} className="w-12 h-12 object-contain rounded-lg bg-gray-50" />
                           )}
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium text-gray-800 truncate">{p.name}</p>
                             {p.price !== null && p.price !== undefined && <p className="text-xs text-brand-600 font-bold">{Number(p.price).toFixed(2)} TND</p>}
                           </div>
-                        </Link>
+                        </a>
                       ))}
                     </div>
                   )}
