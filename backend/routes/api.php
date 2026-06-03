@@ -145,32 +145,110 @@ Route::get('/create-office-categories', function () {
             ['slug' => $slug],
             ['name' => $name, 'parent_id' => $fournitures->id]
         );
-        $created[] = ['id' => $cat->id, 'name' => $cat->name];
+        $created[] = ['id' => $cat->id, 'name' => $cat->name, 'slug' => $slug];
     }
     
     return response()->json([
-        'message' => 'Office supply categories created',
+        'message' => 'Office supply categories created/verified',
         'parent' => ['id' => $fournitures->id, 'name' => $fournitures->name],
         'children' => $created
     ]);
 });
 
-// ── Fix categorizations ─────────────────────────────────────────────────
+// ── Fix ALL miscategorized office supplies ────────────────────────────────
+Route::get('/fix-office-supplies', function () {
+    $piles = \App\Models\Category::where('slug', 'piles-batteries')->first();
+    $reliures = \App\Models\Category::where('slug', 'reliures-spirales')->first();
+    $papeterie = \App\Models\Category::where('slug', 'papeterie')->first();
+    $stylos = \App\Models\Category::where('slug', 'stylos-marqueurs')->first();
+    $classement = \App\Models\Category::where('slug', 'classement')->first();
+    
+    if (!$piles || !$reliures || !$papeterie) {
+        return response()->json(['error' => 'Run /create-office-categories first'], 400);
+    }
+    
+    $updated = 0;
+    
+    $officeSupplyKeywords = [
+        'piles' => $piles->id,
+        'batterie' => $piles->id,
+        'energizer' => $piles->id,
+        'maxell' => $piles->id,
+        'duracell' => $piles->id,
+        'reliure' => $reliures->id,
+        'spirale' => $reliures->id,
+        'baguette' => $reliures->id,
+        'chemise' => $papeterie->id,
+        'règle' => $papeterie->id,
+        'cd-r' => $papeterie->id,
+        'dvd' => $papeterie->id,
+        'bobine' => $papeterie->id,
+        'stylo' => $stylos->id,
+        'marqueur' => $stylos->id,
+        'crayon' => $stylos->id,
+        'gomme' => $stylos->id,
+        'dossier' => $classement->id,
+        'classeur' => $classement->id,
+        'trieur' => $classement->id,
+    ];
+    
+    $products = \App\Models\Product::where('is_validated', true)
+        ->whereIn('category_id', [1, 18])
+        ->get();
+    
+    foreach ($products as $product) {
+        $name = mb_strtolower($product->name, 'UTF-8');
+        
+        foreach ($officeSupplyKeywords as $keyword => $catId) {
+            if (mb_stripos($name, $keyword) !== false) {
+                $product->category_id = $catId;
+                $product->save();
+                $updated++;
+                break;
+            }
+        }
+    }
+    
+    return response()->json(['message' => "Moved {$updated} products to correct office supply categories"]);
+});
+
+// ── Fix ALL categorizations ─────────────────────────────────────────────
 Route::get('/fix-categories', function () {
     $categoryMapping = [
-        'smartphone' => 10, ' phone ' => 10, ' iphone' => 10, 'samsung galaxy' => 10, 'xiaomi' => 10, 'huawei' => 10, 'oppo' => 10, 'vivo' => 10, 'realme' => 10, 'tecno' => 10, 'itel' => 10,
+        // Smartphones (10)
+        'smartphone' => 10, ' phone ' => 10, ' iphone' => 10, 'samsung galaxy' => 10, 'xiaomi' => 10, 'huawei' => 10, 'oppo' => 10, 'vivo' => 10, 'realme' => 10, 'tecno' => 10, 'itel' => 10, 'redmi' => 10, 'poco' => 10,
+        // Tablettes (11)
         'tablette' => 11, 'tablet' => 11, 'ipad' => 11, 'galaxy tab' => 11,
-        'laptop' => 7, 'pc portable' => 7, 'macbook' => 7, 'notebook' => 7, 'ultrabook' => 7,
-        'gaming' => 8, 'gamer' => 8, 'rog ' => 8, 'predator' => 8, 'legion' => 8,
-        'pc bureau' => 9, 'desktop' => 9, 'tour' => 9,
-        'casque' => 14, 'headphone' => 14, 'écouteur' => 14, 'airpod' => 14, 'speaker' => 14, 'bluetooth' => 14, 'soundbar' => 14, 'home cinema' => 14, 'enceintes' => 14,
-        'écran' => 15, 'moniteur' => 15, 'monitor' => 15,
-        'imprimante' => 17, 'printer' => 17, 'toner' => 17, 'cartouche' => 17,
-        'processeur' => 16, ' cpu ' => 16, 'carte mère' => 16, 'motherboard' => 16, ' ram ' => 16, 'mémoire' => 16, 'disque dur' => 16, ' ssd' => 16, ' hdd' => 16, 'carte graphique' => 16, ' gpu ' => 16, 'rtx' => 16, 'gtx' => 16, 'ventirad' => 16, 'watercooling' => 16, 'alimentation' => 16, 'psu' => 16, 'serveur' => 16, 'rack' => 16, 'synology' => 16,
-        'souris' => 18, 'clavier' => 18, 'keyboard' => 18, 'mouse' => 18, 'webcam' => 18, 'micro' => 18, 'hub' => 18, 'cable' => 18, 'chargeur' => 18, 'disque externe' => 18, 'clé usb' => 18, 'flash disk' => 18, 'sacoche' => 18, 'sac à dos' => 18, 'pochette' => 18, 'protège écran' => 18, 'film de protection' => 18,
-        'appareil photo' => 19, 'camera' => 19, 'caméra' => 19, 'reflex' => 19, 'gopro' => 19, 'polaroid' => 19,
-        'montre' => 12, 'smartwatch' => 12, 'apple watch' => 12, 'galaxy watch' => 12, 'fitbit' => 12,
-        'téléviseur' => 13, 'smart tv' => 13, 'televiseur' => 13, 'oled' => 13, 'qled' => 13,
+        // PC Portables (7)
+        'laptop' => 7, 'pc portable' => 7, 'macbook' => 7, 'notebook' => 7, 'ultrabook' => 7, ' Chromebook' => 7,
+        // PC Portables Gaming (8)
+        'gaming' => 8, 'gamer' => 8, 'rog ' => 8, 'predator' => 8, 'legion' => 8, 'tuf' => 8,
+        // PC Bureau (9)
+        'pc bureau' => 9, 'desktop' => 9, 'tour' => 9, 'all in one' => 9, 'all-in-one' => 9,
+        // Audio & Son (14)
+        'casque' => 14, 'headphone' => 14, 'écouteur' => 14, 'airpod' => 14, 'speaker' => 14, 'bluetooth' => 14, 'soundbar' => 14, 'home cinema' => 14, 'enceintes' => 14, 'soundbar' => 14, 'barre de son' => 14, 'homepod' => 14, 'jbl' => 14, 'bose' => 14, 'sony' => 14,
+        // Ecrans PC (15)
+        'écran' => 15, 'moniteur' => 15, 'monitor' => 15, 'display' => 15,
+        // Imprimantes (17)
+        'imprimante' => 17, 'printer' => 17, 'toner' => 17, 'cartouche' => 17, 'scanner' => 17,
+        // Composants PC (16)
+        'processeur' => 16, ' cpu ' => 16, 'carte mère' => 16, 'motherboard' => 16, ' ram ' => 16, 'mémoire' => 16, 'disque dur' => 16, ' ssd' => 16, ' hdd' => 16, 'carte graphique' => 16, ' gpu ' => 16, 'rtx' => 16, 'gtx' => 16, 'ventirad' => 16, 'watercooling' => 16, 'alimentation' => 16, 'psu' => 16, 'serveur' => 16, 'rack' => 16, 'synology' => 16, 'nas' => 16,
+        // Périphériques (18) - Computer accessories only
+        'souris' => 18, 'clavier' => 18, 'keyboard' => 18, 'mouse' => 18, 'webcam' => 18, 'microphone' => 18, 'hub usb' => 18, 'cable usb' => 18, 'chargeur' => 18, 'disque externe' => 18, 'clé usb' => 18, 'flash disk' => 18, 'sacoche laptop' => 18, 'sac à dos' => 18, 'pochette' => 18, 'protège écran' => 18, 'film de protection' => 18,
+        // Photo & Vidéo (19)
+        'appareil photo' => 19, 'camera' => 19, 'caméra' => 19, 'reflex' => 19, 'gopro' => 19, 'polaroid' => 19, 'drone' => 19,
+        // Smartwatches (12)
+        'montre' => 12, 'smartwatch' => 12, 'apple watch' => 12, 'galaxy watch' => 12, 'fitbit' => 12, 'montre connectée' => 12,
+        // Téléviseurs (13)
+        'téléviseur' => 13, 'smart tv' => 13, 'televiseur' => 13, 'oled' => 13, 'qled' => 13, 'tv led' => 13, 'television' => 13,
+        // Fournitures Bureau (50) - Office supplies
+        'papier' => 54, 'feuille' => 54, 'a4' => 54, 'a5' => 54,
+        'stylo' => 51, 'marqueur' => 51, 'crayon' => 51, 'gomme' => 51, 'stabilo' => 51,
+        'piles' => 52, 'batterie' => 52, 'energizer' => 52, 'maxell' => 52, 'duracell' => 52,
+        'reliure' => 53, 'spirale' => 53, 'baguette' => 53,
+        'chemise' => 54, 'dossier' => 54, 'classeur' => 54, 'trieur' => 54,
+        'règle' => 54, 'cutter' => 54, 'scotch' => 54, 'adhésif' => 54, 'talon' => 54, 'perforateur' => 54, 'agrafes' => 54, 'trombone' => 54,
+        'cd-r' => 54, 'dvd' => 54, 'cd dvd' => 54, 'bobine' => 54,
     ];
     
     $updated = 0;
