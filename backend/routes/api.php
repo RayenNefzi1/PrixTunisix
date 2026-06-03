@@ -220,6 +220,31 @@ Route::get('/fix-all-categories', function () {
     ]);
 });
 
+// ── Quick fix for products still in parent category ────────────────────────
+Route::get('/quick-fix-categories', function () {
+    $updates = [
+        ['name_contains' => 'test', 'category_id' => 7],
+        ['name_contains' => 'macbook', 'category_id' => 7],
+        ['name_contains' => 'air m2', 'category_id' => 7],
+    ];
+    
+    $updated = 0;
+    foreach ($updates as $update) {
+        $products = \App\Models\Product::where('is_validated', true)
+            ->where('category_id', 1)
+            ->where('name', 'like', '%' . $update['name_contains'] . '%')
+            ->get();
+        
+        foreach ($products as $product) {
+            $product->category_id = $update['category_id'];
+            $product->save();
+            $updated++;
+        }
+    }
+    
+    return response()->json(['message' => "Fixed {$updated} products (quick fix)"]);
+});
+
 // ── Fix ALL categorizations ─────────────────────────────────────────────
 Route::get('/fix-categories', function () {
     $categoryMapping = [
