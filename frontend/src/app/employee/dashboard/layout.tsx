@@ -31,6 +31,7 @@ const menuItems = [
 ]
 
 export default function EmployeeLayout({ children }: { children: ReactNode }) {
+  console.log('EmployeeLayout rendered')
   const router = useRouter()
   const pathname = usePathname()
   const [employee, setEmployee] = useState<{ name: string; prename: string } | null>(null)
