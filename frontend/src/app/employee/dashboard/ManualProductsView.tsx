@@ -70,9 +70,13 @@ export default function ManualProductsView() {
   }
 
   const fetchProducts = (requestId: number) => {
+    console.log('fetchProducts called with', requestId)
     setLoadingProducts(true)
     employeeApi.get(`/employee/manual-products/${requestId}`)
-      .then(res => setProducts(res.data.products || []))
+      .then(res => {
+        console.log('Products fetched:', res.data.products?.length || 0)
+        setProducts(res.data.products || [])
+      })
       .catch(console.error)
       .finally(() => setLoadingProducts(false))
   }
@@ -127,6 +131,7 @@ export default function ManualProductsView() {
 
   const handleReject = () => {
     console.log('handleReject called', selectedProduct)
+    alert('handleReject called!') // Add alert to verify function is called
     if (!selectedProduct) return
     setShowRejectModal(true)
     console.log('showRejectModal set to true')
@@ -467,7 +472,7 @@ function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMat
 
           <div className="flex gap-2 pt-4 border-t">
             <button
-              onClick={onReject}
+              onClick={() => { console.log('Reject button clicked'); onReject() }}
               className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
             >
               Rejeter
