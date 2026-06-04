@@ -43,8 +43,6 @@ interface Request {
 }
 
 export default function ManualProductsView() {
-  console.log('ManualProductsView rendered')
-  alert('ManualProductsView loaded!')
   const [requests, setRequests] = useState<Request[]>([])
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [products, setProducts] = useState<ManualProduct[]>([])
@@ -64,23 +62,17 @@ export default function ManualProductsView() {
   }, [])
 
   const fetchRequests = () => {
-    console.log('fetchRequests called')
     setLoading(true)
     employeeApi.get('/employee/manual-product-requests')
-      .then(res => {
-        console.log('Requests fetched:', res.data)
-        setRequests(res.data.requests || [])
-      })
+      .then(res => setRequests(res.data.requests || []))
       .catch(console.error)
       .finally(() => setLoading(false))
   }
 
   const fetchProducts = (requestId: number) => {
-    console.log('fetchProducts called with', requestId)
     setLoadingProducts(true)
     employeeApi.get(`/employee/manual-products/${requestId}`)
       .then(res => {
-        console.log('Products fetched:', res.data.products?.length || 0)
         setProducts(res.data.products || [])
       })
       .catch(console.error)
@@ -136,11 +128,8 @@ export default function ManualProductsView() {
   }
 
   const handleReject = () => {
-    console.log('handleReject called', selectedProduct)
-    alert('handleReject called!') // Add alert to verify function is called
     if (!selectedProduct) return
     setShowRejectModal(true)
-    console.log('showRejectModal set to true')
   }
 
   const openRejectFromModal = () => {
@@ -478,7 +467,7 @@ function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMat
 
           <div className="flex gap-2 pt-4 border-t">
             <button
-              onClick={() => { console.log('Reject button clicked'); onReject() }}
+              onClick={onReject}
               className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
             >
               Rejeter
