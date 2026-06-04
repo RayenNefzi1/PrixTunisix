@@ -120,7 +120,7 @@ export default function ManualProductsView() {
         matched_product_id: selectedMatchId,
         image_url: selectedMatchId ? null : imageUrl,
       })
-      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'approved' } : p))
+      setProducts(products.filter(p => p.id !== selectedProduct.id))
       setSelectedProduct(null)
     } catch (err) {
       console.error(err)
@@ -141,7 +141,7 @@ export default function ManualProductsView() {
     if (!selectedProduct || !rejectReason.trim()) return
     try {
       await employeeApi.post(`/employee/manual-products/${selectedProduct.id}/reject`, { reason: rejectReason })
-      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'rejected', rejection_reason: rejectReason } : p))
+      setProducts(products.filter(p => p.id !== selectedProduct.id))
       setSelectedProduct(null)
       setShowRejectModal(false)
       setRejectReason('')

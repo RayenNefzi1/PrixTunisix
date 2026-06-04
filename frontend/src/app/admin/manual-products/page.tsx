@@ -119,7 +119,7 @@ export default function AdminManualProductsPage() {
         matched_product_id: selectedMatchId,
         image_url: selectedMatchId ? null : imageUrl,
       })
-      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'approved' } : p))
+      setProducts(products.filter(p => p.id !== selectedProduct.id))
       setSelectedProduct(null)
     } catch (err) {
       console.error(err)
@@ -135,7 +135,7 @@ export default function AdminManualProductsPage() {
     if (!selectedProduct || !rejectReason.trim()) return
     try {
       await adminApi.post(`/admin/manual-products/${selectedProduct.id}/reject`, { reason: rejectReason })
-      setProducts(products.map(p => p.id === selectedProduct.id ? { ...p, status: 'rejected', rejection_reason: rejectReason } : p))
+      setProducts(products.filter(p => p.id !== selectedProduct.id))
       setSelectedProduct(null)
       setShowRejectModal(false)
       setRejectReason('')
@@ -231,14 +231,14 @@ export default function AdminManualProductsPage() {
                       {product.status === 'pending' ? (
                         <>
                           <button
-                            onClick={() => handleApprove()}
+                            onClick={() => { setSelectedProduct(product); handleApprove() }}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
                             title="Approuver"
                           >
                             <Check className="w-5 h-5" />
                           </button>
                           <button
-                            onClick={() => handleReject()}
+                            onClick={() => { setSelectedProduct(product); handleReject() }}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                             title="Rejeter"
                           >
