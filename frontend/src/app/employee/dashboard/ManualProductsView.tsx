@@ -44,6 +44,7 @@ interface Request {
 
 export default function ManualProductsView() {
   console.log('ManualProductsView rendered')
+  alert('ManualProductsView loaded!')
   const [requests, setRequests] = useState<Request[]>([])
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [products, setProducts] = useState<ManualProduct[]>([])
