@@ -321,13 +321,15 @@ class AdminController extends Controller
             ]);
 
             // Create initial offer with the manual product price
+            $fournisseur = $manualProduct->fournisseur;
             Offer::create([
                 'product_id' => $product->id,
                 'fournisseur_id' => $manualProduct->fournisseur_id,
+                'merchant_website_id' => $fournisseur?->merchant_website_id,
                 'raw_title' => $manualProduct->name,
                 'price' => $manualProduct->price,
                 'is_available' => true,
-                'merchant_url' => $manualProduct->fournisseur?->merchant_url ?? '',
+                'merchant_url' => $fournisseur?->merchant_url ?? '',
             ]);
         }
 
