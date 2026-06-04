@@ -125,7 +125,14 @@ export default function ManualProductsView() {
     }
   }
 
-  const handleReject = async () => {
+  const handleReject = () => {
+    console.log('handleReject called', selectedProduct)
+    if (!selectedProduct) return
+    setShowRejectModal(true)
+    console.log('showRejectModal set to true')
+  }
+
+  const openRejectFromModal = () => {
     if (!selectedProduct) return
     setShowRejectModal(true)
   }
