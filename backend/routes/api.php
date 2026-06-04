@@ -259,9 +259,11 @@ Route::get('/fix-all-office-supplies', function () {
     // Fix all products with "pile" in name
     $pileProducts = \App\Models\Product::where('is_validated', true)
         ->where('category_id', 1)
-        ->where('name', 'like', '%pile%')
-        ->orWhere('name', 'like', '%Pile%')
-        ->orWhere('name', 'like', '%PILE%')
+        ->where(function($q) {
+            $q->where('name', 'like', '%pile%')
+              ->orWhere('name', 'like', '%Pile%')
+              ->orWhere('name', 'like', '%PILE%');
+        })
         ->get();
     
     foreach ($pileProducts as $product) {
