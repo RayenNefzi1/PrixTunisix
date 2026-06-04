@@ -26,21 +26,20 @@ class AdminController extends Controller
         
         // Products by category for pie chart - include all categories
         $allCategories = \App\Models\Category::whereNotNull('parent_id')
-            ->withCount(['products' => function($q) {
-                $q->where('is_validated', true);
-            }])
-            ->having('products_count', '>', 0)
+            ->withCount('products')
             ->orderByDesc('products_count')
             ->limit(8)
             ->get()
             ->map(function($cat) use ($productsCount) {
+                $count = $cat->products_count;
                 return [
                     'id' => $cat->id,
                     'name' => $cat->name,
-                    'count' => $cat->products_count,
-                    'percentage' => $productsCount > 0 ? round(($cat->products_count / $productsCount) * 100, 1) : 0
+                    'count' => $count,
+                    'percentage' => $productsCount > 0 && $count > 0 ? round(($count / $productsCount) * 100, 1) : 0
                 ];
-            });
+            })
+            ->filter(fn($c) => $c['count'] > 0);
 
         // Recent products
         $recentProducts = Product::where('is_validated', true)
