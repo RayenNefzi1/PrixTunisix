@@ -276,7 +276,7 @@ Route::get('/fix-all-office-supplies', function () {
         ->where(function($q) {
             $q->where('name', 'like', '%stylo%')
               ->orWhere('name', 'like', '%marqueur%')
-              ->orWhere('like', '%stabilo%')
+              ->orWhere('name', 'like', '%stabilo%')
               ->orWhere('name', 'like', '%surligneur%')
               ->orWhere('name', 'like', '%crayon%')
               ->orWhere('name', 'like', '%gomme%');
