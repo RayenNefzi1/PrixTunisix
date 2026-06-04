@@ -69,6 +69,20 @@ class AdminController extends Controller
                 ];
             });
 
+        // Products added over time (last 30 days)
+        $productsOverTime = Product::where('is_validated', true)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'date' => $item->date,
+                    'count' => (int) $item->count,
+                ];
+            });
+
         $stats = [
             'total_products' => $productsCount,
             'total_categories' => $categoriesCount,
@@ -76,6 +90,7 @@ class AdminController extends Controller
             'active_alerts' => PriceAlert::whereNull('triggered_at')->count(),
             'total_offers' => Offer::count(),
             'products_by_category' => $allCategories,
+            'products_over_time' => $productsOverTime,
             'recent_products' => $recentProducts,
             'top_brands' => $topBrands,
             'total_users' => User::count(),
