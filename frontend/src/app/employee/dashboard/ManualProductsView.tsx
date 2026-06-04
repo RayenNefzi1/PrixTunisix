@@ -43,6 +43,7 @@ interface Request {
 }
 
 export default function ManualProductsView() {
+  console.log('ManualProductsView rendered')
   const [requests, setRequests] = useState<Request[]>([])
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [products, setProducts] = useState<ManualProduct[]>([])
@@ -62,9 +63,13 @@ export default function ManualProductsView() {
   }, [])
 
   const fetchRequests = () => {
+    console.log('fetchRequests called')
     setLoading(true)
     employeeApi.get('/employee/manual-product-requests')
-      .then(res => setRequests(res.data.requests || []))
+      .then(res => {
+        console.log('Requests fetched:', res.data)
+        setRequests(res.data.requests || [])
+      })
       .catch(console.error)
       .finally(() => setLoading(false))
   }
