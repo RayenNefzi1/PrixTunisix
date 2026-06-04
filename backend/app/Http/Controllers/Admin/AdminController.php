@@ -24,21 +24,23 @@ class AdminController extends Controller
         $categoriesCount = \App\Models\Category::whereNull('parent_id')->count();
         $brandsCount = \App\Models\Brand::count();
         
-        // Products by category for pie chart
-        $rootCategories = \App\Models\Category::whereNull('parent_id')
-            ->with(['products' => function($q) {
+        // Products by category for pie chart - include all categories
+        $allCategories = \App\Models\Category::whereNotNull('parent_id')
+            ->withCount(['products' => function($q) {
                 $q->where('is_validated', true);
             }])
+            ->having('products_count', '>', 0)
+            ->orderByDesc('products_count')
+            ->limit(8)
             ->get()
             ->map(function($cat) use ($productsCount) {
                 return [
+                    'id' => $cat->id,
                     'name' => $cat->name,
-                    'count' => $cat->products->count(),
-                    'percentage' => $productsCount > 0 ? round(($cat->products->count() / $productsCount) * 100, 1) : 0
+                    'count' => $cat->products_count,
+                    'percentage' => $productsCount > 0 ? round(($cat->products_count / $productsCount) * 100, 1) : 0
                 ];
-            })
-            ->filter(fn($c) => $c['count'] > 0)
-            ->take(6);
+            });
 
         // Recent products
         $recentProducts = Product::where('is_validated', true)
@@ -74,7 +76,7 @@ class AdminController extends Controller
             'total_brands' => $brandsCount,
             'active_alerts' => PriceAlert::whereNull('triggered_at')->count(),
             'total_offers' => Offer::count(),
-            'products_by_category' => $rootCategories,
+            'products_by_category' => $allCategories,
             'recent_products' => $recentProducts,
             'top_brands' => $topBrands,
             'total_users' => User::count(),
