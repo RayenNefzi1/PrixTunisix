@@ -266,7 +266,12 @@ class AdminController extends Controller
 
     public function getManualProductRequests(): JsonResponse
     {
-        $requests = \App\Models\ManualProductRequest::with('fournisseur', 'products')
+        $requests = \App\Models\ManualProductRequest::with(['fournisseur', 'products' => function($q) {
+                $q->where('status', 'pending');
+            }])
+            ->whereHas('products', function($q) {
+                $q->where('status', 'pending');
+            })
             ->orderByDesc('created_at')
             ->get();
         return response()->json(['requests' => $requests]);
@@ -285,6 +290,7 @@ class AdminController extends Controller
     public function getManualProducts($requestId): JsonResponse
     {
         $products = \App\Models\ManualProduct::where('request_id', $requestId)
+            ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
             ->get();
         return response()->json(['products' => $products]);

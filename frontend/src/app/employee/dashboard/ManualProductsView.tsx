@@ -295,6 +295,51 @@ export default function ManualProductsView() {
 }
 
 function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMatchMode, searchSuggestions, suggestions, selectedMatchId, setSelectedMatchId, imageUrl, setImageUrl, loadingSuggestions, showRejectModal, setShowRejectModal, rejectReason, setRejectReason, confirmReject }: any) {
+  // Show reject modal first if open
+  if (showRejectModal) {
+    return createPortal(
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+              <X className="w-6 h-6 text-red-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Rejeter le produit</h3>
+              <p className="text-sm text-gray-500">Veuillez fournir la raison du rejet</p>
+            </div>
+          </div>
+
+          <textarea
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            placeholder="Expliquez pourquoi ce produit est rejeté..."
+            className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            rows={4}
+            autoFocus
+          />
+
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => { setShowRejectModal(false); setRejectReason('') }}
+              className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-medium"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={confirmReject}
+              disabled={!rejectReason.trim()}
+              className="flex-1 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Confirmer le rejet
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    )
+  }
+
   return createPortal(
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center" style={{ zIndex: 999999 }}>
       <div className="bg-white rounded-xl w-full max-w-2xl p-6 max-h-[80vh] overflow-y-auto">
@@ -439,50 +484,6 @@ function ProductModal({ product, onClose, onApprove, onReject, matchMode, setMat
     </div>,
     document.body
   )
-
-  if (showRejectModal) {
-    return createPortal(
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-              <X className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">Rejeter le produit</h3>
-              <p className="text-sm text-gray-500">Veuillez fournir la raison du rejet</p>
-            </div>
-          </div>
-
-          <textarea
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Expliquez pourquoi ce produit est rejeté..."
-            className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            rows={4}
-            autoFocus
-          />
-
-          <div className="flex gap-3 mt-6">
-            <button
-              onClick={() => { setShowRejectModal(false); setRejectReason('') }}
-              className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-medium"
-            >
-              Annuler
-            </button>
-            <button
-              onClick={confirmReject}
-              disabled={!rejectReason.trim()}
-              className="flex-1 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Confirmer le rejet
-            </button>
-          </div>
-        </div>
-      </div>,
-      document.body
-    )
-  }
 
   return null
 }
