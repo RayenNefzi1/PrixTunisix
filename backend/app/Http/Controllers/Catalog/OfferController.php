@@ -82,4 +82,33 @@ class OfferController extends Controller
         
         return redirect($offer->merchant_url);
     }
+
+    /**
+     * GET /offers/{offer}/merchant-phone — Get merchant phone for manual products
+     */
+    public function merchantPhone(Offer $offer): JsonResponse
+    {
+        // Check if it's a manual product (has fournisseur but no merchant_website)
+        $fournisseur = $offer->fournisseur;
+        
+        if (!$fournisseur || $offer->merchant_website_id) {
+            // Not a manual product - redirect normally
+            return response()->json([
+                'url' => $offer->merchant_url,
+            ]);
+        }
+
+        // Log click for manual product
+        RedirectClick::create([
+            'offer_id' => $offer->id,
+            'user_id' => null,
+            'ip_address' => request()->ip(),
+            'clicked_at' => now(),
+        ]);
+
+        return response()->json([
+            'phone' => $fournisseur->company_phone,
+            'name' => $fournisseur->company_name,
+        ]);
+    }
 }

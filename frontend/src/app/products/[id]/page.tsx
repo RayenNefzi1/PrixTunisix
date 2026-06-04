@@ -7,7 +7,7 @@ import api from '@/lib/api'
 import { isLoggedIn } from '@/lib/auth'
 import PriceHistoryChart from '@/components/product/PriceHistoryChart'
 import LoginModal from '@/components/common/LoginModal'
-import { Heart, Bell, ExternalLink, ChevronRight, Star, Package, Tag, ArrowLeft, TrendingDown, CheckCircle } from 'lucide-react'
+import { Heart, Bell, ExternalLink, ChevronRight, Star, Package, Tag, ArrowLeft, TrendingDown, CheckCircle, Phone, X } from 'lucide-react'
 
 interface Offer {
   id: number
@@ -39,6 +39,9 @@ export default function ProductDetailPage() {
   const [liked, setLiked]     = useState(false)
   const [alertSet, setAlertSet] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showPhoneModal, setShowPhoneModal] = useState(false)
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null)
+  const [merchantPhone, setMerchantPhone] = useState<string | null>(null)
 
   useEffect(() => {
     api.get(`/products/${id}`)
@@ -242,6 +245,28 @@ export default function ProductDetailPage() {
                             </p>
                           </div>
                           <button onClick={async () => {
+                            // Check if it's a manual product (has fournisseur but no merchant_website)
+                            const isManualProduct = !offer.merchant_website && offer.raw_title;
+                            
+                            if (isManualProduct) {
+                              // Show phone modal for manual products
+                              try {
+                                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+                                const res = await fetch(`${apiUrl}/offers/${offer.id}/merchant-phone`, { credentials: 'include' });
+                                const data = await res.json();
+                                if (data.phone) {
+                                  setMerchantPhone(data.phone)
+                                  setSelectedOffer(offer)
+                                  setShowPhoneModal(true)
+                                } else if (data.url) {
+                                  window.location.href = data.url;
+                                }
+                              } catch (e) {
+                                console.error(e);
+                              }
+                              return;
+                            }
+                            
                             try {
                               const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
                               const res = await fetch(`${apiUrl}/offers/${offer.id}/redirect`, { credentials: 'include' });
@@ -263,6 +288,29 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Phone Modal for Manual Products */}
+      {showPhoneModal && merchantPhone && selectedOffer && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setShowPhoneModal(false)}>
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowPhoneModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+              <X className="w-5 h-5" />
+            </button>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="w-8 h-8 text-brand-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Contact pour livraison</h3>
+              <p className="text-gray-500 text-sm mb-4">Appelez pour commander et bénéficier de la livraison</p>
+              <a href={`tel:${merchantPhone}`} className="text-2xl font-bold text-brand-600 hover:text-brand-700">{merchantPhone}</a>
+              <p className="text-xs text-gray-400 mt-2">{selectedOffer.merchant_website?.name || 'Fournisseur'}</p>
+              <a href={`tel:${merchantPhone}`} className="mt-6 w-full py-3 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 flex items-center justify-center gap-2">
+                <Phone className="w-4 h-4" /> Appeler
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

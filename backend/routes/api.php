@@ -112,6 +112,7 @@ Route::get('search/filters',     [SearchController::class, 'filters']);
 Route::get('offers/{offer}/price-history', [OfferController::class, 'priceHistory']);
 Route::get('offers/{offer}/redirect', [OfferController::class, 'redirect']);
 Route::get('offers/{offer}/go', [OfferController::class, 'go']);
+Route::get('offers/{offer}/merchant-phone', [OfferController::class, 'merchantPhone']);
 
 // ── Boutiques (merchant storefronts) ──────────────────────────────────────
 Route::get('boutiques',        [BoutiqueController::class, 'index']);
