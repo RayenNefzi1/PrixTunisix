@@ -294,6 +294,21 @@ Route::get('/fix-all-office-supplies', function () {
     return response()->json(['message' => "Fixed {$updated} office supply products"]);
 });
 
+Route::get('/fix-surligneur-products', function () {
+    $styloCategory = \App\Models\Category::where('slug', 'stylos-marqueurs')->first();
+    
+    $products = \App\Models\Product::whereIn('id', [798, 799, 800])->get();
+    $updated = 0;
+    
+    foreach ($products as $product) {
+        $product->category_id = $styloCategory->id;
+        $product->save();
+        $updated++;
+    }
+    
+    return response()->json(['message' => "Fixed {$updated} surligneur products", 'category_id' => $styloCategory->id]);
+});
+
 // ── Fix ALL categorizations ─────────────────────────────────────────────
 Route::get('/fix-categories', function () {
     $categoryMapping = [
