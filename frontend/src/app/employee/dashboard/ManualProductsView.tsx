@@ -242,14 +242,14 @@ export default function ManualProductsView() {
                       {product.status === 'pending' ? (
                         <>
                           <button
-                            onClick={() => handleApprove()}
+                            onClick={() => { setSelectedProduct(product); handleApprove() }}
                             className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
                             title="Approuver"
                           >
                             <Check className="w-5 h-5" />
                           </button>
                           <button
-                            onClick={handleReject}
+                            onClick={() => { setSelectedProduct(product); handleReject() }}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                             title="Rejeter"
                           >
