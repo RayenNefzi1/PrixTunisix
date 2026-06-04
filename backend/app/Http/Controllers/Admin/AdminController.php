@@ -301,11 +301,11 @@ class AdminController extends Controller
             'reviewed_at' => now(),
         ]);
 
-        $subscription = $manualProduct->fournisseur->subscription;
+        $subscription = $manualProduct->fournisseur?->subscription;
         
         if ($matchProductId) {
             // Link to existing product - no new product created
-        } elseif ($subscription && $subscription->plan === 'premium_manual') {
+        } elseif ($manualProduct->fournisseur && $subscription && $subscription->plan === 'premium_manual') {
             // Create new product with manual data
             $slug = \Illuminate\Support\Str::slug($manualProduct->name) . '-' . uniqid();
             $product = Product::create([
@@ -327,7 +327,7 @@ class AdminController extends Controller
                 'raw_title' => $manualProduct->name,
                 'price' => $manualProduct->price,
                 'is_available' => true,
-                'merchant_url' => $manualProduct->fournisseur->merchant_url ?? '',
+                'merchant_url' => $manualProduct->fournisseur?->merchant_url ?? '',
             ]);
         }
 
